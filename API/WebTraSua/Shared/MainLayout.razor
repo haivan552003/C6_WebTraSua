@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @using WebTraSua.Pages
+@inject IJSRuntime jsRuntime
+@inject NavigationManager nv
+
 
 <nav class="navbar navbar-expand-lg fixed-top bg-white">
     <div class="container" id="nav">
@@ -44,9 +47,32 @@
                     </a>
                 </div>
                 <div class="col-md-4">
-                    <a class="nav-hover nav-link text-black fs-16 fw-medium" href="user.html">
-                        <i class="me-3 fa-regular fa-user"></i>
-                    </a>
+                    <div class="dropdown">
+                        <a class="nav-link text-black fs-16 fw-medium dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            @if (IsLoggedIn)
+                            {
+                                <span>Hi, @UserName</span>
+                            }
+                            else
+                            {
+                                <i class="me-3 fa-regular fa-user"></i>
+                            }
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            @if (IsLoggedIn)
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="#" @onclick="Logout">Đăng xuất</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="/login">Đăng nhập</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <a class="nav-hover nav-link text-black fs-16 fw-medium" href="cart.html">
@@ -131,9 +157,14 @@
 
     public IEnumerable<Blog> blog { get; set; } = Enumerable.Empty<Blog>();
 
+    //session
+    private bool IsLoggedIn = false;
+    private string UserName = "Người dùng";
+
     protected async override Task OnInitializedAsync()
     {
         await Get();
+        await GetSession();
     }
 
     async Task Get()
@@ -153,5 +184,27 @@
                 blog = JsonConvert.DeserializeObject<List<Blog>>(apiResponse).OrderByDescending(b => b.Id).Take(5);
             }
         }
+    }
+
+     async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                UserName = userInfo.UserName;
+            }
+        }
+    }
+
+    private async Task Logout()
+    {
+        await jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "userSession");
+        IsLoggedIn = false;
+        UserName = "Người dùng";
+        nv.NavigateTo("/");
     }
 }
