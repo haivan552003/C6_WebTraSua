@@ -41,10 +41,18 @@
                     </a>
                 </div>
                 <div class="col-md-4">
-                    <a class="nav-hover nav-link text-black fs-16 fw-medium" href="user.html">
-                        <i class="me-3 fa-regular fa-user"></i>
-                    </a>
+                    <div class="dropdown">
+                        <p class="nav-hover nav-link text-black fs-16 fw-medium dropdown-toggle" id="userDropdown" role="button">
+                            <i class="me-3 fa-regular fa-user"></i>
+                        </p>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </div>
                 </div>
+
                 <div class="col-md-4">
                     <a class="nav-hover nav-link text-black fs-16 fw-medium" href="cart.html">
                         <i class="me-3 fa-solid fa-cart-shopping"></i>
