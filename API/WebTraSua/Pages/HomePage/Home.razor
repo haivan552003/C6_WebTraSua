@@ -1,42 +1,31 @@
 ﻿@page "/"
-<PageTitle>QUÁN TRÀ SỮA 5 CHÚ MÈO CON - TRANG CHỦ</PageTitle>
-
 <header>
-    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-                    aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                    aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                    aria-label="Slide 3"></button>
-        </div>
+    <div id="carouselExampleIndicators" class="carousel slide">
         <div class="carousel-inner">
             @foreach (Banner item in banner)
             {
-                <div class="carousel-item active">
+                <div class="carousel-item @(item == banner.First() ? "active" : "")">
                     <img src="@item.Image"
-                         class="d-block w-100" style="height: 700px;" alt="...">
+                         class="d-block w-100" style="height: 630px; object-fit: cover;" alt="@item.Title">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>@item.Title</h5>
                     </div>
                 </div>
             }
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-                data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-                data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
         </button>
     </div>
+
 </header>
 <div class="row mt-96">
-    <div class="col-md-6">
+    <div class="col-md-6 img_col6">
         <img src="https://th.bing.com/th/id/R.df17bccbb4546f0e6e78655c1b243f87?rik=WTz3IegmLfcYbw&pid=ImgRaw&r=0"
              class="img-fluid" alt="">
     </div>
@@ -44,41 +33,43 @@
         <div class="p-5">
             @foreach (Blog item in blogLast)
             {
-                <p class="fs-36 fw-bold ellipsis">@item.Title</p>
+                <a class="fs-36 fw-bold ellipsis">@item.Title</a>
                 <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
-                   @item.Decription
+                    @item.Decription
                 </p>
                 <div class="btn btn-black mt-30" style="width: 270px;">XEM SẢN PHẨM</div>
             }
         </div>
     </div>
 </div>
+
 <div class="d-flex flex-wrap pt-48 pb-48 bg-F4F4F4 mt-96">
-    <div class="col-md-3">
+    <div class="col-md-3 animate-wave">
         <p class="text-center">
             <i class="fa-solid fa-mug-saucer"></i>
             100+ TRÀ SỮA NGON
         </p>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 animate-wave">
         <p class="text-center">
             <i class="fa-solid fa-certificate"></i>
             CHỨNG NHẬN AN TOÀN THỰC PHẨM
         </p>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 animate-wave">
         <p class="text-center">
             <i class="fa-solid fa-truck"></i>
             MIỄN PHÍ VẬN CHUYỂN
         </p>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 animate-wave">
         <p class="text-center">
             <i class="fa-solid fa-tag"></i>
             DANH MỤC ĐA DẠNG
         </p>
     </div>
 </div>
+
 <div class="mt-96 col-md-10 mx-auto">
     <h2 class="text-center">Danh Mục Sản Phẩm Của Chúng Tôi</h2>
     <div class="row">
@@ -211,18 +202,19 @@
             {
                 <div class="col-md-6">
                     <div class="row">
-                        <div class="col-md-6 pe-2">
+                        <div class="col-md-6 pe-2 img_col6">
                             <img src="@item.Image"
                                  alt="" class="img-fluid w-100" style="height:300px">
                         </div>
                         <div class="col-md-6 pe-2">
-                            <p class="fs-22 ellipsis">
+                            <a class="fs-22 ellipsis">
                                 @item.Title
-                            </p>
+                            </a>
                             <p class="block-ellipsis color-1C1B1F">
                                 @item.Decription
                             </p>
                         </div>
+
                     </div>
                 </div>
             }
@@ -246,12 +238,34 @@
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
 </div>
+
+<div class="d-flex justify-content-evenly pt-48 pb-48 bg-light mt-96 fw-bold">
+    <div class="voucher">
+        <p class="text-center">
+            <i class="fa-solid fa-percent"></i>
+            VOUCHER 10% GIẢM GIÁ
+        </p>
+    </div>
+    <div class="voucher">
+        <p class="text-center">
+            <i class="fa-solid fa-truck"></i>
+            VOUCHER MIỄN PHÍ GIAO HÀNG
+        </p>
+    </div>
+    <div class="voucher">
+        <p class="text-center">
+            <i class="fa-solid fa-splotch"></i>
+            VOUCHER GIẢM GIÁ ĐẶC BIỆT
+        </p>
+    </div>
+</div>
+
 <div class="row mt-96">
     @foreach (Blog item in blogLast)
     {
         <div class="col-md-6 mx-auto d-flex align-items-center">
             <div class="p-5">
-                <p class="fs-36 fw-bold ellipsis">@item.Title</p>
+                <a class="fs-36 fw-bold ellipsis">@item.Title</a>
 
                 <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
                     @item.Decription
@@ -260,7 +274,7 @@
                 <div class="btn btn-outline-black mt-30" style="width: 360px;">MUA TRÀ SỮA</div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 img_col6">
             <img src="@item.Image"
                  class="img-fluid" alt="">
         </div>

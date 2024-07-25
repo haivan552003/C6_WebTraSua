@@ -15,11 +15,17 @@
                 <div class="input-box">
                     <InputText @bind-Value="userData.UserName" placeholder="Tên đăng nhập" />
                     <i class='bx bxs-user'></i>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>userData.UserName"></ValidationMessage>
+                    </div>
                 </div>
                 <div class="input-box">
                     <InputText @bind-Value="userData.PassWord" type="password" placeholder="Mật khẩu" />
                     <div id="eye">
                         <i class='bx bx-low-vision'></i>
+                        <div class="text-danger ps-3">
+                            <ValidationMessage For="()=>userData.PassWord"></ValidationMessage>
+                        </div>
                     </div>
                 </div>
 
@@ -33,8 +39,7 @@
                 <div class="register-link">
                     <p>Không có tài khoản? <a href="#">Đăng ký</a></p>
                 </div>
-
-                <p class="text-danger mx-auto p-2">@FormSubmitMessage</p>
+                <p class="text-danger text-center p-2">@FormSubmitMessage</p>
             </EditForm>
         </div>
     </main>
@@ -62,7 +67,7 @@
                 var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
                 var userInfo = JsonConvert.DeserializeObject<User>(userInfoJson);
 
-                if (userInfo != null && userInfo.RoleID == 2) // Kiểm tra role hợp lệ
+                if (userInfo != null && userInfo.RoleID == 2)
                 {
                     var jsonContent = JsonConvert.SerializeObject(userData);
                     StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -91,7 +96,7 @@
                 }
                 else
                 {
-                    FormSubmitMessage = "Role không hợp lệ";
+                    FormSubmitMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
                 }
             }
             else
@@ -101,5 +106,5 @@
         }
     }
 
-    public void HandleInvalidSubmit() => FormSubmitMessage = "Thông tin không hợp lệ";
+    public void HandleInvalidSubmit() => FormSubmitMessage = null;
 }
