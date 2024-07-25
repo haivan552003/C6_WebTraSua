@@ -1,0 +1,40 @@
+﻿@page "/get"
+@inject NavigationManager nv;
+
+<PageTitle>get role</PageTitle>
+<h3>Get</h3>
+
+<table>
+    <tr>
+        <th>Name</th>
+    </tr>
+    @foreach (Roles roles in Roless)
+    {
+        <tr>
+            <td>@roles.Name</td>
+        </tr>
+    }
+</table>
+
+@code {
+    string url = "http://localhost:20714/api/Roles";
+
+    public IEnumerable<Roles> Roless { get; set; } = Enumerable.Empty<Roles>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                Roless = JsonConvert.DeserializeObject<List<Roles>>(apiResponse);
+            }
+        }
+    }
+}

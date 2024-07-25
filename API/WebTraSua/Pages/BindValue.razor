@@ -1,0 +1,55 @@
+﻿@page "/bind"
+
+<h3>Event Binding Example</h3>
+
+<div>
+    <label>Bind on Input (default):</label>
+    <input @bind-Value="inputValue" @bind-Value:event="oninput" />
+    <p>Value: @inputValue</p>
+</div>
+
+<div>
+    <label>Bind on Change:</label>
+    <input @bind-Value="changeValue" @bind-Value:event="onchange" />
+    <p>Value: @changeValue</p>
+</div>
+
+<div>
+    <label>Bind on Blur:</label>
+    <input @bind-Value="blurValue" @bind-Value:event="onblur" />
+    <p>Value: @blurValue</p>
+</div>
+
+<div>
+    <label>Bind on Key Up:</label>
+    <input @bind-Value="keyupValue" @bind-Value:event="onkeyup" />
+    <p>Value: @keyupValue</p>
+</div>
+
+<div>
+    <label>Bind on Key Down:</label>
+    <input @bind-Value="keydownValue" @bind-Value:event="onkeydown" />
+    <p>Value: @keydownValue</p>
+</div>
+
+<div>
+    <label>Bind on Mouse Up:</label>
+    <input @bind-Value="mouseupValue" @bind-Value:event="onmouseup" />
+    <p>Value: @mouseupValue</p>
+</div>
+
+<div>
+    <label>Bind on Mouse Down:</label>
+    <input @bind-Value="mousedownValue" @bind-Value:event="onmousedown" />
+    <p>Value: @mousedownValue</p>
+</div>
+
+@code {
+    private string inputValue { get; set; }
+    private string changeValue { get; set; }
+    private string blurValue { get; set; }
+    private string keyupValue { get; set; }
+    private string keydownValue { get; set; }
+    private string mouseupValue { get; set; }
+    private string mousedownValue { get; set; }
+}
