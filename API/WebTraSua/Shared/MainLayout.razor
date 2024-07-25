@@ -5,7 +5,7 @@
 
 
 <nav class="navbar navbar-expand-lg fixed-top bg-white">
-    <div class="container" id="nav">
+    <div class="container" id="menu">
         <div class="col-md-4">
             <div>
                 <img src="logo.png" alt="" class="mb-3" style="width: 36px; height: 36px;">
@@ -41,21 +41,21 @@
         </div>
         <div class="col-md-3 mt-3">
             <ul class="float-end row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <a class="nav-hover nav-link text-black fs-16 fw-medium">
                         <i class="me-3 fa-solid fa-magnifying-glass"></i>
                     </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8">
                     <div class="dropdown">
-                        <a class="nav-link text-black fs-16 fw-medium dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link text-black text-center fs-16 fw-medium dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             @if (IsLoggedIn)
                             {
-                                <span>Hi, @UserName</span>
+                                <span class="fw-semibold">Hi, @UserName</span>
                             }
                             else
                             {
-                                <i class="me-3 fa-regular fa-user"></i>
+                                <i class="fa-regular fa-user"></i>
                             }
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="userDropdown">
@@ -74,7 +74,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <a class="nav-hover nav-link text-black fs-16 fw-medium" href="cart.html">
                         <i class="me-3 fa-solid fa-cart-shopping"></i>
                     </a>
@@ -159,12 +159,21 @@
 
     //session
     private bool IsLoggedIn = false;
-    private string UserName = "Người dùng";
+    private string UserName = null;
 
     protected async override Task OnInitializedAsync()
     {
         await Get();
         await GetSession();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+            StateHasChanged(); // Cập nhật lại UI
+        }
     }
 
     async Task Get()
@@ -186,7 +195,7 @@
         }
     }
 
-     async Task GetSession()
+    async Task GetSession()
     {
         var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
         if (!string.IsNullOrEmpty(userInfoJson))
@@ -204,7 +213,7 @@
     {
         await jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "userSession");
         IsLoggedIn = false;
-        UserName = "Người dùng";
+        UserName = null;
         nv.NavigateTo("/");
     }
 }
