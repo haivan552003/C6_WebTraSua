@@ -9,22 +9,32 @@
     <main>
         <div class="wrapper">
             <EditForm Model="registerData" FormName="register" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+                <DataAnnotationsValidator />
                 <h1>Đăng Ký</h1>
                 <div class="input-box">
                     <InputText type="text" @bind-Value="registerData.Name" placeholder="Họ và tên" /> <i class='bx bx-rename'></i>
-                    <ValidationMessage For="()=>registerData.Name"></ValidationMessage>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>registerData.Name"></ValidationMessage>
+                    </div>
                 </div>
                 <div class="input-box">
                     <InputText type="text" @bind-Value="registerData.UserName" placeholder="Tên đăng nhập" /> <i class='bx bx-child'></i>
-                    <ValidationMessage For="()=>registerData.UserName"></ValidationMessage>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>registerData.UserName"></ValidationMessage>
+                    </div>
                 </div>
                 <div class="input-box">
                     <InputText type="password" @bind-Value="registerData.PassWord" placeholder="Mật khẩu" /> <i class='bx bxs-lock-alt'></i>
-                    <ValidationMessage For="()=>registerData.PassWord"></ValidationMessage>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>registerData.PassWord"></ValidationMessage>
+                    </div>
                 </div>
-                @*   <div class="input-box">
-                <InputText type="password" placeholder="Nhập lại mật khẩu" /> <i class='bx bxs-lock'></i>
-                </div> *@
+                <div class="input-box">
+                    <InputText type="password" @bind-Value="registerData.RePass" placeholder="Nhập lại mật khẩu" /> <i class='bx bxs-lock'></i>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>registerData.RePass"></ValidationMessage>
+                    </div>
+                </div>
                 <button type="submit" class="btn">Đăng ký</button>
 
                 <div class="register-link">
@@ -46,14 +56,14 @@
 @code {
     string url = "http://localhost:20714/api/Users";
 
-    public User registerData = new User();
-    User recievedRegister;
+    public UserRegister registerData = new UserRegister();
+    UserRegister recievedRegister;
 
     public string FormSubmitMessage { get; set; } = null;
 
     public async Task HandleValidSubmit()
     {
-        recievedRegister = new User();
+        recievedRegister = new UserRegister();
         using (var httpClient = new HttpClient())
         {
             StringContent content = new StringContent(JsonConvert.SerializeObject(registerData), Encoding.UTF8, "application/json");
@@ -61,7 +71,16 @@
             using (var response = await httpClient.PostAsync(url, content))
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
-                recievedRegister = JsonConvert.DeserializeObject<User>(apiResponse);
+                recievedRegister = JsonConvert.DeserializeObject<UserRegister>(apiResponse);
+                if (response.IsSuccessStatusCode)
+                {
+                    FormSubmitMessage = "Đăng ký thành công";
+                    nv.NavigateTo("/");
+                }
+                else
+                {
+                    FormSubmitMessage = "Đăng ký thất bại";
+                }
             }
         }
         FormSubmitMessage = "Đăng ký thành công";

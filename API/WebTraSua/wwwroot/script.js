@@ -11,3 +11,16 @@ window.addEventListener("scroll", function (event) {
     nav.style.transition = "all .5s ease-out"
   }
 });
+
+//session
+window.sessionStorageHelper = {
+    setItem: function (key, value) {
+        sessionStorage.setItem(key, value);
+    },
+    getItem: function (key) {
+        return sessionStorage.getItem(key);
+    },
+    removeItem: function (key) {
+        sessionStorage.removeItem(key);
+    }
+};
