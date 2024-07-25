@@ -1,0 +1,324 @@
+﻿@page "/"
+<PageTitle>QUÁN TRÀ SỮA 5 CHÚ MÈO CON - TRANG CHỦ</PageTitle>
+
+<header>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="false">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            @foreach (Banner item in banner)
+            {
+                <div class="carousel-item active">
+                    <img src="@item.Image"
+                         class="d-block w-100" style="height: 700px;" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>@item.Title</h5>
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</header>
+<div class="row mt-96">
+    <div class="col-md-6">
+        <img src="https://th.bing.com/th/id/R.df17bccbb4546f0e6e78655c1b243f87?rik=WTz3IegmLfcYbw&pid=ImgRaw&r=0"
+             class="img-fluid" alt="">
+    </div>
+    <div class="col-md-6 mx-auto d-flex align-items-center">
+        <div class="p-5">
+            @foreach (Blog item in blogLast)
+            {
+                <p class="fs-36 fw-bold ellipsis">@item.Title</p>
+                <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
+                   @item.Decription
+                </p>
+                <div class="btn btn-black mt-30" style="width: 270px;">XEM SẢN PHẨM</div>
+            }
+        </div>
+    </div>
+</div>
+<div class="d-flex flex-wrap pt-48 pb-48 bg-F4F4F4 mt-96">
+    <div class="col-md-3">
+        <p class="text-center">
+            <i class="fa-solid fa-mug-saucer"></i>
+            100+ TRÀ SỮA NGON
+        </p>
+    </div>
+    <div class="col-md-3">
+        <p class="text-center">
+            <i class="fa-solid fa-certificate"></i>
+            CHỨNG NHẬN AN TOÀN THỰC PHẨM
+        </p>
+    </div>
+    <div class="col-md-3">
+        <p class="text-center">
+            <i class="fa-solid fa-truck"></i>
+            MIỄN PHÍ VẬN CHUYỂN
+        </p>
+    </div>
+    <div class="col-md-3">
+        <p class="text-center">
+            <i class="fa-solid fa-tag"></i>
+            DANH MỤC ĐA DẠNG
+        </p>
+    </div>
+</div>
+<div class="mt-96 col-md-10 mx-auto">
+    <h2 class="text-center">Danh Mục Sản Phẩm Của Chúng Tôi</h2>
+    <div class="row">
+        <div class="col-md-4 p-3">
+            <div id="carouselExampleControls" class="carousel slide shadow rounded-start"
+                 data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://images.deliveryhero.io/image/fd-ph/LH/o7oz-hero.jpg"
+                             style="height: 336px" class="d-block w-100 rounded-start" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://th.bing.com/th/id/OIP.KeF519aLiE04MzP55k7_HAHaF7?w=2880&h=2304&rs=1&pid=ImgDetMain"
+                             style="height: 336px" class="d-block w-100 rounded-start" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://rs-menus-api.roocdn.com/images/2218ef5c-c0ba-43af-9f35-67bfe4ffd930/image.jpeg?width=1200&height=630&fit=crop"
+                             style="height: 336px" class="d-block w-100 rounded-start" alt="...">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+        @foreach (Categories item in cateOne)
+        {
+            <div class="col-md-4 p-3">
+                <img class="img-fluid w-100" style="height: 336px"
+                     src="@item.Image"
+                     alt="">
+                <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
+            </div>
+        }
+    </div>
+    <div class="row">
+        @foreach (Categories item in cateTwo)
+        {
+            <div class="col-md-4 p-3">
+                <img class="img-fluid w-100" style="height: 336px"
+                     src="@item.Image"
+                     alt="">
+                <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
+            </div>
+        }
+        <div class="col-md-4 p-3">
+            <div id="carouselExampleControls" class="carousel slide shadow rounded-end" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://rs-menus-api.roocdn.com/images/2218ef5c-c0ba-43af-9f35-67bfe4ffd930/image.jpeg?width=1200&height=630&fit=crop"
+                             class="d-block w-100 rounded-end" alt="..." style="height: 336px">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.deliveryhero.io/image/fd-ph/LH/o7oz-hero.jpg"
+                             class="d-block w-100 rounded-end" alt="..." style="height: 336px">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://th.bing.com/th/id/OIP.KeF519aLiE04MzP55k7_HAHaF7?w=2880&h=2304&rs=1&pid=ImgDetMain"
+                             class="d-block w-100 rounded-end" alt="..." style="height: 336px">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 p-3">
+            <div id="carouselExampleControls" class="carousel slide shadow rounded-start"
+                 data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://d1sag4ddilekf6.azureedge.net/compressed/merchants/2-CYWYTET2MAVKTA/hero/11c52a7925744f49bf48f80efddc771a_1583822486967164003.jpeg"
+                             class="d-block w-100 rounded-start" alt="..." style="height: 336px">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://rs-menus-api.roocdn.com/images/2218ef5c-c0ba-43af-9f35-67bfe4ffd930/image.jpeg?width=1200&height=630&fit=crop"
+                             class="d-block w-100 rounded-start" alt="..." style="height: 336px">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://images.deliveryhero.io/image/fd-ph/LH/o7oz-hero.jpg"
+                             class="d-block w-100 rounded-start" alt="..." style="height: 336px">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+        @foreach (Categories item in cateThree)
+        {
+            <div class="col-md-4 p-3">
+                <img class="img-fluid w-100" style="height: 336px"
+                     src="@item.Image"
+                     alt="">
+                <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
+            </div>
+        }
+    </div>
+</div>
+<div class="d-flex flex-wrap pt-48 pb-48 bg-F4F4F4 mt-96">
+    <div class="col-md-12">
+        <h2 class="text-center">Bài Viết Mới Nhất</h2>
+    </div>
+    <div class="col-md-10 mx-auto">
+        <div class="row mt-5">
+            @foreach (Blog item in blog)
+            {
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 pe-2">
+                            <img src="@item.Image"
+                                 alt="" class="img-fluid w-100" style="height:300px">
+                        </div>
+                        <div class="col-md-6 pe-2">
+                            <p class="fs-22 ellipsis">
+                                @item.Title
+                            </p>
+                            <p class="block-ellipsis color-1C1B1F">
+                                @item.Decription
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="row mt-96">
+    <div class="col-md-4">
+        @foreach (Categories item in cateLast)
+        {
+            <img src="@item.Image"
+                 class="w-75 mx-auto floating" alt="" style="height: 440px;">
+            <p class="text-center fw-semibold">Sắp ra mắt</p>
+        }
+    </div>
+    <div class="col-md-8">
+        <iframe class="w-100" height="455"
+                src="https://www.youtube.com/embed/ovs-7L5WEPM?si=xcRmvWRAzcxD5dFH&amp;controls=0"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+</div>
+<div class="row mt-96">
+    @foreach (Blog item in blogLast)
+    {
+        <div class="col-md-6 mx-auto d-flex align-items-center">
+            <div class="p-5">
+                <p class="fs-36 fw-bold ellipsis">@item.Title</p>
+
+                <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
+                    @item.Decription
+                </p>
+
+                <div class="btn btn-outline-black mt-30" style="width: 360px;">MUA TRÀ SỮA</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="@item.Image"
+                 class="img-fluid" alt="">
+        </div>
+    }
+</div>
+
+
+@code {
+    [Inject]
+    public NavigationManager NV { get; set; }
+
+    string urlCate = "http://localhost:20714/api/Categories";
+    string urlBanner = "http://localhost:20714/api/Banners";
+    string urlBlog = "http://localhost:20714/api/Blogs";
+    string urlPro = "http://localhost:20714/api/Products";
+
+    public IEnumerable<Categories> cateOne { get; set; } = Enumerable.Empty<Categories>();
+    public IEnumerable<Categories> cateTwo { get; set; } = Enumerable.Empty<Categories>();
+    public IEnumerable<Categories> cateThree { get; set; } = Enumerable.Empty<Categories>();
+    public IEnumerable<Categories> cateFour { get; set; } = Enumerable.Empty<Categories>();
+    public IEnumerable<Categories> cateLast { get; set; } = Enumerable.Empty<Categories>();
+
+    public IEnumerable<Banner> banner { get; set; } = Enumerable.Empty<Banner>();
+
+    public IEnumerable<Blog> blog { get; set; } = Enumerable.Empty<Blog>();
+    public IEnumerable<Blog> blogLast { get; set; } = Enumerable.Empty<Blog>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Get();
+    }
+
+    async Task Get()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlCate))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                var allCategories = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+                cateOne = allCategories.OrderByDescending(c => c.CateID).Take(2);
+                cateTwo = allCategories.OrderByDescending(c => c.CateID).Skip(2).Take(2);
+                cateThree = allCategories.OrderByDescending(c => c.CateID).Skip(4).Take(2);
+                cateLast = allCategories.OrderByDescending(c => c.CateID).Take(1);
+            }
+
+            using (var response = await httpClient.GetAsync(urlBanner))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                banner = JsonConvert.DeserializeObject<List<Banner>>(apiResponse).OrderByDescending(b => b.Id).Where(b => b.Status == 0);
+            }
+
+            using (var response = await httpClient.GetAsync(urlBlog))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                blog = JsonConvert.DeserializeObject<List<Blog>>(apiResponse).OrderByDescending(b => b.Id).Take(2);
+                blogLast = JsonConvert.DeserializeObject<List<Blog>>(apiResponse).OrderByDescending(b => b.Id).Take(1);
+            }
+        }
+    }
+}
