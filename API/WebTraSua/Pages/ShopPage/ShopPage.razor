@@ -1,6 +1,8 @@
 ﻿@page "/shop"
 @inject NavigationManager nv;
+<PageTitle>get role</PageTitle>
 <h3>Shop</h3>
+
 
 <!doctype html>
 <html lang="en">
@@ -120,12 +122,16 @@
                 {
                     @foreach(var cate in categories)
                     {
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
                                 @cate.Name
-                                <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                            </li>
-                        </ul>
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                    <li class="list-group-item">
+                        CÀ PHÊ
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                </ul>
                     }
                 }
             </div>
@@ -136,7 +142,8 @@
                         @foreach (var product in products)
                         {
                             <div class="col-md-4 md-4 mt-5">
-                                <div class="product-container">
+                                <a class="nav-link text-black fs-16 me-75" href="details/@product.ProductID">
+                                    <div class="product-container">
                                     <a class="nav-link text-black fs-16 me-75" href="details/@product.ProductID">
                                         <img src="@(product.Image.FirstOrDefault()?.Name ?? "https://via.placeholder.com/306x301")"
                                              style="height: 301px; width: 306px;" alt="">
@@ -145,10 +152,11 @@
                                             <p style="margin-bottom: 0rem;margin-left: 77px;">@product.Size_Product.FirstOrDefault()?.Price VNĐ</p>
                                         </div>
                                     </a>
-                                    <a href="details/@product.ProductID" class="btn-mua-ngay btn btn-primary mt-4 rounded-1">
-                                        MUA NGAY
-                                    </a>
-                                </div>
+                                        <a href="details/@product.ProductID" class="btn-mua-ngay btn btn-primary mt-4 rounded-1">
+                                            MUA NGAY
+                                        </a>
+                                    </div>
+                                </a>
                             </div>
                         }
                     }
