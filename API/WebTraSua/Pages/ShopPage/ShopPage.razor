@@ -1,0 +1,231 @@
+﻿@page "/shop"
+@inject NavigationManager nv;
+<PageTitle>get role</PageTitle>
+<h3>Shop</h3>
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+          integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- (Optional) Use CSS or JS implementation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js"
+            integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+            .pagination .page-item a.page-link {
+                border: 0;
+                border-radius: 7px;
+                padding: 10px 20px;
+                background-color: #F9F1E7;
+                color: black;
+            }
+
+            .pagination .page-item {
+                margin-right: 20px;
+            }
+
+        .product-container {
+            position: relative;
+        }
+
+        .btn-mua-ngay {
+            display: none;
+            position: absolute;
+            bottom: -45px;
+            left: 68%;
+            transform: translateX(-50%);
+            width: 315px;
+        }
+
+        .product-container:hover .btn-mua-ngay {
+            display: block;
+        }
+
+        .mt-5 {
+            margin-top: 4rem !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="container-fluid-custom" style="margin-top: 65px;">
+        <div class="position-relative">
+            <img class="img-fluid w-100 opacity-75"
+                 src="https://sohanews.sohacdn.com/160588918557773824/2024/5/13/ts3-1049-1715565758631-17155657587441981471723.jpg"
+                 style="height: 316px;" alt="">
+        </div>
+    </header>
+    <nav class="navbar navbar-expand-lg bg-109BE9 second-navbar z-2 p-2 ps-5 border-bottom border-white">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    TRANG CHỦ/BỘ SƯU TẬP/
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="navbar navbar-expand-lg bg-109BE9 second-navbar border-bottom border-white" style="margin-right: 62px;">
+        <div class="pe-5 ms-auto">
+            <ul class="navbar-nav">
+                <li class="nav-item me-3">
+                    <a class="nav-link text-black" href="#">Short by</a>
+                </li>
+                <li class="nav-item">
+                    <select id="cars" class="form-select">
+                        <option value="volvo">Volvo</option>
+                        <option value="saab">Saab</option>
+                        <option value="vw">VW</option>
+                        <option value="audi" selected>Audi</option>
+                    </select>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <main class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        BỘ SƯU TẬP(1)
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                    <li class="list-group-item">
+                        NGUỒN GỐC
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                    <li class="list-group-item">
+                        HƯƠNG VỊ
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                    <li class="list-group-item">
+                        CHẤT LƯỢNG
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                    <li class="list-group-item">
+                        CÀ PHÊ
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+                    @if (products != null)
+                    {
+                        @foreach (var product in products)
+                        {
+                            <div class="col-md-4 md-4 mt-5">
+                                <a class="nav-link text-black fs-16 me-75" href="details/@product.ProductID">
+                                    <div class="product-container">
+                                        <img src="@(product.Image.FirstOrDefault()?.Name ?? "https://via.placeholder.com/306x301")"
+                                             style="height: 301px; width: 306px;" alt="">
+                                        <div class="mt-3 text-center">
+                                            <p style="margin-bottom: 0rem;margin-left: 77px;">@product.Name</p>
+                                            <p style="margin-bottom: 0rem;margin-left: 77px;">@product.Size_Product.FirstOrDefault()?.Price VNĐ</p>
+                                        </div>
+                                        <a href="details/@product.ProductID" class="btn-mua-ngay btn btn-primary mt-4 rounded-1">
+                                            MUA NGAY
+                                        </a>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Loading...</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <br>
+    </main>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"></script>
+</body>
+
+</html>
+
+@code {
+    string url = "http://localhost:20714/api/Products";
+    string urlImage = "http://localhost:20714/api/Images";
+    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
+    string urlCategory = "http://localhost:20714/api/Categories";
+
+    public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<Image> images { get; set; } = Enumerable.Empty<Image>();
+    public IEnumerable<Size_Product> size_Products { get; set; } = Enumerable.Empty<Size_Product>();
+    public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+            using (var response = await httpClient.GetAsync(urlImage))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                images = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
+            }
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+                foreach (var product in products)
+                {
+                    product.Size_Product = size_Products.Where(sp => sp.ProductID == product.ProductID).ToList();
+                }
+            }
+            using (var response = await httpClient.GetAsync(urlCategory))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                categories = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+            }
+
+        }
+    }
+}
