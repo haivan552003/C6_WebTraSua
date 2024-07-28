@@ -60,6 +60,12 @@ namespace API.Controllers
                 .Include(u => u.User)
                 .Include(u => u.Status)
                 .Include(u => u.BillDetail)
+                .ThenInclude(u => u.sizeProduct)
+                .ThenInclude(u => u.Size)
+                .ThenInclude(u => u.Size_Product)
+                .ThenInclude(u => u.Product)
+                .ThenInclude(u => u.Image)
+                .Where(u => u.UserID == id)
                 .ToListAsync();
 
 
