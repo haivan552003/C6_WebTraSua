@@ -1,0 +1,311 @@
+﻿@page "/cart"
+
+<div class="container-fluid-custom" style="margin-top: 85px">
+    <main>
+        <div class="container">
+            <div class="header-cart mb-3">
+                <div class="row">
+                    <div class="col-md-1 pe-0">1.Giỏ hàng</div>
+                    <div class="col-md-3">
+                        <hr width="100%" size="2" />
+                    </div>
+                    <div class="col-md-1 text-black-50">2.Vận chuyển</div>
+                    <div class="col-md-3">
+                        <hr width="100%" size="2" />
+                    </div>
+                    <div class="col-md-4 text-black-50">3.Đánh giá & thanh toán</div>
+                </div>
+            </div>
+            <div class="content-cart">
+                <div class="row">
+                    <div class="col-md-7">                    
+                        @foreach (var sp in Join3Table)
+                        {
+                            <div class="row">
+                                <div class="col-md-2">
+                                 
+                                        <div class="p-4">
+                                        <img class="h-100 w-100" src="@sp.Image.Name" />
+                                        </div>
+                                    
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <span class="col-md-6 d-inline-flex ps-4 pt-4 pe-4 pb-2 fs-16">
+                                            @sp.Product.Name
+                                        </span>
+                                        <span class="col-md-2 d-inline-flex ps-4 pt-4 pe-4 pb-2 fs-20"></span>
+                                        <div class="wrapper rounded-2 col-md-2 d-inline-flex ps-4 pt-4 pe-4 pb-2 fs-20">
+                                            <span id="minus">-</span>
+                                            <span id="num">1</span>
+                                            <span id="plus">+</span>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                    </div>
+                                    <div class="row">
+                                        <span class="col-md-6 ps-4 fs-16">
+                                            XÓA
+                                        </span>
+                                        <span class="col-md-2"></span>
+                                        <div class="cart111 col-md-2 fs-16">
+                                            <span>@sp.SizeProduct.Price VNĐ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2"></div>
+                            </div>
+
+                        }
+
+                        <div class="row">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-7">
+                                <hr>
+                            </div>
+                            <div class="col-md-4"></div>
+                        </div>
+                        <div class="row mb-4">
+                            <span class="col-md-2 ps-5 fs-16">
+                                Tổng tiền
+                            </span>
+                            <div class="col-md-5 me-3"></div>
+                            <div class="cart111 col-md-2 fs-16">
+                                <span>250.000 VNĐ</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-9">
+                                <div class="btn btn-outline-black mt-30" style="width: 60%">
+                                    QUAY LẠI CỬA HÀNG
+                                </div>
+                            </div>
+                            <div class="col-md-1"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="mb-5" style="background-color: #eeeeee;height: 420px;">
+                            <div class="pt-5">
+                                <h2 class="fs-20 ps-4 mb-4">Hoá đơn</h2>
+
+                            </div>
+                            <div class="ms-4 mb-0">
+                                <div class="row mb-3">
+                                    <div class="col-md-9">
+                                        <span class="fs-16">Tổng Tiền</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span> VNĐ</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-9">
+                                        <span class="fs-16">Phí Vận Chuyển</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span>100.000 VNĐ</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-10">
+                                    <hr />
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                            <div class="ms-4 mb-0">
+                                <div class="row mb-3">
+                                    <div class="col-md-9">
+                                        <span class="fs-16">Thành Tiền</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span class="fs-16">145.000 VNĐ</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ms-4 mb-3">
+                                <span class="fs-16 text-black-50">Estimated shipping time: 2days</span>
+                            </div>
+                            <div class="col-md-10 mx-auto">
+                                <div class="row">
+                                    <div class="btn btn-black mt-30" style="width: 100%">
+                                        XEM SẢN PHẨM
+                                    </div>
+                                </div>
+                                <div class="row mb-5"></div>
+                                <div class="row mb-4"></div>
+                            </div>
+                        </div>
+                        <div class="mb-5" style="background-color: #eeeeee;height: 190px;">
+                            <div class="pt-5">
+                                <h2 class="fs-20 ps-4 mb-4">Hình thức thanh toán</h2>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2 ms-4 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Sealey-Logo.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Visa-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Mastercard-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Citi-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/PNC-credit-card-Logo-768x461.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                        </div>
+                        <div style="background-color: #eeeeee;height: 300px;">
+                            <div class="pt-5">
+                                <h2 class="fs-20 ps-4 mb-4">Chính sách giao hàng và trả hàng</h2>
+                            </div>
+                            <div class="collapseoder mb-3">
+                                <p class="d-inline-flex gap-1">
+                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                        > Đặt hàng trước 12h00 và chúng tôi sẽ giao hàng ngay trong ngày.
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseExample">
+                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
+                                        Chúng tôi cam kết mang đến dịch vụ giao hàng nhanh chóng và tiện lợi nhất cho khách hàng. Bằng cách đặt hàng trước 12h00, bạn sẽ nhận được sản phẩm trong cùng ngày, đảm bảo không làm gián đoạn kế hoạch của bạn. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="collapseoder mb-3">
+                                <p class="d-inline-flex gap-1">
+                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
+                                        > Các đơn hàng được thực hiện sau 12:00 thứ sáu sẽ được sử lý vào thứ hai.
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseExample1">
+                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
+                                        Điều này giúp chúng tôi đảm bảo rằng bạn nhận được dịch vụ tốt nhất, kể cả trong những ngày cuối tuần. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+</div>
+<script>
+    const plus = document.getElementById("plus"),
+        minus = document.getElementById("minus"),
+        num = document.getElementById("num");
+    let a = 1;
+    plus.addEventListener("click", () => {
+        a++;
+        a = (a <= 100) ? "" + a : 9;
+        num.innerText = a;
+    });
+    minus.addEventListener("click", () => {
+        if (a > 1) {
+            a--;
+            a = (a < 10) ? a : a;
+            num.innerText = a;
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        var coll = document.getElementsByClassName("collapsible");
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
+    });
+</script>
+
+@code {
+    [Inject]
+    public NavigationManager NV { get; set; }
+
+    string urlProduct = "http://localhost:20714/api/Products";
+    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
+    string urlImgProduct = "http://localhost:20714/api/Images";
+
+    public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<Size_Product> SZproducts { get; set; } = Enumerable.Empty<Size_Product>();
+    public IEnumerable<Image> ImgProduct { get; set; } = Enumerable.Empty<Image>();
+    public List<Join3Tablee> Join3Table { get; set; } = new List<Join3Tablee>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                SZproducts = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+            using (var response = await httpClient.GetAsync(urlImgProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                ImgProduct = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
+            }
+        }
+
+        // Kết hợp dữ liệu
+        Join3Table = (from product in products
+                      join sizeProduct in SZproducts on product.ProductID equals sizeProduct.ProductID
+                      join imgProduct in ImgProduct on product.ProductID equals imgProduct.ProductID
+                      select new Join3Tablee
+                                   {
+                                       Product = product,
+                                       SizeProduct = sizeProduct,
+                                       Image = imgProduct
+                                   }).ToList();
+
+        StateHasChanged(); 
+    }
+    // public decimal CalculateTotalPrice()
+    // {
+    //     var hehe = new Join3Tablee())
+    //     return hehe.Sum(item => item.SizeProduct.Price);
+    // }
+
+    public class Join3Tablee
+    {
+        public Product Product { get; set; }
+        public Size_Product SizeProduct { get; set; }
+        public Image Image { get; set; }
+    }
+
+}
