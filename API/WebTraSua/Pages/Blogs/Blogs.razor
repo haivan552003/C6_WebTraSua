@@ -1,0 +1,332 @@
+﻿@page "/Blogs"
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+          integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- (Optional) Use CSS or JS implementation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js"
+            integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top bg-white">
+        <div class="container">
+            <div class="col-md-4">
+                <div>
+                    <img src="img/logo.png" alt="" class="mb-3" style="width: 50px; height: 50px;">
+                    <a class="navbar-brand fw-bold fs-20" style="letter-spacing: -1px;" href="#">
+                        Năm Chú Mèo
+                        Con
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="col-md-5 collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium me-75" aria-current="page"
+                           href="index.html">
+                            <span class="p-nav-hover">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium me-75" href="shop.html">
+                            <span class="p-nav-hover">Shop</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium me-75" href="blog.html">
+                            <span class="p-nav-hover">Blog</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-3 mt-3">
+                <ul class="float-end row">
+                    <div class="col-md-4">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium" href="user.html">
+                            <i class="me-3 p-nav-hover fa-regular fa-user"></i>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium">
+                            <i class="me-3 p-nav-hover fa-solid fa-magnifying-glass"></i>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a class="nav-hover nav-link text-black fs-16 fw-medium" href="cart.html">
+                            <i class="me-3 p-nav-hover fa-solid fa-cart-shopping"></i>
+
+                        </a>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid-custom" style="margin-top: 85px;">
+        <header class="container-fluid-custom" style="margin-top: 65px;">
+            <div class="position-relative">
+                <img class="img-fluid w-100 opacity-75"
+                     src="https://sohanews.sohacdn.com/160588918557773824/2024/5/13/ts3-1049-1715565758631-17155657587441981471723.jpg"
+                     style="height: 316px;" alt="">
+                <div class="position-absolute start-50 translate-middle" style="top: 40%;">
+                    <img src="img/logo.png" class="d-flex justify-content-center" style="width: 80px; height: 80px;"
+                         alt="">
+                </div>
+                <div class="position-absolute start-50 translate-middle" style="top: 60%">
+                    <p class="fw-medium text-center" style="font-size: 48px;">Blog</p>
+                </div>
+                <div class="position-absolute start-50 translate-middle" style="top:70%">
+                    <span class="fw-medium text-center fs-16">Home > </span>
+                    <span class="text-center fs-16">Blog</span>
+                </div>
+            </div>
+        </header>
+        <main class="container" style="margin-top: 106px;">
+            <div class="row">
+                @foreach (Blog blogs in thinh)
+                {
+                    <div class="col-md-8">
+                        <div class="mb-72">
+                            <img src="@(blogs.Image)"
+                                 style="height: 301px; width: 306px;" alt="">
+
+                            <div class="row color-9F9F9F mt-3">
+                                <div class="col-md-2">
+                                    <i class="fa-solid fa-user"></i> Admin
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="fa-solid fa-calendar-days"></i> 16/05/2023
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="fa-solid fa-tag"></i> Trà sữa
+                                </div>
+                            </div>
+                            <p class="fw-medium mt-3" style="font-size: 30px;">@blogs.Title</p>
+                            <p class="color-9F9F9F mt-3" style="text-align: justify;">
+                                @blogs.Decription
+                            </p>
+                            <hr>
+                        </div>
+                    </div>
+
+                }
+                <div class="col-md-4">
+                    <div>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" aria-describedby="basic-addon2">
+                            <span class="input-group-text bg-white" id="basic-addon2">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                        </div>
+                        <div class="col-md-10 mx-auto mt-5">
+                            <p class="fs-24 fw-medium">Danh Mục</p>
+                        </div>
+                        <div class="col-md-10 mx-auto">
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <a class="fs-16 color-9F9F9F-hover color-9F9F9F text-decoration-none">Trà sữa</a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="float-end  color-9F9F9F-hover text-decoration-none fs-16 color-9F9F9F">2</a>
+                                </div>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <a class="fs-16 color-9F9F9F-hover color-9F9F9F text-decoration-none">Trà sữa</a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="float-end  color-9F9F9F-hover text-decoration-none fs-16 color-9F9F9F">2</a>
+                                </div>
+                            </div>
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <a class="fs-16 color-9F9F9F-hover color-9F9F9F text-decoration-none">Trà sữa</a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="float-end  color-9F9F9F-hover text-decoration-none fs-16 color-9F9F9F">2</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 118px;">
+                        <div class="col-md-10 mx-auto mt-5">
+                            <p class="fs-24 fw-medium">Blog</p>
+                        </div>
+                        <div class="col-md-10 mx-auto">
+                            <div class="row mt-36">
+                                <div class="col-md-4">
+                                    <img class="img-fluid w-100 rounded-3" style="height: 80px;"
+                                         src="https://vuaxedaybanhang.vn/wp-content/uploads/2022/01/tra-sua-socola.jpg"
+                                         alt="">
+                                </div>
+                                <div class="col-md-8">
+                                    <a class="mt-2 text-long color-9F9F9F-hover text-wrap color-black text-decoration-none fs-16">
+                                        Trà
+                                        sữa bạc hà, món trà sữa hot nhất ở hiện nay. Đừng bỏ lỡ,
+                                        mua ngay!!!
+                                    </a>
+                                    <p class="color-9F9F9F" style="font-size: 12px;">18/05/2024</p>
+                                </div>
+                            </div>
+                            <div class="row mt-36">
+                                <div class="col-md-4">
+                                    <img class="img-fluid w-100 rounded-3" style="height: 80px;"
+                                         src="https://vuaxedaybanhang.vn/wp-content/uploads/2022/01/tra-sua-socola.jpg"
+                                         alt="">
+                                </div>
+                                <div class="col-md-8">
+                                    <a class="mt-2 text-long color-9F9F9F-hover text-wrap color-black text-decoration-none fs-16">
+                                        Trà
+                                        sữa bạc hà, món trà sữa hot nhất ở hiện nay. Đừng bỏ lỡ,
+                                        mua ngay!!!
+                                    </a>
+                                    <p class="color-9F9F9F" style="font-size: 12px;">18/05/2024</p>
+                                </div>
+                            </div>
+                            <div class="row mt-36">
+                                <div class="col-md-4">
+                                    <img class="img-fluid w-100 rounded-3" style="height: 80px;"
+                                         src="https://vuaxedaybanhang.vn/wp-content/uploads/2022/01/tra-sua-socola.jpg"
+                                         alt="">
+                                </div>
+                                <div class="col-md-8">
+                                    <a class="mt-2 text-long color-9F9F9F-hover text-wrap color-black text-decoration-none fs-16">
+                                        Trà
+                                        sữa bạc hà, món trà sữa hot nhất ở hiện nay. Đừng bỏ lỡ,
+                                        mua ngay!!!
+                                    </a>
+                                    <p class="color-9F9F9F" style="font-size: 12px;">18/05/2024</p>
+                                </div>
+                            </div>
+                            <div class="row mt-36">
+                                <div class="col-md-4">
+                                    <img class="img-fluid w-100 rounded-3" style="height: 80px;"
+                                         src="https://vuaxedaybanhang.vn/wp-content/uploads/2022/01/tra-sua-socola.jpg"
+                                         alt="">
+                                </div>
+                                <div class="col-md-8">
+                                    <a class="mt-2 text-long color-9F9F9F-hover text-wrap color-black text-decoration-none fs-16">
+                                        Trà
+                                        sữa bạc hà, món trà sữa hot nhất ở hiện nay. Đừng bỏ lỡ,
+                                        mua ngay!!!
+                                    </a>
+                                    <p class="color-9F9F9F" style="font-size: 12px;">18/05/2024</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <hr class="opacity-25" style="margin-top: 57px; margin-bottom: 57px;">
+        <footer class="container" style="margin-top: 57px;">
+            <div class="row">
+                <div class="col-md-3 color-9F9F9F">
+                    <div row>
+                        <img src="img/logo.png" style="width: 50px; height: 50px;" alt="">
+                        <span class="text-black fw-bold">Năm Chú Mèo Con</span>
+                    </div>
+                    <p class="mt-4">FPT Polytechnic cần Thơ</p>
+                    <p>Đ. Số 22, Thường Thạnh, Cái Răng, Cần Thơ 900000, Việt Nam Can Tho Cần Thơ ·</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="color-9F9F9F">Links</p>
+                    <p>Home</p>
+                    <p>Shop</p>
+                    <p>About</p>
+                    <p>Contact</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="color-9F9F9F">Help</p>
+                    <p>Payment Options</p>
+                    <p>Returns</p>
+                    <p>Privacy Policies</p>
+                </div>
+                <div class="col-md-4">
+                    <p class="color-9F9F9F">Newsletter</p>
+                    <div class="row">
+                        <div class="col-md-6"
+                             style="border-top: 0; border-left: 0; border-right: 0; border-bottom: 2px solid black;">
+                            <input class="w-100 border-0" type="text" placeholder="Điền email của bạn">
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-3"
+                             style="border-top: 0; border-left: 0; border-right: 0; border-bottom: 2px solid black;">
+                            <button class="btn bg-white button-footer fw-bold">SUBSRIBE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="opacity-25" style="margin-top: 57px; margin-bottom: 57px;">
+            <p>2024 Năm Chú Mèo Con. All rights reverved</p>
+            <footer>
+                <!-- place footer here -->
+            </footer>
+        </footer>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"></script>
+</body>
+
+</html>
+
+@code {
+    [Inject]
+    public NavigationManager NV { get; set; }
+
+    string url = "http://localhost:20714/api/Blogs";
+
+    public IEnumerable<Blog> thinh { get; set; } = Enumerable.Empty<Blog>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                thinh = JsonConvert.DeserializeObject<List<Blog>>(apiResponse);
+            }
+        }
+    }
+}
