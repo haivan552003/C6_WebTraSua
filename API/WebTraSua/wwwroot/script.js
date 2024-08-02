@@ -21,3 +21,29 @@ window.sessionStorageHelper = {
         sessionStorage.removeItem(key);
     }
 };
+
+/*details*/
+function changeMainImage(src) {
+    document.getElementById('mainImage').src = src;
+}
+
+function attachQuantityHandlers() {
+    const decreaseBtn = document.querySelector('#decreaseBtn');
+    const increaseBtn = document.querySelector('#increaseBtn');
+    const quantityInput = document.querySelector('#quantityInput');
+
+    decreaseBtn.addEventListener('click', function () {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+
+    increaseBtn.addEventListener('click', function () {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue < 10) {  // Giới hạn tối đa là 10
+            quantityInput.value = currentValue + 1;
+        }
+    });
+}
+
