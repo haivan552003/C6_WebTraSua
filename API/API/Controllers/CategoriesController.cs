@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace API.Controllers
 {
@@ -32,14 +35,27 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Categories>> GetCategories(int id)
         {
-            var categories = await _context.category.FindAsync(id);
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-            if (categories == null)
+            var bill = await _context.category
+                              .Include(u => u.Products)
+                            .ThenInclude(u => u.Image)
+                            .ThenInclude(u => u.Products)
+                            .ThenInclude(u => u.Size_Product)
+                            .Where(u => u.CateID == id)
+                            .ToListAsync();
+
+
+            if (bill == null)
             {
                 return NotFound();
             }
 
-            return categories;
+            var serializedData = JsonSerializer.Serialize(bill, options);
+            return Content(serializedData, "application/json");
         }
 
         // PUT: api/Categories/5
