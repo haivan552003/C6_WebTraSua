@@ -66,6 +66,31 @@ namespace API.Controllers
             return Content(serializedData, "application/json");
         }
 
+        // GET: api/Products/Cate/5
+        [HttpGet("Cate/{cateId}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(int cateId)
+        {
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            var products = await _context.product
+                .Include(u => u.Image)
+                .Include(u => u.Categories)
+                .Where(u => u.CateID == cateId)
+                .ToListAsync();
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var serializedData = JsonSerializer.Serialize(products, options);
+            return Content(serializedData, "application/json");
+        }
+
+
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
