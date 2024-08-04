@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,6 +121,8 @@ namespace API
             app.UseAuthorization();
 
             app.UseSession();
+
+            StripeConfiguration.ApiKey = Configuration["Stripe:SecretKey"];
 
             app.UseEndpoints(endpoints =>
             {
