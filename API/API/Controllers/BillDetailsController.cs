@@ -23,6 +23,16 @@ namespace API.Controllers
             _context = context;
         }
 
+
+        // GET: api/BillDetails
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BillDetail>>> GetBillDetails()
+        {
+            var billDetails = await _context.bill_detail.ToListAsync();
+            return Ok(billDetails);
+        }
+
+
         //// GET: api/BillDetails
         //[HttpGet]
         //public async Task<ActionResult<IEnumerable<BillDetail>>> Getbill_detail()

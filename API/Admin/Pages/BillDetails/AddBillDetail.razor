@@ -1,0 +1,133 @@
+﻿@page "/createbilldetails"
+@using System.Text
+<h3>Create</h3>
+
+
+<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBillDetails">
+    <DataAnnotationsValidator />
+    <h1>BillDetails</h1>
+
+    <div class="input-box">
+        <label>BillID</label>
+        <InputSelect @bind-Value="proData.BillID">
+            @foreach (Bill item in bills)
+            {
+                <option value="@item.BillId">@item.BillId</option>
+            }
+        </InputSelect>
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.BillID"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Quality</label>
+        <InputNumber @bind-Value="proData.Quality" placeholder="UserID" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Quality"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Subtotal</label>
+        <InputNumber @bind-Value="proData.Subtotal" placeholder="UserID" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Subtotal"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Size ProductID</label>
+        <InputSelect @bind-Value="proData.SizeProductID">
+            @foreach (Size_Product item in size_Products)
+            {
+                <option value="@item.SizeProductID">@item.SizeProductID</option>
+            }
+        </InputSelect>
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.SizeProductID"></ValidationMessage>
+        </div>
+    </div>
+
+    <button type="submit" class="btn">Thêm Sản Phẩm</button>
+    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+</EditForm>
+
+@code {
+    string urlBillDetails = "http://localhost:20714/api/BillDetails";
+    string urlBill = "http://localhost:20714/api/Bills";
+    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
+
+    public Admin.Model.BillDetail proData = new Admin.Model.BillDetail();
+    Admin.Model.BillDetail ReceivedPro;
+    public List<Bill> bills { get; set; } = new List<Bill>();
+    public List<Size_Product> size_Products { get; set; } = new List<Size_Product>();
+    public string FormSubmitMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bills = JsonConvert.DeserializeObject<List<Bill>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        ReceivedPro = new Admin.Model.BillDetail();
+        using (var httpClient = new HttpClient())
+        {
+            StringContent content = new StringContent(JsonConvert.SerializeObject(proData), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PostAsync(urlBillDetails, content))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    ReceivedPro = JsonConvert.DeserializeObject<Admin.Model.BillDetail>(apiResponse);
+                    FormSubmitMessage = "Thêm sản phẩm thành công!";
+                }
+                else
+                {
+                    FormSubmitMessage = "Thêm thất bại: " + apiResponse;
+                }
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bills = JsonConvert.DeserializeObject<List<Bill>>(apiResponse);
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+
+}
