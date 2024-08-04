@@ -1,0 +1,65 @@
+﻿@page "/getimg"
+
+<PageTitle>Get Images</PageTitle>
+<h3>Danh Sách Ảnh</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Hình Ảnh</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var image in Roless)
+        {
+            <tr>
+                <td>@image.Name</td>
+                <td>
+                    <img src="@GetImagePath(image.Name)" width="100" />
+                </td>
+
+                <td>
+                    <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(image))">
+                        Xóa
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string url = "http://localhost:20714/api/Images";
+    string imageBasePath = "http://localhost:49972/images/";
+
+    public IEnumerable<Image> Roless { get; set; } = Enumerable.Empty<Image>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(url);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            Roless = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
+        }
+    }
+
+    public async Task Delete(Image r)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.DeleteAsync(url + "/" + r.ImageID))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+            }
+        }
+        await CallAPI();
+    }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
+}

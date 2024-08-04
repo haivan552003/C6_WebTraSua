@@ -13,7 +13,7 @@ namespace Admin.Model
         public int SizeProductID { get; set; }
         public int ProductID { get; set; }
         public int SizeID { get; set; }
-        public float Price { get; set; }
+        public int Price { get; set; }
         public Product Product { get; set; }
         public Size Size { get; set; }
         public ICollection<BillDetail> billDetail { get; set; }

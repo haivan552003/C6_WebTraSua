@@ -1,0 +1,125 @@
+﻿@page "/updatesizeproduct/{id:int}"
+@using System.Text
+<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateSizeProduct">
+    <DataAnnotationsValidator />
+    <h1>Chỉnh Sửa Kích Thước Sản Phẩm</h1>
+
+    <div class="form-group">
+        <InputNumber hidden class="form-control" @bind-Value="proData.SizeProductID" />
+    </div>
+
+    <div class="input-box">
+        <label>Tên Sản Phẩm</label>
+        <InputSelect disable @bind-Value="proData.ProductID">
+            @foreach (Product item in pro)
+            {
+                <option value="@item.ProductID">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="input-box">
+        <label>Kích Thước</label>
+        <InputSelect disable @bind-Value="proData.SizeID">
+            @foreach (Size item in size)
+            {
+                <option value="@item.SizeID">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="input-box">
+        <label>Giá</label>
+        <InputNumber @bind-Value="proData.Price" placeholder="Giá" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="() => proData.Price"></ValidationMessage>
+        </div>
+    </div>
+
+    <button type="submit" class="btn">Cập Nhật Kích Thước</button>
+    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    string urlPro = "http://localhost:20714/api/Products";
+    string urlSize = "http://localhost:20714/api/Sizes";
+    string urlSizePro = "http://localhost:20714/api/Size_Product";
+
+    public Size_Product proData { get; set; } = new Size_Product();
+    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<Size> size { get; set; } = Enumerable.Empty<Size>();
+    public string FormSubmitMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlPro);
+            if (response.IsSuccessStatusCode)
+            {
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+            else
+            {
+                FormSubmitMessage = "Không thể tải danh sách sản phẩm.";
+            }
+        }
+
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlSize);
+            if (response.IsSuccessStatusCode)
+            {
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                size = JsonConvert.DeserializeObject<List<Size>>(apiResponse);
+            }
+            else
+            {
+                FormSubmitMessage = "Không thể tải danh sách kích thước.";
+            }
+        }
+
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync($"{urlSizePro}/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                proData = JsonConvert.DeserializeObject<Size_Product>(apiResponse);
+            }
+            else
+            {
+                FormSubmitMessage = "Không thể tải dữ liệu kích thước sản phẩm.";
+            }
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(proData), Encoding.UTF8, "application/json");
+            var response = await httpClient.PutAsync($"{urlSizePro}/{id}", jsonContent);
+            if (response.IsSuccessStatusCode)
+            {
+                FormSubmitMessage = "Cập nhật kích thước sản phẩm thành công!";
+            }
+            else
+            {
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                FormSubmitMessage = "Cập nhật thất bại: " + apiResponse;
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+}
