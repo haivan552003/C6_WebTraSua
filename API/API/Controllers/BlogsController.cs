@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -99,7 +100,43 @@ namespace API.Controllers
 
             return NoContent();
         }
+        [HttpPost("UploadFile")]
+        public async Task<ActionResult<Blog>> UploadFile([FromForm] IFormFile file, [FromForm] string title, [FromForm] string decription)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is empty");
+            }
 
+            // Đường dẫn đến thư mục
+            var uploadFolder = "D:\\FPT Plytechnic\\C Sharp 6\\images";
+            var imageName = Path.GetFileName(file.FileName);
+            var imagePath = Path.Combine(uploadFolder, imageName);
+
+            // Tạo thư mục nếu chưa tồn tại
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            // Lưu file vào thư mục đã chỉ định
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var newBanner = new Blog
+            {
+                Image = imageName,
+                Title = title,
+                Decription = decription
+            };
+
+            _context.blog.Add(newBanner);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("blog", new { id = newBanner.Id }, newBanner);
+        }
         private bool BlogExists(int id)
         {
             return _context.blog.Any(e => e.Id == id);

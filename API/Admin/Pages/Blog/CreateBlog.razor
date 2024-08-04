@@ -1,0 +1,72 @@
+﻿@page "/CreateBlog"
+@using System.Text
+<link href="/validation.css" rel="stylesheet" />
+
+<h2 class="text-success p-2">@FormSubmitMessage</h2>
+<EditForm Model="BlogData" OnValidSubmit="CreateeeBanner">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <h1>Thêm Bài Viết</h1>
+
+    <div class="form-group">
+        <label class="font-weight-bold">Title</label>
+        <ValidationMessage For="@(() => BlogData.Title)" />
+        <InputText class="form-control" @bind-Value="BlogData.Title" />
+    </div>
+    <div class="form-group">
+        <label class="font-weight-bold">Image</label>
+        <InputFile OnChange="ChangeHandler" />
+    </div>
+    <div class="form-group">
+        <label class="font-weight-bold">Status</label>
+        <ValidationMessage For="@(() => BlogData.Decription)" />
+        <InputText class="form-control" @bind-Value="BlogData.Decription">
+        </InputText>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+<p>@apiResponse</p>
+
+@code {
+    string urlPro = "http://localhost:20714/api/Blogs";
+    string url = "http://localhost:20714/api/Blogs/UploadFile";
+    private Blog BlogData = new Blog();
+    Blog ReceivedBlog;
+    public string FormSubmitMessage { get; set; } = "Reservation Not Created";
+    public string apiResponse { get; set; }
+    public IBrowserFile F;
+
+    private void ChangeHandler(InputFileChangeEventArgs e)
+    {
+        F = e.File;
+    }
+
+    public async Task CreateeeBanner()
+    {
+        if (F != null)
+        {
+            using (var ms = F.OpenReadStream(968435456))
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StringContent(BlogData.Title.ToString()), "title");
+                content.Add(new StringContent(BlogData.Decription.ToString()), "decription");
+
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.PostAsync(url, content);
+                    response.EnsureSuccessStatusCode();
+                    apiResponse = await response.Content.ReadAsStringAsync();
+                    FormSubmitMessage = "Banner Created";
+                }
+            }
+        }
+        else
+        {
+            apiResponse = "Please select a file to upload.";
+        }
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/UpdateBlog/{id:int}"
+@using System.Text
+@using System.Net.Http
+@using System.Net.Http.Headers
+@using Newtonsoft.Json
+
+<h2 class="text-success p-2">@FormSubmitMessage</h2>
+<EditForm Model="BlogData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateBlog">
+    <DataAnnotationsValidator />
+    <h1>Chỉnh Sửa Bài Viết</h1>
+
+    <div class="form-group">
+        <InputNumber hidden class="form-control" @bind-Value="BlogData.Id" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>BlogData.Id"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="font-weight-bold">Tiêu Đề</label>
+        <InputText class="form-control" @bind-Value="BlogData.Title"/>
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>BlogData.Title"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <InputText hidden class="form-control" @bind-Value="BlogData.Image" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>BlogData.Image"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="font-weight-bold">Nội Dung</label>
+        <InputTextArea class="form-control" @bind-Value="BlogData.Decription" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>BlogData.Decription"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Sửa Bài Viết</button>
+    </div>
+</EditForm>
+
+@code {
+    string urlPro = "http://localhost:20714/api/Blogs";
+    public Blog BlogData = new Blog();
+    Blog ReceivedBlog;
+    public string FormSubmitMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        BlogData = new Blog();
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync($"{urlPro}/{Id}"))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                BlogData = JsonConvert.DeserializeObject<Blog>(apiResponse);
+            }
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        ReceivedBlog = new Blog();
+        using (var httpClient = new HttpClient())
+        {
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(BlogData), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PutAsync($"{urlPro}/{BlogData.Id}", jsonContent))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    ReceivedBlog = JsonConvert.DeserializeObject<Blog>(apiResponse);
+                    FormSubmitMessage = "Sửa blog thành công !";
+                }
+                else
+                {
+                    FormSubmitMessage = "Sửa thất bại: " + apiResponse;
+                }
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+}
