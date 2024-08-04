@@ -1,0 +1,142 @@
+﻿@page "/update/{id:int}"
+@using System.Text
+<h3>Create</h3>
+
+<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateProduct">
+    <DataAnnotationsValidator />
+    <h1>Sửa Sản Phẩm</h1>
+
+    <div class="form-group">
+        <InputNumber hidden class="form-control" @bind-Value="proData.ProductID" />
+    </div>
+
+    <div class="input-box">
+        <label>Tên Sản Phẩm</label>
+        <InputText @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Name"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Đánh Giá</label>
+        <InputNumber @bind-Value="proData.Rate" placeholder="Đánh giá" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Mô Tả 1</label>
+        <InputText @bind-Value="proData.Description1" placeholder="Mô tả 1" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Mô Tả 2</label>
+        <InputText @bind-Value="proData.Description2" placeholder="Mô tả 2" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Danh Mục</label>
+        <InputSelect @bind-Value="proData.CateID">
+            @foreach (Categories item in cate)
+            {
+                @item.Name
+                <option value="@item.CateID">@item.Name</option>
+            }
+        </InputSelect>
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
+        </div>
+    </div>
+
+    <div class="input-box">
+        <label>Trạng Thái</label>
+        <InputSelect @bind-Value="proData.StatusID">
+            <option value="0" selected>Hợp lệ</option>
+            <option value="1">Không hợp lệ</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn">Thêm Sản Phẩm</button>
+    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+</EditForm>
+
+@code {
+    string urlPro = "http://localhost:20714/api/Products";
+    string urlCate = "http://localhost:20714/api/Categories";
+
+    public Product proData = new Product();
+    Product ReceivedPro;
+    public IEnumerable<Categories> cate { get; set; } = Enumerable.Empty<Categories>();
+    public string FormSubmitMessage { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlCate))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+            }
+        }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        proData = new Product();
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync($"{urlPro}/{Id}"))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                proData = JsonConvert.DeserializeObject<Product>(apiResponse);
+            }
+        }
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        ReceivedPro = new Product();
+        using (var httpClient = new HttpClient())
+        {
+            var jsonSettings = new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(proData, jsonSettings), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PutAsync($"{urlPro}/{proData.ProductID}", jsonContent))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    ReceivedPro = JsonConvert.DeserializeObject<Product>(apiResponse);
+                    FormSubmitMessage = "Sửa sản phẩm thành công!";
+                }
+                else
+                {
+                    FormSubmitMessage = "Sửa thất bại: " + apiResponse;
+                }
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+}
