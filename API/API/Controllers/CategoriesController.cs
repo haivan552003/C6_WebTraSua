@@ -10,6 +10,7 @@ using API.Model;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -88,6 +89,42 @@ namespace API.Controllers
 
             return NoContent();
         }
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("UploadFile")]
+        public async Task<ActionResult<Categories>> UploadFile([FromForm] IFormFile file, [FromForm] string name, [FromForm] byte status)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is empty");
+            }
+
+            var uploadFolder = "D:\\FPT POLYTECNIC\\C#6\\images";
+            var imageName = Path.GetFileName(file.FileName);
+            var imagePath = Path.Combine(uploadFolder, imageName);
+
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var newCategory = new Categories
+            {
+                Image = imageName,
+                Name = name,
+                Status = status
+            };
+
+            _context.category.Add(newCategory); // Đảm bảo DbSet là đúng
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetCategory", new { id = newCategory.CateID }, newCategory);
+        }
+
 
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
