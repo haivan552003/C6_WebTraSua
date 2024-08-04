@@ -1,41 +1,51 @@
 ﻿@page "/GetBanner"
-<h3>GetBanner</h3>
 @if (banner != null)
 {
-    <h3 class="text-warning p-2">Banner</h3>
-    <table class="table table-sm table-striped table-bordered m-2">
-        <thead>
+    <p> <a href="CreateBlog">Thêm Bảng Hiệu</a></p>
+    <div class="panel panel-primary">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><h2>Thông tin bảng hiệu</h2></div>
+
+        <!-- Table -->
+        <table class="table">
             <tr>
-                <th>ID</th>
-                <th>Image</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th></th>
+                <th>Hình ảnh</th>
+                <th>Nội dung</th>
+                <th>Trạng thái</th>
+                <th>Khác</th>
             </tr>
-        </thead>
-        <tbody>
             @foreach (var item in banner)
             {
                 <tr>
-                    <td>@item.Id</td>
                     <td>
-                        <img src="@GetImagePath(item.Image)"  width="100" height="100" />
+                        <img src="@GetImagePath(item.Image)" width="100" height="100" />
                     </td>
                     <td>@item.Title</td>
-                    <td>@item.Status</td>
-                    <td><a href="UpdateBanner/@item.Id">Sửa</a></td>
+                    @if (item.Status == 0)
+                    {
+                        <td>@item.Status.ToString("Hợp lệ")</td>
+                    }
+                    else
+                    {
+                        <td>@item.Status.ToString("Không hợp lệ")</td>
+
+                    }
                     <td>
+                        <a class="btn btn-sm btn-success" href="UpdateBanner/@item.Id">
+                            Sửa
+                        </a> |
                         <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(item.Id))">
-                            <img src="/icon/close.png" />
+                            Xóa
                         </button>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+        </table>
+    </div>  
 }
 
 @code {
+
     string imageBasePath = "http://localhost:49972/images";
 
     string urlBanner = "http://localhost:20714/api/Banners";

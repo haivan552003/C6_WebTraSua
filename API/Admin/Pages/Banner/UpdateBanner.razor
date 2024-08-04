@@ -1,32 +1,34 @@
 ﻿@page "/UpdateBanner/{Id:int}"
 @using System.Text
-<link href="/validation.css" rel="stylesheet" />
-
-<h1 class="bg-info text-white">Update Banner</h1>
-<h2 class="text-success p-2">@FormSubmitMessage</h2>
-
 <EditForm Model="bannerData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
+
     <div class="form-group">
-        <label>Image</label>
-        <ValidationMessage For="@(() => bannerData.Image)" />
-        <InputText class="form-control" @bind-Value="bannerData.Image" />
-    </div>
-    <div class="form-group">
-        <label>Title</label>
-        <ValidationMessage For="@(() => bannerData.Title)" />
+        <label class="font-weight-bold">Tiêu đề</label>
         <InputText class="form-control" @bind-Value="bannerData.Title" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Title"></ValidationMessage>
+        </div>
     </div>
     <div class="form-group">
-        <label>Status</label>
-        <ValidationMessage For="@(() => bannerData.Status)" />
-        <InputNumber class="form-control" @bind-Value="bannerData.Status" />
+        <label class="font-weight-bold">Trạng thái</label>
+        <InputSelect class="form-control" @bind-Value="bannerData.Status">
+            <option value="0" selected>Hợp lệ</option>
+            <option value="1">Không hợp lệ</option>
+        </InputSelect>
+
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Status">
+
+            </ValidationMessage>
+        </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Click</button>
+        <button type="submit" class="btn btn-primary">Thêm bảng hiệu</button>
     </div>
 </EditForm>
+<p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
 
 @code {
     string urlPro = "http://localhost:20714/api/Banners";
@@ -63,7 +65,7 @@
                 if (response.IsSuccessStatusCode)
                 {
                     ReceivedBlog = JsonConvert.DeserializeObject<Banner>(apiResponse);
-                    FormSubmitMessage = "Sửa blog thành công !";
+                    FormSubmitMessage = "Sửa bảng hiệu thành công !";
                 }
                 else
                 {
@@ -75,49 +77,3 @@
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 }
-@* @code {
-    public Banner bannerData { get; set; }
-    public Banner banner { get; set; }
-
-    public string FormSubmitMessage { get; set; } = "Banner Not Updated";
-
-    [Parameter]
-    public int Id { get; set; }
-
-    public async Task HandleValidSubmit()
-    {
-        banner = new Banner();
-        using (var httpClient = new HttpClient())
-        {
-            var content = new MultipartFormDataContent();
-            content.Add(new StringContent(bannerData.Image), "Image");
-            content.Add(new StringContent(bannerData.Title), "Title");
-            content.Add(new StringContent(bannerData.Status.ToString()), "Status"); // Convert Status to string
-
-            using (var response = await httpClient.PutAsync("http://localhost:20714/api/Banners", content))
-            {
-                response.EnsureSuccessStatusCode(); // Ensure the request was successful
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                banner = JsonConvert.DeserializeObject<Banner>(apiResponse);
-            }
-        }
-        FormSubmitMessage = "Banner Updated";
-    }
-
-    protected async override Task OnParametersSetAsync()
-    {
-        bannerData = new Banner();
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync($"http://localhost:20714/api/Banners/{Id}"))
-            {
-                response.EnsureSuccessStatusCode(); // Ensure the request was successful
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                bannerData = JsonConvert.DeserializeObject<Banner>(apiResponse);
-            }
-        }
-    }
-
-    public void BannerInvalidSubmit() => FormSubmitMessage = "Invalid Banner";
-}
- *@
