@@ -1,0 +1,70 @@
+﻿@page "/AddCategoris"
+@using System.Text
+
+<h2 class="text-success p-2">@FormSubmitMessage</h2>
+<EditForm Model="CateData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateCate">
+    <DataAnnotationsValidator />
+    <h1>Create Category</h1>
+
+    
+    <div class="form-group">
+        <label>Name</label>
+        <InputText class="form-control" @bind-Value="CateData.Name" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>CateData.Name"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Image</label>
+        <InputText class="form-control" @bind-Value="CateData.Image" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>CateData.Image"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="input-box">
+            <label>Trạng Thái</label>
+            <InputSelect @bind-Value="CateData.Status">
+                <option value="0" selected>Hợp lệ</option>
+                <option value="1">Không hợp lệ</option>
+            </InputSelect>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</EditForm>
+
+
+@code {
+    string urlCate = "http://localhost:20714/api/Categories";
+
+    public Categories CateData = new Categories();
+    Categories ReceivedBlog;
+    public string FormSubmitMessage { get; set; } = string.Empty;
+
+    public async Task HandleValidSubmit()
+    {
+        ReceivedBlog = new Categories();
+        using (var httpClient = new HttpClient())
+        {
+            StringContent content = new StringContent(JsonConvert.SerializeObject(CateData), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PostAsync(urlCate, content))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    CateData = JsonConvert.DeserializeObject<Categories>(apiResponse);
+                    FormSubmitMessage = "Thêm sản phẩm thành công !";
+                }
+                else
+                {
+                    FormSubmitMessage = "Thêm thất bại: " + apiResponse;
+                }
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+}
