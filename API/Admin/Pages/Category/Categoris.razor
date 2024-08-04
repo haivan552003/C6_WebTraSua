@@ -1,0 +1,55 @@
+﻿@page "/category"
+<h3>Categoris</h3>
+<p>
+    <a href="/addcategoris" class=" btn btn-info"> Add New Category</a>
+</p>
+<table class=" table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    @foreach (Categories item in categories)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Image</td>
+            <td>@item.Status</td>
+            <td>
+                <a href="EditCategoris/@item.CateID">
+                    Sửa
+                </a>
+            </td>
+        </tr>
+        
+    }
+
+
+</table>
+
+@code {
+    string url = "http://localhost:20714/api/Categories";
+
+    public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                categories = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+            }
+        }
+    }
+}
+
