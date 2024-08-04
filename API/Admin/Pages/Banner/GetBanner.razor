@@ -14,11 +14,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (Banner item in banner)
+            @foreach (var item in banner)
             {
                 <tr>
                     <td>@item.Id</td>
-                    <td><img src="@item.Image" class="h-25 w-25" /></td>
+                    <td>
+                        <img src="@GetImagePath(item.Image)" width="100" />
+                    </td>
                     <td>@item.Title</td>
                     <td>@item.Status</td>
                     <td><a href="UpdateBanner/@item.Id">Sửa</a></td>
@@ -34,6 +36,8 @@
 }
 
 @code {
+    string imageBasePath = "http://localhost:49972/images/";
+
     string urlBanner = "http://localhost:20714/api/Banners";
     public string FormSubmitMessage { get; set; } = "Banner Not Created";
 
@@ -67,4 +71,6 @@
         }
         await CallAPI();
     }
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
+
 }
