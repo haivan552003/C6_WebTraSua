@@ -5,14 +5,14 @@
     <ValidationSummary />
 
     <div class="form-group">
-        <label class="font-weight-bold">Tiêu đề</label>
+        <label class="font-weight-bold">Tiêu Đfề</label>
         <InputText class="form-control" @bind-Value="bannerData.Title" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Title"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label class="font-weight-bold">Trạng thái</label>
+        <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="bannerData.Status">
             <option value="0" selected>Hợp lệ</option>
             <option value="1">Không hợp lệ</option>
@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Thêm bảng hiệu</button>
+        <button type="submit" class="btn btn-primary">Sửa Bảng Hiệu</button>
     </div>
 </EditForm>
 <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>

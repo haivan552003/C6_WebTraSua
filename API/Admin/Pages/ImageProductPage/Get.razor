@@ -1,19 +1,18 @@
 ﻿@page "/getimg"
 
-<PageTitle>Get Images</PageTitle>
+<p> <a href="createimg">Thêm Hình Ảnh Sản Phẩm</a></p>
 <h3>Danh Sách Ảnh</h3>
 <table class="table">
     <thead>
         <tr>
-            <th>Tên</th>
             <th>Hình Ảnh</th>
+            <th>Khác</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var image in Roless)
         {
             <tr>
-                <td>@image.Name</td>
                 <td>
                     <img src="@GetImagePath(image.Name)" width="100" />
                 </td>

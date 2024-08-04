@@ -1,16 +1,14 @@
 ﻿@page "/createimg"
 @using Microsoft.AspNetCore.Components.Forms
 
-<PageTitle>Upload File</PageTitle>
 
-<h3>Upload File</h3>
-
+<h1>Thêm hình ảnh sản phẩm</h1>
 <EditForm Model="uploadModel">
     <DataAnnotationsValidator />
 
-    <div class="input-box">
-        <label>Tên Sản Phẩm</label>
-        <InputSelect @bind-Value="uploadModel.ProductID">
+    <div class="form-group">
+        <label class="font-weight-bold">Tên Sản Phẩm</label>
+        <InputSelect @bind-Value="uploadModel.ProductID" class="form-control">
             @foreach (Product item in pro)
             {
                 <option value="@item.ProductID">@item.Name</option>
@@ -18,9 +16,14 @@
         </InputSelect>
     </div>
 
-    <InputFile OnChange="ChangeHandler" />
+    <div class="form-group">
+        <label class="font-weight-bold">Chọn Hình Ảnh</label>
+        <InputFile OnChange="ChangeHandler" />
+    </div>
 
-    <button @onclick="UploadFile">Upload</button>
+     <div class="form-group">
+        <button @onclick="UploadFile" class="btn btn-primary">Thêm Hình Ảnh</button>
+     </div>
 
     <p>@apiResponse</p>
 </EditForm> 

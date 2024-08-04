@@ -84,7 +84,7 @@ namespace API.Controllers
             }
 
             // Đường dẫn đến thư mục
-            var uploadFolder = "C:\\Users\\ACER\\Documents\\c6\\images";
+            var uploadFolder = "D:\\FPoly\\C# 6\\ImageUpload";
             var imageName = Path.GetFileName(file.FileName);
             var imagePath = Path.Combine(uploadFolder, imageName);
 

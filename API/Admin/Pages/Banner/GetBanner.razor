@@ -1,7 +1,7 @@
 ﻿@page "/GetBanner"
 @if (banner != null)
 {
-    <p> <a href="CreateBlog">Thêm Bảng Hiệu</a></p>
+    <p> <a href="CreateBanner">Thêm Bảng Hiệu</a></p>
     <div class="panel panel-primary">
         <!-- Default panel contents -->
         <div class="panel-heading"><h2>Thông tin bảng hiệu</h2></div>
@@ -10,7 +10,7 @@
         <table class="table">
             <tr>
                 <th>Hình ảnh</th>
-                <th>Nội dung</th>
+                <th>Tiêu Đề</th>
                 <th>Trạng thái</th>
                 <th>Khác</th>
             </tr>
@@ -49,7 +49,7 @@
     string imageBasePath = "http://localhost:49972/images";
 
     string urlBanner = "http://localhost:20714/api/Banners";
-    public string FormSubmitMessage { get; set; } = "Banner Not Created";
+    public string FormSubmitMessage { get; set; } = null;
     public IEnumerable<Banner> banner { get; set; } = Enumerable.Empty<Banner>();
 
 
