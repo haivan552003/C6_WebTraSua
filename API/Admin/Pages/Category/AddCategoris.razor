@@ -1,70 +1,93 @@
-﻿@page "/AddCategoris"
+﻿@page "/AddCategories"
+@using Microsoft.AspNetCore.Components.Forms
 @using System.Text
+@using System.Net.Http.Headers
 
-<h2 class="text-success p-2">@FormSubmitMessage</h2>
-<EditForm Model="CateData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateCate">
+<div class="panel-heading"><h2>Thêm loại sản phẩm </h2></div>
+
+<EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
-    <h1>Create Category</h1>
-
+    <ValidationSummary />
     
     <div class="form-group">
-        <label>Name</label>
-        <InputText class="form-control" @bind-Value="CateData.Name" />
+        <label class="font-weight-bold">Tiêu đề</label>
+        <InputText class="form-control" @bind-Value="bannerData.Name" />
         <div class="text-danger ps-3">
-            <ValidationMessage For="()=>CateData.Name"></ValidationMessage>
+            <ValidationMessage For="()=>bannerData.Name"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
         <label>Image</label>
-        <InputText class="form-control" @bind-Value="CateData.Image" />
+        <InputFile OnChange="ChangeHandler" />
         <div class="text-danger ps-3">
-            <ValidationMessage For="()=>CateData.Image"></ValidationMessage>
+            <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <div class="input-box">
-            <label>Trạng Thái</label>
-            <InputSelect @bind-Value="CateData.Status">
-                <option value="0" selected>Hợp lệ</option>
-                <option value="1">Không hợp lệ</option>
-            </InputSelect>
+        <label class="font-weight-bold">Trạng thái</label>
+        <InputSelect class="form-control" @bind-Value="bannerData.Status">
+            <option value="0" selected>Hợp lệ</option>
+            <option value="1">Không hợp lệ</option>
+        </InputSelect>
+
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Status">
+
+            </ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="submit" class="btn btn-primary">Thêm loại sản phẩm</button>
     </div>
+
 </EditForm>
+<h2 class="text-success p-2">@FormSubmitMessage</h2>
 
 
 @code {
-    string urlCate = "http://localhost:20714/api/Categories";
+    string url = "http://localhost:20714/api/Categories/UploadFile";
+    private Categories bannerData = new Categories();
+    public string FormSubmitMessage { get; set; } = "Reservation Not Created";
+    public string apiResponse { get; set; }
+    public IBrowserFile F;
 
-    public Categories CateData = new Categories();
-    Categories ReceivedBlog;
-    public string FormSubmitMessage { get; set; } = string.Empty;
-
-    public async Task HandleValidSubmit()
+    private void ChangeHandler(InputFileChangeEventArgs e)
     {
-        ReceivedBlog = new Categories();
-        using (var httpClient = new HttpClient())
-        {
-            StringContent content = new StringContent(JsonConvert.SerializeObject(CateData), Encoding.UTF8, "application/json");
+        F = e.File;
+    }
 
-            using (var response = await httpClient.PostAsync(urlCate, content))
+    private async Task CreateeeBanner()
+    {
+        if (F != null)
+        {
+            using (var ms = F.OpenReadStream(968435456))
             {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
+                var content = new MultipartFormDataContent();
+                content.Add(new StringContent(bannerData.Name ?? string.Empty), "name");
+                content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StringContent(bannerData.Status.ToString()), "status");
+
+                using (var httpClient = new HttpClient())
                 {
-                    CateData = JsonConvert.DeserializeObject<Categories>(apiResponse);
-                    FormSubmitMessage = "Thêm sản phẩm thành công !";
-                }
-                else
-                {
-                    FormSubmitMessage = "Thêm thất bại: " + apiResponse;
+                    var response = await httpClient.PostAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        apiResponse = await response.Content.ReadAsStringAsync();
+                        FormSubmitMessage = "Banner Created Successfully";
+                    }
+                    else
+                    {
+                        apiResponse = $"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
+                        FormSubmitMessage = "Failed to Create Banner";
+                    }
                 }
             }
         }
+        else
+        {
+            apiResponse = "Please select a file to upload.";
+            FormSubmitMessage = "File not selected";
+        }
     }
-
-    public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 }

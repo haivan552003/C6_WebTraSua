@@ -1,39 +1,56 @@
-﻿@page "/category"
-<h3>Categoris</h3>
-<p>
-    <a href="/addcategoris" class=" btn btn-info"> Add New Category</a>
-</p>
-<table class=" table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Status</th>
-        </tr>
-    </thead>
+﻿ @page "/Category"
+<p> <a href="AddCategories">Thêm loại sản phẩm</a></p>
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><h2>Thông tin loại sản phẩm </h2></div>
 
-    @foreach (Categories item in categories)
-    {
-        <tr>
-            <td>@item.Name</td>
-            <td>@item.Image</td>
-            <td>@item.Status</td>
-            <td>
-                <a href="EditCategoris/@item.CateID">
-                    Sửa
-                </a>
-            </td>
-        </tr>
-        
-    }
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Categoriss)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        <img src="@GetImagePath(item.Image)" width="100" height="100" />
+                    </td>
+
+                    @if (item.Status == 0)
+                    {
+                        <td>@item.Status.ToString("Hợp lệ")</td>
+                    }
+                    else
+                    {
+                        <td>@item.Status.ToString("Không hợp lệ")</td>
+
+                    }
+
+                    <td><a class="btn btn-success" href="EditCategoris/@item.CateID">Sửa</a></td>
 
 
-</table>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
 
 @code {
-    string url = "http://localhost:20714/api/Categories";
+    string imageBasePath = "http://localhost:49972/images";
 
-    public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
+    string urlBanner = "http://localhost:20714/api/Categories";
+    public string FormSubmitMessage { get; set; } = "Banner Not Created";
+    public IEnumerable<Categories> Categoriss { get; set; } = Enumerable.Empty<Categories>();
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -44,12 +61,12 @@
     {
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.GetAsync(url))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                categories = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
-            }
+            var response = await httpClient.GetAsync(urlBanner);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            Categoriss = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
         }
     }
-}
 
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}/{imageName}";
+}
