@@ -1,0 +1,64 @@
+﻿@page "/getsizeproduct"
+<PageTitle>get role</PageTitle>
+<h3>Get</h3>
+
+<table>
+    <tr>
+        <th>Tên Sản Phẩm</th>
+        <th>Hình Ảnh</th>
+        <th>Kích Thước</th>
+        <th>Giá</th>
+        <th>Khác</th>
+    </tr>
+    @foreach (var item in product)
+    {
+        <tr>
+            <td>@item.Product.Name</td>
+            <td>
+                @if (item.Product.Image != null && item.Product.Image.Any())
+                {
+                    @foreach (var img in item.Product.Image)
+                    {
+                        <img src="@GetImagePath(img.Name)" width="100" height="100" alt="Product Image" class="m-1">
+                    }
+                }
+                else
+                {
+                    <span>Không có hình ảnh</span>
+                }
+            </td>
+            <td>@item.Size.Name</td>
+            <td>@item.Price</td>
+            <td>
+                <a href="updatesizeproduct/@item.SizeProductID">Sửa</a>
+            </td>
+        </tr>
+    }
+</table>
+
+@code {
+    string urlPro = "http://localhost:20714/api/Size_Product";
+    string imageBasePath = "http://localhost:49972/images/";
+
+
+    public List<Size_Product> product { get; set; } = new List<Size_Product>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlPro))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                product = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+    }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
+}

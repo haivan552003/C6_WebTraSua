@@ -1,0 +1,89 @@
+﻿@page "/createimg"
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Upload File</PageTitle>
+
+<h3>Upload File</h3>
+
+<EditForm Model="uploadModel">
+    <DataAnnotationsValidator />
+
+    <div class="input-box">
+        <label>Tên Sản Phẩm</label>
+        <InputSelect @bind-Value="uploadModel.ProductID">
+            @foreach (Product item in pro)
+            {
+                <option value="@item.ProductID">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <InputFile OnChange="ChangeHandler" />
+
+    <button @onclick="UploadFile">Upload</button>
+
+    <p>@apiResponse</p>
+</EditForm> 
+
+@code {
+    string url = "http://localhost:20714/api/Images/UploadFile";
+    string urlPro = "http://localhost:20714/api/Products";
+
+    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
+
+    public string apiResponse { get; set; }
+    public IBrowserFile F;
+    private Image uploadModel = new Image();
+
+    private void ChangeHandler(InputFileChangeEventArgs e)
+    {
+        F = e.File;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlPro);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+        }
+    }
+
+    public async Task UploadFile()
+    {
+        if (F != null && uploadModel.ProductID > 0)
+        {
+            using (var ms = F.OpenReadStream(968435456))
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StringContent(uploadModel.ProductID.ToString()), "ProductID");
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.PostAsync(url, content))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        apiResponse = await response.Content.ReadAsStringAsync();
+                    }
+                }
+            }
+        }
+        else
+        {
+            apiResponse = "Please provide a valid Product ID.";
+        }
+    }
+
+    public class Image
+    {
+        public int ProductID { get; set; }
+        public IBrowserFile File { get; set; }
+    }
+}
