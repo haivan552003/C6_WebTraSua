@@ -5,13 +5,12 @@
 <h1 class="bg-info text-white">Create Reservation</h1>
 <h2 class="text-success p-2">@FormSubmitMessage</h2>
 
-<EditForm Model="bannerData" OnValidSubmit="CreateeeBanner" OnInvalidSubmit="CreateeBanner">
+<EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="form-group">
         <label>Image</label>
         <InputFile OnChange="ChangeHandler" />
-        <p>@apiResponse</p>
     </div>
     <div class="form-group">
         <label>Title</label>
@@ -21,17 +20,21 @@
     <div class="form-group">
         <label>Status</label>
         <ValidationMessage For="@(() => bannerData.Status)" />
-        <InputNumber class="form-control" @bind-Value="bannerData.Status" />
+        <InputSelect @bind-Value="bannerData.Status">
+            <option value="0">Hợp lệ</option>
+            <option value="1">Không hợp lệ</option>
+        </InputSelect>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </EditForm>
 
+<p>@apiResponse</p>
+
 @code {
-    string url = "http://localhost:20714/api/Images/UploadFile";
-    public Banner bannerData = new Banner();
-    Banner banner;
+    string url = "http://localhost:20714/api/Banners/UploadFile";
+    private Banner bannerData = new Banner();
     public string FormSubmitMessage { get; set; } = "Reservation Not Created";
     public string apiResponse { get; set; }
     public IBrowserFile F;
@@ -39,28 +42,9 @@
     private void ChangeHandler(InputFileChangeEventArgs e)
     {
         F = e.File;
-        Task.Run(async () => await UploadFile()); // Start the file upload immediately
     }
 
     public async Task CreateeeBanner()
-    {
-        banner = new Banner();
-        using (var httpClient = new HttpClient())
-        {
-            StringContent content = new StringContent(JsonConvert.SerializeObject(bannerData), Encoding.UTF8, "application/json");
-
-            using (var response = await httpClient.PostAsync("http://localhost:20714/api/Banners", content))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                banner = JsonConvert.DeserializeObject<Banner>(apiResponse);
-            }
-        }
-        FormSubmitMessage = "Banner Created";
-    }
-
-    public void CreateeBanner() => FormSubmitMessage = "Invalid Banner";
-
-    public async Task UploadFile()
     {
         if (F != null)
         {
@@ -68,14 +52,15 @@
             {
                 var content = new MultipartFormDataContent();
                 content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StringContent(bannerData.Title.ToString()), "title");
+                content.Add(new StringContent(bannerData.Status.ToString()), "status");
 
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.PostAsync(url, content))
-                    {
-                        response.EnsureSuccessStatusCode();
-                        apiResponse = await response.Content.ReadAsStringAsync();
-                    }
+                    var response = await httpClient.PostAsync(url, content);
+                    response.EnsureSuccessStatusCode();
+                    apiResponse = await response.Content.ReadAsStringAsync();
+                    FormSubmitMessage = "Banner Created";
                 }
             }
         }

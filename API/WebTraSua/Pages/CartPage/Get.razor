@@ -3,34 +3,169 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-<PageTitle>Cart</PageTitle>
+<div class="container-fluid-custom" style="margin-top: 85px">
+    <main>
+        <div class="container">
+            <div class="header-cart mb-3">
+                <div class="row">
+                    <div class="col-md-1 pe-0">1.Giỏ hàng</div>
+                    <div class="col-md-3">
+                        <hr width="100%" size="2" />
+                    </div>
+                    <div class="col-md-1 text-black-50">2.Vận chuyển</div>
+                    <div class="col-md-3">
+                        <hr width="100%" size="2" />
+                    </div>
+                    <div class="col-md-4 text-black-50">3.Đánh giá & thanh toán</div>
+                </div>
+            </div>
+            <div class="content-cart">
+                <div class="row">
+                    <div class="col-md-3">
+                    </div>
+                    <div class="col-md-6">
+                        @if (bills == null || !bills.Any())
+                        {
+                            <p>Không có hóa đơn.</p>
+                        }
+                        else
+                        {
+                            <div class="mb-5" style="background-color: #eeeeee;height: 420px;">
+                                <h1>Thanh toán ngay nào, @UserName</h1>
 
-<h3>Cart</h3>
+                                @foreach (var bill in bills)
+                                {
+                                        <div class="pt-5">
+                                            <h2 class="fs-20 ps-4 mb-4">Hoá đơn</h2>
 
-@if (bills == null || !bills.Any())
-{
-    <p>Không có hóa đơn.</p>
-}
-else
-{
-    <h1>Thanh toán ngay nào, @UserName</h1>
-    <ul>
-        @foreach (var bill in bills)
-        {
-            <li>
-                Bill ID: @bill.BillId - Total: @bill.Total - Date: @bill.Date
-                <ul>
-                    @foreach (var detail in bill.BillDetail)
-                    {
-                        <li>
-                            Quantity: @detail.Quality - Subtotal: @detail.Subtotal
-                        </li>
-                    }
-                </ul>
-            </li>
-        }
-    </ul>
-}
+                                        </div>
+                                        <div class="ms-4 mb-0">
+                                            <div class="row mb-3">
+                                                <div class="col-md-9">
+                                                    <span class="fs-16">Tổng Tiền</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span>@bill.Total</span>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-md-9">
+                                                    <span class="fs-16">Phí Vận Chuyển</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span>Miễn phí</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-1"></div>
+                                            <div class="col-md-10">
+                                                <hr />
+                                            </div>
+                                            <div class="col-md-1"></div>
+                                        </div>
+                                        <div class="ms-4 mb-0">
+                                            <div class="row mb-3">
+                                                <div class="col-md-9">
+                                                    <span class="fs-16">Thành Tiền</span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <span class="fs-16">@bill.Total VNĐ</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ms-4 mb-3">
+                                            <span class="fs-16 text-black-50">Estimated shipping time: 2days</span>
+                                        </div>
+                                        <div class="col-md-10 mx-auto">
+                                            <div class="row">
+                                                <div class="btn btn-black mt-30" style="width: 100%">
+                                                    XEM SẢN PHẨM
+                                                </div>
+                                            </div>
+                                            <div class="row mb-5"></div>
+                                            <div class="row mb-4"></div>
+                                        </div>
+
+                                    
+                                }
+                            </div>
+                        }
+                        <div class="mb-5" style="background-color: #eeeeee;height: 190px;">
+                            <div class="pt-5">
+                                <h2 class="fs-20 ps-4 mb-4">Hình thức thanh toán</h2>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2 ms-4 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Sealey-Logo.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Visa-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Mastercard-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Citi-credit-card-Logo-768x432.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1"
+                                     style=" width: 65px; height: 35px;">
+                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/PNC-credit-card-Logo-768x461.png"
+                                         alt="" style="width: 50px;">
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                        </div>
+                        <div style="background-color: #eeeeee;height: 300px;">
+                            <div class="pt-5">
+                                <h2 class="fs-20 ps-4 mb-4">Chính sách giao hàng và trả hàng</h2>
+                            </div>
+                            <div class="collapseoder mb-3">
+                                <p class="d-inline-flex gap-1">
+                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                        > Đặt hàng trước 12h00 và chúng tôi sẽ giao hàng ngay trong ngày.
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseExample">
+                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
+                                        Chúng tôi cam kết mang đến dịch vụ giao hàng nhanh chóng và tiện lợi nhất cho khách hàng. Bằng cách đặt hàng trước 12h00, bạn sẽ nhận được sản phẩm trong cùng ngày, đảm bảo không làm gián đoạn kế hoạch của bạn. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="collapseoder mb-3">
+                                <p class="d-inline-flex gap-1">
+                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
+                                        > Các đơn hàng được thực hiện sau 12:00 thứ sáu sẽ được sử lý vào thứ hai.
+                                    </a>
+                                </p>
+                                <div class="collapse" id="collapseExample1">
+                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
+                                        Điều này giúp chúng tôi đảm bảo rằng bạn nhận được dịch vụ tốt nhất, kể cả trong những ngày cuối tuần. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+</div>
+
 
 @code {
     private bool IsLoggedIn = false;
@@ -71,5 +206,10 @@ else
         var response = await HttpClient.GetStringAsync($"{url}{UserName}");
         var result = JsonConvert.DeserializeObject<List<Bill>>(response);
         bills = result;
+    }
+    private async Task LoadSizeProducts(BillDetail detail)
+    {
+        var response = await HttpClient.GetStringAsync($"{urlSizePro}{detail.SizeProductID}");
+        detail.Size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(response);
     }
 }
