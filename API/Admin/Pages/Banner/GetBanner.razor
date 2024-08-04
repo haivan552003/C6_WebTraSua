@@ -1,0 +1,70 @@
+﻿@page "/GetBanner"
+<h3>GetBanner</h3>
+@if (banner != null)
+{
+    <h3 class="text-warning p-2">Banner</h3>
+    <table class="table table-sm table-striped table-bordered m-2">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Banner item in banner)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td><img src="@item.Image" class="h-25 w-25" /></td>
+                    <td>@item.Title</td>
+                    <td>@item.Status</td>
+                    <td><a href="UpdateBanner/@item.Id">Sửa</a></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(item.Id))">
+                            <img src="/icon/close.png" />
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    string urlBanner = "http://localhost:20714/api/Banners";
+    public string FormSubmitMessage { get; set; } = "Banner Not Created";
+
+    public List<Banner> banner { get; set; } = new List<Banner>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBanner))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                banner = JsonConvert.DeserializeObject<List<Banner>>(apiResponse);
+            }
+        }
+    }
+
+    public async Task Delete(int bannerId)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.DeleteAsync($"{urlBanner}/{bannerId}"))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+            }
+        }
+        await CallAPI();
+    }
+}
