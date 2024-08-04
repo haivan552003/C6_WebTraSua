@@ -65,9 +65,7 @@ namespace API.Controllers
                 .ThenInclude(u => u.Size_Product)
                 .ThenInclude(u => u.Product)
                 .ThenInclude(u => u.Image)
-                .Where(u => u.UserID == id)
-                .ToListAsync();
-
+                .FirstOrDefaultAsync(u => u.BillId == id); // Dùng FirstOrDefaultAsync thay vì ToListAsync
 
             if (bill == null)
             {
@@ -77,6 +75,7 @@ namespace API.Controllers
             var serializedData = JsonSerializer.Serialize(bill, options);
             return Content(serializedData, "application/json");
         }
+
 
         // PUT: api/Bills/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

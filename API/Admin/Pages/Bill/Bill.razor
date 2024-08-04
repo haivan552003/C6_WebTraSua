@@ -1,0 +1,55 @@
+﻿@page "/bill"
+@using Admin.Model
+
+<h3>Danh Sách Hóa Đơn</h3>
+
+<table class="table">
+    <tr>
+        <td>Date</td>
+        <td>Total</td>
+        <td>UserID</td>
+        <td>StatusID</td>
+        <td>ProductName</td>
+        <td>SizeName</td>
+        <td>Subtotal</td>
+        <td>Price</td>
+    </tr>
+    @foreach (Admin.Model.Bill bills in bill)
+    {
+        <tr>
+            <td>@bills.Date.ToShortDateString()</td>
+            <td>@bills.Total</td>
+            <td>@bills.User.Name</td>
+            <td>@bills.StatusID</td>
+            @foreach(var item in bills.BillDetail){
+                <td>@item.sizeProduct.Product.Name</td>
+                <td>@item.sizeProduct.Size.Name</td>
+                <td>@item.Subtotal</td>
+                <td>@item.sizeProduct.Price</td>
+                <td><a href="createbilldetails">Thêm</a></td>
+            }
+        </tr>
+    }
+</table>
+@code {
+    string urlBill = "http://localhost:20714/api/Bills";
+
+    public IEnumerable<Admin.Model.Bill> bill { get; set; } = Enumerable.Empty<Admin.Model.Bill>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bill = JsonConvert.DeserializeObject<List<Admin.Model.Bill>>(apiResponse);
+            }
+        }
+    }
+}
