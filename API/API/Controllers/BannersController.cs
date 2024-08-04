@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Model;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -72,7 +73,41 @@ namespace API.Controllers
 
             return NoContent();
         }
+        [HttpPost("UploadFile")]
+        public async Task<ActionResult<Image>> UploadFile(IFormFile file, [FromForm] int productId)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is empty");
+            }
 
+            // Đường dẫn đến thư mục
+            var uploadFolder = "C:\\Users\\ACER\\Documents\\c6\\Image";
+            var imageName = Path.GetFileName(file.FileName);
+            var imagePath = Path.Combine(uploadFolder, imageName);
+
+            // Tạo thư mục nếu chưa tồn tại
+            if (!Directory.Exists(uploadFolder))
+            {
+                Directory.CreateDirectory(uploadFolder);
+            }
+            // Lưu file vào thư mục đã chỉ định
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var newImg = new Image
+            {
+                Name = imageName,
+                ProductID = productId
+            };
+
+            _context.image.Add(newImg);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetImage", new { id = newImg.ImageID }, newImg);
+        }
         // POST: api/Banners
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

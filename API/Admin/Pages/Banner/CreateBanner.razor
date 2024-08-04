@@ -10,8 +10,8 @@
     <ValidationSummary />
     <div class="form-group">
         <label>Image</label>
-        <ValidationMessage For="@(() => bannerData.Image)" />
-        <InputText class="form-control" @bind-Value="bannerData.Image" />
+        <InputFile OnChange="ChangeHandler" />
+        <p>@apiResponse</p>
     </div>
     <div class="form-group">
         <label>Title</label>
@@ -24,16 +24,23 @@
         <InputNumber class="form-control" @bind-Value="bannerData.Status" />
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Click</button>
-
+        <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </EditForm>
 
 @code {
-
+    string url = "http://localhost:20714/api/Images/UploadFile";
     public Banner bannerData = new Banner();
     Banner banner;
     public string FormSubmitMessage { get; set; } = "Reservation Not Created";
+    public string apiResponse { get; set; }
+    public IBrowserFile F;
+
+    private void ChangeHandler(InputFileChangeEventArgs e)
+    {
+        F = e.File;
+        Task.Run(async () => await UploadFile()); // Start the file upload immediately
+    }
 
     public async Task CreateeeBanner()
     {
@@ -53,4 +60,28 @@
 
     public void CreateeBanner() => FormSubmitMessage = "Invalid Banner";
 
+    public async Task UploadFile()
+    {
+        if (F != null)
+        {
+            using (var ms = F.OpenReadStream(968435456))
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(ms), "file", F.Name);
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.PostAsync(url, content))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        apiResponse = await response.Content.ReadAsStringAsync();
+                    }
+                }
+            }
+        }
+        else
+        {
+            apiResponse = "Please select a file to upload.";
+        }
+    }
 }
