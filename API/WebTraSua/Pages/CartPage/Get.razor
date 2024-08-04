@@ -1,0 +1,75 @@
+﻿@page "/cart"
+@inject IJSRuntime jsRuntime
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>Cart</PageTitle>
+
+<h3>Cart</h3>
+
+@if (bills == null || !bills.Any())
+{
+    <p>Không có hóa đơn.</p>
+}
+else
+{
+    <h1>Thanh toán ngay nào, @UserName</h1>
+    <ul>
+        @foreach (var bill in bills)
+        {
+            <li>
+                Bill ID: @bill.BillId - Total: @bill.Total - Date: @bill.Date
+                <ul>
+                    @foreach (var detail in bill.BillDetail)
+                    {
+                        <li>
+                            Quantity: @detail.Quality - Subtotal: @detail.Subtotal
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private bool IsLoggedIn = false;
+    private string UserName = null;
+    private string url = "http://localhost:20714/api/Bills/";
+    private string urlSizePro = "http://localhost:20714/api/Size_Product/";
+    private IEnumerable<Bill> bills = Enumerable.Empty<Bill>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetSession();
+        if (!IsLoggedIn)
+        {
+            NavigationManager.NavigateTo("/login", true);
+        }
+        else
+        {
+            await LoadBills();
+        }
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                UserName = userInfo.UserName;
+            }
+        }
+    }
+
+    private async Task LoadBills()
+    {
+        var response = await HttpClient.GetStringAsync($"{url}{UserName}");
+        var result = JsonConvert.DeserializeObject<List<Bill>>(response);
+        bills = result;
+    }
+}

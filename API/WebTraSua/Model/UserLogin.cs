@@ -4,6 +4,7 @@ namespace WebTraSua.Model
 {
     public class UserLogin
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập tên tài khoản")]
         public string UserName { get; set; }
 
