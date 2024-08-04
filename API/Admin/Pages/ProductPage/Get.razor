@@ -29,13 +29,20 @@
                         <span>Không có hình ảnh</span>
                     }
                 </td>
-                <td>@item.Categories.Name</td>
                 <td>@item.Rate</td>
+                <td>@item.Categories.Name</td>
                 <td>@item.StatusID</td>
                 <td>
-                    <a href="update/@item.ProductID">
-                        Sửa
-                    </a>
+                    @{
+                        if (item.StatusID == 0)
+                        {
+                            <span>Hợp Lệ</span>
+                        }
+                        else if (item.StatusID == 1)
+                        {
+                            <span>Không Hợp Lệ</span>
+                        }
+                    }
                 </td>
             </tr>
         }
