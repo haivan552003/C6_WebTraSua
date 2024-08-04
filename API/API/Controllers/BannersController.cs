@@ -73,8 +73,10 @@ namespace API.Controllers
 
             return NoContent();
         }
+
+        // Upload file
         [HttpPost("UploadFile")]
-        public async Task<ActionResult<Image>> UploadFile(IFormFile file, [FromForm] int productId)
+        public async Task<ActionResult<Banner>> UploadFile([FromForm] IFormFile file, [FromForm] string title, [FromForm] byte status)
         {
             if (file == null || file.Length == 0)
             {
@@ -82,7 +84,7 @@ namespace API.Controllers
             }
 
             // Đường dẫn đến thư mục
-            var uploadFolder = "C:\\Users\\ACER\\Documents\\c6\\Image";
+            var uploadFolder = "C:\\Users\\ACER\\Documents\\c6\\images";
             var imageName = Path.GetFileName(file.FileName);
             var imagePath = Path.Combine(uploadFolder, imageName);
 
@@ -91,23 +93,27 @@ namespace API.Controllers
             {
                 Directory.CreateDirectory(uploadFolder);
             }
+
             // Lưu file vào thư mục đã chỉ định
             using (var stream = new FileStream(imagePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
 
-            var newImg = new Image
+            var newBanner = new Banner
             {
-                Name = imageName,
-                ProductID = productId
+                Image = imageName,
+                Title = title,
+                Status = status
             };
 
-            _context.image.Add(newImg);
+            _context.banner.Add(newBanner);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetImage", new { id = newImg.ImageID }, newImg);
+            return CreatedAtAction("GetBanner", new { id = newBanner.Id }, newBanner);
         }
+
+
         // POST: api/Banners
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
