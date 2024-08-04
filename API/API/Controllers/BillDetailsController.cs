@@ -59,7 +59,7 @@ namespace API.Controllers
                 .Include(u => u.sizeProduct)
                 .ThenInclude(u => u.Product)
                 .ThenInclude(u => u.Image)
-                .Where(u => u.Bill.User.UserName == userName)
+                .Where(u => u.Bill.User.UserName == userName && u.Bill.StatusID == 1)
                 .ToListAsync();
 
             var serializedData = JsonSerializer.Serialize(billdetail, options);
