@@ -46,17 +46,24 @@ namespace API.Controllers
         //}
 
         // GET: api/BillDetails/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<BillDetail>> GetBillDetail(int id)
+        [HttpGet("{userName}")]
+        public async Task<ActionResult<BillDetail>> GetBillDetail(string userName)
         {
-            var billDetail = await _context.bill_detail.FindAsync(id);
-
-            if (billDetail == null)
+            var options = new JsonSerializerOptions
             {
-                return NotFound();
-            }
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-            return billDetail;
+            var billdetail = await _context.bill_detail
+                .Include(u => u.Bill)
+                .Include(u => u.sizeProduct)
+                .ThenInclude(u => u.Product)
+                .ThenInclude(u => u.Image)
+                .Where(u => u.Bill.User.UserName == userName)
+                .ToListAsync();
+
+            var serializedData = JsonSerializer.Serialize(billdetail, options);
+            return Content(serializedData, "application/json");
         }
 
         // PUT: api/BillDetails/5

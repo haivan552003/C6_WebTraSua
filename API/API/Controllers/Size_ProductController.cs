@@ -45,22 +45,33 @@ namespace API.Controllers
 
             var serializedData = JsonSerializer.Serialize(product, options);
             return Content(serializedData, "application/json");
-
-            return await _context.size_product.ToListAsync();
         }
 
         // GET: api/Size_Product/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Size_Product>> GetSize_Product(int id)
         {
-            var size_Product = await _context.size_product.FindAsync(id);
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-            if (size_Product == null)
+            var bill = await _context.size_product
+               
+                .Include(u => u.Size)
+                            .Include(u => u.Product)
+                .ThenInclude(u => u.Image)
+                .Where(u => u.SizeProductID == id)
+                .ToListAsync();
+
+
+            if (bill == null)
             {
                 return NotFound();
             }
 
-            return size_Product;
+            var serializedData = JsonSerializer.Serialize(bill, options);
+            return Content(serializedData, "application/json");
         }
 
         // PUT: api/Size_Product/5
