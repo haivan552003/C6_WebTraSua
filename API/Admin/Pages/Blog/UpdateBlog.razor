@@ -4,7 +4,6 @@
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
 
-<h2 class="text-success p-2">@FormSubmitMessage</h2>
 <EditForm Model="BlogData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateBlog">
     <DataAnnotationsValidator />
     <h1>Chỉnh Sửa Bài Viết</h1>
@@ -38,6 +37,7 @@
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Sửa Bài Viết</button>
     </div>
+    <p class="text-success p-2 mx-auto">@FormSubmitMessage</p>
 </EditForm>
 
 @code {

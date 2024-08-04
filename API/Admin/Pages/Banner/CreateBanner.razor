@@ -1,36 +1,44 @@
 ﻿@page "/CreateBanner"
 @using System.Text
-<link href="/validation.css" rel="stylesheet" />
-
-<h1 class="bg-info text-white">Create Reservation</h1>
-<h2 class="text-success p-2">@FormSubmitMessage</h2>
 
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <h1>Thêm bảng hiệu</h1>
+
     <div class="form-group">
         <label>Image</label>
         <InputFile OnChange="ChangeHandler" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
+        </div>
     </div>
     <div class="form-group">
-        <label>Title</label>
-        <ValidationMessage For="@(() => bannerData.Title)" />
+        <label class="font-weight-bold">Tiêu đề</label>
         <InputText class="form-control" @bind-Value="bannerData.Title" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Title"></ValidationMessage>
+        </div>
     </div>
     <div class="form-group">
-        <label>Status</label>
-        <ValidationMessage For="@(() => bannerData.Status)" />
-        <InputSelect @bind-Value="bannerData.Status">
-            <option value="0">Hợp lệ</option>
+        <label class="font-weight-bold">Trạng thái</label>
+        <InputSelect class="form-control" @bind-Value="bannerData.Status">
+            <option value="0" selected>Hợp lệ</option>
             <option value="1">Không hợp lệ</option>
-        </InputSelect>
+        </InputSelect>       
+       
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>bannerData.Status">
+              
+            </ValidationMessage>
+        </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Thêm bảng hiệu</button>
     </div>
+    <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+
 </EditForm>
 
-<p>@apiResponse</p>
 
 @code {
     string url = "http://localhost:20714/api/Banners/UploadFile";

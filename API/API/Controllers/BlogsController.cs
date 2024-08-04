@@ -109,7 +109,7 @@ namespace API.Controllers
             }
 
             // Đường dẫn đến thư mục
-            var uploadFolder = "D:\\FPT Plytechnic\\C Sharp 6\\images";
+            var uploadFolder = "D:\\FPoly\\C# 6\\ImageUpload";
             var imageName = Path.GetFileName(file.FileName);
             var imagePath = Path.Combine(uploadFolder, imageName);
 
