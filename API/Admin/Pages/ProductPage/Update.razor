@@ -1,53 +1,46 @@
 ﻿@page "/update/{id:int}"
 @using System.Text
-<h3>Create</h3>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateProduct">
     <DataAnnotationsValidator />
     <h1>Sửa Sản Phẩm</h1>
-
     <div class="form-group">
-        <InputNumber hidden class="form-control" @bind-Value="proData.ProductID" />
-    </div>
-
-    <div class="input-box">
-        <label>Tên Sản Phẩm</label>
-        <InputText @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
+        <label class="font-weight-bold">Tên Sản Phẩm</label>
+        <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Name"></ValidationMessage>
         </div>
     </div>
 
-    <div class="input-box">
-        <label>Đánh Giá</label>
-        <InputNumber @bind-Value="proData.Rate" placeholder="Đánh giá" />
+    <div class="form-group">
+        <label class="font-weight-bold">Đánh Giá</label>
+        <InputNumber class="form-control" @bind-Value="proData.Rate" placeholder="Đánh giá" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
         </div>
     </div>
 
-    <div class="input-box">
-        <label>Mô Tả 1</label>
-        <InputText @bind-Value="proData.Description1" placeholder="Mô tả 1" />
+    <div class="form-group">
+        <label class="font-weight-bold">Mô Tả 1</label>
+        <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
         </div>
     </div>
 
-    <div class="input-box">
-        <label>Mô Tả 2</label>
-        <InputText @bind-Value="proData.Description2" placeholder="Mô tả 2" />
+    <div class="form-group">
+        <label class="font-weight-bold">Mô Tả 2</label>
+        <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
         </div>
     </div>
 
-    <div class="input-box">
-        <label>Danh Mục</label>
-        <InputSelect @bind-Value="proData.CateID">
+    <div class="form-group">
+        <label class="font-weight-bold">Danh Mục</label>
+        <InputSelect class="form-control" @bind-Value="proData.CateID">
             @foreach (Categories item in cate)
             {
-                @item.Name
                 <option value="@item.CateID">@item.Name</option>
             }
         </InputSelect>
@@ -56,16 +49,16 @@
         </div>
     </div>
 
-    <div class="input-box">
-        <label>Trạng Thái</label>
-        <InputSelect @bind-Value="proData.StatusID">
+    <div class="form-group">
+        <label class="font-weight-bold">Trạng Thái</label>
+        <InputSelect class="form-control" @bind-Value="proData.StatusID">
             <option value="0" selected>Hợp lệ</option>
             <option value="1">Không hợp lệ</option>
         </InputSelect>
     </div>
 
-    <button type="submit" class="btn">Thêm Sản Phẩm</button>
-    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+    <button type="submit" class="btn btn-primary">Sửa Sản Phẩm</button>
+    <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
 </EditForm>
 
 @code {
