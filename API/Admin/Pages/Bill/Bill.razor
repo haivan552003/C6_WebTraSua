@@ -1,36 +1,50 @@
 ﻿@page "/bill"
 @using Admin.Model
+@using Syncfusion.Blazor.BarcodeGenerator
 
 <h3>Danh Sách Hóa Đơn</h3>
+<p> <a href="CreateBill">Thêm hóa đơn</a></p>
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><h2>Thông tin hóa đơn</h2></div>
 
-<table class="table">
-    <tr>
-        <td>Date</td>
-        <td>Total</td>
-        <td>UserID</td>
-        <td>StatusID</td>
-        <td>ProductName</td>
-        <td>SizeName</td>
-        <td>Subtotal</td>
-        <td>Price</td>
-    </tr>
-    @foreach (Admin.Model.Bill bills in bill)
-    {
-        <tr>
-            <td>@bills.Date.ToShortDateString()</td>
-            <td>@bills.Total</td>
-            <td>@bills.User.Name</td>
-            <td>@bills.StatusID</td>
-            @foreach(var item in bills.BillDetail){
-                <td>@item.sizeProduct.Product.Name</td>
-                <td>@item.sizeProduct.Size.Name</td>
-                <td>@item.Subtotal</td>
-                <td>@item.sizeProduct.Price</td>
-                <td><a href="createbilldetails">Thêm</a></td>
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ngày</th>
+                <th>Người dùng</th>
+                <th>Trạng thái</th>
+                <th>Tên sản phẩm</th>
+                <th>Size</th>
+                <th>Thành tiền</th>
+                <th>Giá</th>
+                <th>QR Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bills in bill)
+            {
+                @foreach (var item in bills.BillDetail)
+                {
+                    <tr>
+                        <td>@bills.Date.ToShortDateString()</td>
+                        <td>@bills.User.Name</td>
+                        <td>@bills.Status.Name</td>
+                        <td>@item.sizeProduct.Product.Name</td>
+                        <td>@item.sizeProduct.Size.Name</td>
+                        <td>@item.Subtotal</td>
+                        <td>@item.sizeProduct.Price</td>
+                        <td>
+                            <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, item.sizeProduct.Price, item.sizeProduct.Product.Name)"></SfQRCodeGenerator>
+                        </td>
+                    </tr>
+                }
             }
-        </tr>
-    }
-</table>
+        </tbody>
+    </table>
+</div>
+
 @code {
     string urlBill = "http://localhost:20714/api/Bills";
 
@@ -52,4 +66,21 @@
             }
         }
     }
+
+    // Hàm tạo chuỗi giá trị cho mã QR
+    private string GetQRCodeValue(int billId, decimal price, string productName)
+    {
+        return $"BillID: {billId}, Price: {price}, ProductName: {productName}";
+    }
 }
+
+
+<style>
+    .table th, .table td {
+        text-align: center;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+</style>

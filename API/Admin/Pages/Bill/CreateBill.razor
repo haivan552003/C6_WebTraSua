@@ -2,38 +2,27 @@
 @using System.Text
 <h3>Create</h3>
 
-
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
     <DataAnnotationsValidator />
-    <h1>Thêm Bill</h1>
+    <ValidationSummary />
 
-    <div class="input-box">
+    <div class="form-group">
         <label>Ngày</label>
-        <InputDate @bind-Value="proData.Date" placeholder="Ngày" />
+        <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Date"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
-        <label>Tổng</label>
-        <InputNumber @bind-Value="proData.Total" placeholder="Tổng" />
+    <div class="form-group">
+        <label>Thành tiền</label>
+        <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Total"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
-        <label>UserID</label>
-        <InputNumber @bind-Value="proData.UserID" placeholder="UserID" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.UserID"></ValidationMessage>
-        </div>
-    </div>
-
-    <div class="input-box">
-        <label>Danh Mục</label>
-        <InputSelect @bind-Value="proData.UserID">
+    <div class="form-group">
+        <label>User</label>
+        <InputSelect class="form-control" @bind-Value="proData.UserID">
             @foreach (User item in users)
             {
                 @item.Name
@@ -44,10 +33,9 @@
             <ValidationMessage For="()=>proData.UserID"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
+    <div class="form-group">
         <label>Trạng thái</label>
-        <InputSelect @bind-Value="proData.StatusID">
+        <InputSelect class="form-control" @bind-Value="proData.StatusID">
             @foreach (Status item in statuses)
             {
                 @item.Name
@@ -55,13 +43,14 @@
             }
         </InputSelect>
         <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.UserID"></ValidationMessage>
+            <ValidationMessage For="()=>proData.StatusID"></ValidationMessage>
         </div>
     </div>
-
-    <button type="submit" class="btn">Thêm Sản Phẩm</button>
-    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Thêm hóa đơn</button>
+    </div>
 </EditForm>
+<p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
 
 @code {
     string urlBill = "http://localhost:20714/api/Bills";
@@ -113,7 +102,7 @@
                 if (response.IsSuccessStatusCode)
                 {
                     ReceivedPro = JsonConvert.DeserializeObject<Admin.Model.Bill>(apiResponse);
-                    FormSubmitMessage = "Thêm sản phẩm thành công!";
+                    FormSubmitMessage = "Thêm thành công!";
                 }
                 else
                 {
