@@ -5,7 +5,7 @@
         @foreach (Blog blogs in blog)
         {
             <div class="mb-72">
-                <img src="@blogs.Image"
+                <img src="@GetImagePath(@blogs.Image)"
                 class="w-100"
                      style="height: 600px" alt="">
 
@@ -35,6 +35,7 @@
     [Inject]
     public NavigationManager NV { get; set; }
 
+    string imageBasePath = "http://localhost:49972/images/";
     string url = "http://localhost:20714/api/Blogs";
 
     public IEnumerable<Blog> blog { get; set; } = Enumerable.Empty<Blog>();
@@ -55,4 +56,6 @@
             }
         }
     }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }

@@ -5,7 +5,7 @@
             @foreach (Banner item in banner)
             {
                 <div class="carousel-item @(item == banner.First() ? "active" : "")">
-                    <img src="@item.Image"
+                    <img src="@GetImagePath(item.Image)"
                          class="d-block w-100" style="height: 630px; object-fit: cover;" alt="@item.Title">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>@item.Title</h5>
@@ -106,7 +106,7 @@
         {
             <div class="col-md-4 p-3">
                 <img class="img-fluid w-100" style="height: 336px"
-                     src="@item.Image"
+                     src="@GetImagePath(item.Image)"
                      alt="">
                 <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
             </div>
@@ -117,7 +117,7 @@
         {
             <div class="col-md-4 p-3">
                 <img class="img-fluid w-100" style="height: 336px"
-                     src="@item.Image"
+                     src="@GetImagePath(item.Image)"
                      alt="">
                 <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
             </div>
@@ -185,7 +185,7 @@
         {
             <div class="col-md-4 p-3">
                 <img class="img-fluid w-100" style="height: 336px"
-                     src="@item.Image"
+                     src="@GetImagePath(item.Image)"
                      alt="">
                 <p class="text-center fs-16 text-uppercase pt-3">@item.Name</p>
             </div>
@@ -203,7 +203,7 @@
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-md-6 pe-2 img_col6">
-                            <img src="@item.Image"
+                            <img src="@GetImagePath(item.Image)"
                                  alt="" class="img-fluid w-100" style="height:300px">
                         </div>
                         <div class="col-md-6 pe-2">
@@ -225,7 +225,7 @@
     <div class="col-md-4">
         @foreach (Categories item in cateLast)
         {
-            <img src="@item.Image"
+            <img src="@GetImagePath(item.Image)"
                  class="w-75 mx-auto floating" alt="" style="height: 440px;">
             <p class="text-center fw-semibold">Sắp ra mắt</p>
         }
@@ -275,7 +275,7 @@
             </div>
         </div>
         <div class="col-md-6 img_col6">
-            <img src="@item.Image"
+            <img src="@GetImagePath(item.Image)"
                  class="img-fluid" alt="">
         </div>
     }
@@ -290,6 +290,7 @@
     string urlBanner = "http://localhost:20714/api/Banners";
     string urlBlog = "http://localhost:20714/api/Blogs";
     string urlPro = "http://localhost:20714/api/Products";
+    string imageBasePath = "http://localhost:49972/images/";
 
     public IEnumerable<Categories> cateOne { get; set; } = Enumerable.Empty<Categories>();
     public IEnumerable<Categories> cateTwo { get; set; } = Enumerable.Empty<Categories>();
@@ -335,4 +336,6 @@
             }
         }
     }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }

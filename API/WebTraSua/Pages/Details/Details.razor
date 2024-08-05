@@ -18,12 +18,12 @@
 
                         if (imagesForProduct.Any())
                         {
-                            <img id="mainImage" src="@imagesForProduct.First().Name" class="img-fluid h-75 w-100 main-image" />
+                            <img id="mainImage" src="@GetImagePath(imagesForProduct.First().Name)" class="img-fluid h-75 w-100 main-image" />
                             <div class="row secondary">
                                 @foreach (var image in imagesForProduct.Take(4))
                                 {
                                     <div class="col-md-3">
-                                        <img src="@image.Name" class="img-fluid h-100 w-100 secondary-img" onclick="changeMainImage('@image.Name')" />
+                                        <img src="@GetImagePath(@image.Name)" class="img-fluid h-100 w-100 secondary-img" onclick="changeMainImage('@image.Name')" />
                                     </div>
                                 }
                             </div>
@@ -193,6 +193,7 @@
     public string FormSubmitMessage { get; set; } = string.Empty;
 
     string urlDetail = $"http://localhost:20714/api/BillDetails";
+    string imageBasePath = "http://localhost:49972/images/";
 
     protected override async Task OnInitializedAsync()
     {
@@ -358,4 +359,6 @@
             }
         }
     }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }
