@@ -98,7 +98,7 @@ namespace API.Controllers
                 return BadRequest("File is empty");
             }
 
-            var uploadFolder = "D:\\FPT POLYTECNIC\\C#6\\images";
+            var uploadFolder = "D:\\FPoly\\C# 6\\ImageUpload";
             var imageName = Path.GetFileName(file.FileName);
             var imagePath = Path.Combine(uploadFolder, imageName);
 

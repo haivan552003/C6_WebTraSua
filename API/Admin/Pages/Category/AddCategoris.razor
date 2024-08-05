@@ -3,28 +3,28 @@
 @using System.Text
 @using System.Net.Http.Headers
 
-<div class="panel-heading"><h2>Thêm loại sản phẩm </h2></div>
+<div class="panel-heading"><h2>Thêm danh mục sản phẩm</h2></div>
 
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
     <ValidationSummary />
     
     <div class="form-group">
-        <label class="font-weight-bold">Tiêu đề</label>
+        <label class="font-weight-bold">Tiêu Đề</label>
         <InputText class="form-control" @bind-Value="bannerData.Name" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Name"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>Image</label>
+        <label class="font-weight-bold">Hình Ảnh</label>
         <InputFile OnChange="ChangeHandler" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label class="font-weight-bold">Trạng thái</label>
+        <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="bannerData.Status">
             <option value="0" selected>Hợp lệ</option>
             <option value="1">Không hợp lệ</option>
@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Thêm loại sản phẩm</button>
+        <button type="submit" class="btn btn-primary">Thêm Danh Mục</button>
     </div>
 
 </EditForm>
@@ -47,7 +47,7 @@
 @code {
     string url = "http://localhost:20714/api/Categories/UploadFile";
     private Categories bannerData = new Categories();
-    public string FormSubmitMessage { get; set; } = "Reservation Not Created";
+    public string FormSubmitMessage { get; set; } = null;
     public string apiResponse { get; set; }
     public IBrowserFile F;
 
@@ -74,20 +74,20 @@
                     if (response.IsSuccessStatusCode)
                     {
                         apiResponse = await response.Content.ReadAsStringAsync();
-                        FormSubmitMessage = "Banner Created Successfully";
+                        FormSubmitMessage = "Thêm thành công";
                     }
                     else
                     {
                         apiResponse = $"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
-                        FormSubmitMessage = "Failed to Create Banner";
+                        FormSubmitMessage = "Thêm thất bại";
                     }
                 }
             }
         }
         else
         {
-            apiResponse = "Please select a file to upload.";
-            FormSubmitMessage = "File not selected";
+            apiResponse = "Vui lòng chọn hình ảnh";
+            FormSubmitMessage = "Vui lòng chọn hình ảnh";
         }
     }
 }
