@@ -2,14 +2,13 @@
 @using System.Text
 <h3>Create</h3>
 
-
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBillDetails">
     <DataAnnotationsValidator />
-    <h1>BillDetails</h1>
+    <ValidationSummary />
 
-    <div class="input-box">
+    <div class="form-group">
         <label>BillID</label>
-        <InputSelect @bind-Value="proData.BillID">
+        <InputSelect class="form-control" @bind-Value="proData.BillID">
             @foreach (Bill item in bills)
             {
                 <option value="@item.BillId">@item.BillId</option>
@@ -19,26 +18,23 @@
             <ValidationMessage For="()=>proData.BillID"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
-        <label>Quality</label>
-        <InputNumber @bind-Value="proData.Quality" placeholder="UserID" />
+    <div class="form-group">
+        <label>Số lượng</label>
+        <InputNumber class="form-control" @bind-Value="proData.Quality" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Quality"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
-        <label>Subtotal</label>
-        <InputNumber @bind-Value="proData.Subtotal" placeholder="UserID" />
+    <div class="form-group">
+        <label>Tổng tiền</label>
+        <InputNumber class="form-control" @bind-Value="proData.Subtotal" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Subtotal"></ValidationMessage>
         </div>
     </div>
-
-    <div class="input-box">
-        <label>Size ProductID</label>
-        <InputSelect @bind-Value="proData.SizeProductID">
+    <div class="form-group">
+        <label>Size</label>
+        <InputSelect class="form-control" @bind-Value="proData.SizeProductID">
             @foreach (Size_Product item in size_Products)
             {
                 <option value="@item.SizeProductID">@item.SizeProductID</option>
@@ -48,10 +44,11 @@
             <ValidationMessage For="()=>proData.SizeProductID"></ValidationMessage>
         </div>
     </div>
-
-    <button type="submit" class="btn">Thêm Sản Phẩm</button>
-    <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Thêm</button>
+    </div>
 </EditForm>
+<p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
 
 @code {
     string urlBillDetails = "http://localhost:20714/api/BillDetails";
@@ -102,7 +99,7 @@
                 if (response.IsSuccessStatusCode)
                 {
                     ReceivedPro = JsonConvert.DeserializeObject<Admin.Model.BillDetail>(apiResponse);
-                    FormSubmitMessage = "Thêm sản phẩm thành công!";
+                    FormSubmitMessage = "Thêm thành công!";
                 }
                 else
                 {
