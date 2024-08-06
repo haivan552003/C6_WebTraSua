@@ -1,4 +1,6 @@
 ﻿@page "/getproduct"
+@inject IJSRuntime jsRuntime
+
 <p> <a href="createproduct">Thêm Sản phẩm</a></p>
 <div class="panel panel-primary">
     <!-- Default panel contents -->
@@ -43,6 +45,11 @@
                         }
                     }
                 </td>
+                <td>
+                    <a class="btn btn-sm btn-success" href="updatepro/@item.ProductID">
+                        Sửa
+                    </a>
+                </td>
             </tr>
         }
     </table>
@@ -54,11 +61,29 @@
     string imageBasePath = "http://localhost:49972/images/";
     string urlPro = "http://localhost:20714/api/Products";
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     public List<Product> product { get; set; } = new List<Product>();
 
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     async Task CallAPI()

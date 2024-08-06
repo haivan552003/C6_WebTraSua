@@ -1,4 +1,6 @@
 ﻿@page "/createimg"
+@inject IJSRuntime jsRuntime
+
 @using Microsoft.AspNetCore.Components.Forms
 
 
@@ -31,6 +33,8 @@
 @code {
     string url = "http://localhost:20714/api/Images/UploadFile";
     string urlPro = "http://localhost:20714/api/Products";
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
 
     public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
 
@@ -46,6 +50,21 @@
     protected override async Task OnInitializedAsync()
     {
         await Load();
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     private async Task Load()

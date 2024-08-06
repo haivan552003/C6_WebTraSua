@@ -38,15 +38,25 @@
                         <a class="btn btn-sm btn-success" href="UpdateBanner/@item.Id">
                             Sửa
                         </a> |
-                        <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(item.Id))">
+                        <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(item.Id))">
                             Xóa
                         </button>
+
                     </td>
                 </tr>
             }
         </table>
     </div>
 }
+
+<script>
+    function confirmDelete(message) {
+        return new Promise((resolve) => {
+            const result = confirm(message);
+            resolve(result);
+        });
+    }
+</script>
 
 @code {
 
@@ -88,6 +98,15 @@
             var response = await httpClient.GetAsync(urlBanner);
             var apiResponse = await response.Content.ReadAsStringAsync();
             banner = JsonConvert.DeserializeObject<List<Banner>>(apiResponse);
+        }
+    }
+
+    private async Task ConfirmDelete(int bannerId)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bảng hiệu này không?");
+        if (confirmed)
+        {
+            await Delete(bannerId);
         }
     }
 

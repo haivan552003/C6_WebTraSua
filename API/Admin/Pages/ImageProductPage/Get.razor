@@ -1,4 +1,5 @@
 ﻿@page "/getimg"
+@inject IJSRuntime jsRuntime
 
 <p> <a href="createimg">Thêm Hình Ảnh Sản Phẩm</a></p>
 <h3>Danh Sách Ảnh</h3>
@@ -28,6 +29,9 @@
 </table>
 
 @code {
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     string url = "http://localhost:20714/api/Images";
     string imageBasePath = "http://localhost:49972/images/";
 
@@ -36,6 +40,7 @@
     protected override async Task OnInitializedAsync()
     {
         await CallAPI();
+        await GetSession();
     }
 
     async Task CallAPI()
@@ -45,6 +50,20 @@
             var response = await httpClient.GetAsync(url);
             var apiResponse = await response.Content.ReadAsStringAsync();
             Roless = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
+        }
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
         }
     }
 

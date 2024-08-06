@@ -1,5 +1,6 @@
-﻿@page "/update/{id:int}"
+﻿@page "/updatepro/{id:int}"
 @using System.Text
+@inject IJSRuntime jsRuntime
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateProduct">
     <DataAnnotationsValidator />
@@ -70,10 +71,29 @@
     public IEnumerable<Categories> cate { get; set; } = Enumerable.Empty<Categories>();
     public string FormSubmitMessage { get; set; } = string.Empty;
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     protected override async Task OnInitializedAsync()
     {
         await Load();
+        await GetSession();
     }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
+
 
     private async Task Load()
     {

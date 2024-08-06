@@ -1,66 +1,158 @@
 ﻿@page "/createproduct"
 @using System.Text
-<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateProduct">
-    <DataAnnotationsValidator />
-    <h1>Thêm Sản Phẩm</h1>
-    <div class="form-group">
-        <label class="font-weight-bold">Tên Sản Phẩm</label>
-        <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Name"></ValidationMessage>
-        </div>
-    </div>
+@inject IJSRuntime jsRuntime
 
-    <div class="form-group">
-        <label class="font-weight-bold">Đánh Giá</label>
-        <InputNumber class="form-control" @bind-Value="proData.Rate" placeholder="Đánh giá" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
-        </div>
-    </div>
+<style>
+    #formgetpro {
+        display: block;
+    }
 
-    <div class="form-group">
-        <label class="font-weight-bold">Mô Tả 1</label>
-        <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
-        </div>
-    </div>
+    #formgetimg {
+        display: none;
+    }
+</style>
+<div class="form-group">
+    <button onclick="HideProFunction()" class="btn btn-primary">Thêm Hình Ảnh</button>
+</div>
+<div class="row">
+    <div id="formgetpro" class="col-md-6">
+        <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateProduct">
+            <DataAnnotationsValidator />
+            <h1>
+                Thêm Sản Phẩm
+            </h1>
+            <div class="form-group">
+                <label class="font-weight-bold">Tên Sản Phẩm</label>
+                <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Name"></ValidationMessage>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label class="font-weight-bold">Mô Tả 2</label>
-        <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
-        </div>
-    </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Đánh Giá</label>
+                <InputNumber class="form-control" @bind-Value="proData.Rate" placeholder="Đánh giá" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label class="font-weight-bold">Danh Mục</label>
-        <InputSelect class="form-control" @bind-Value="proData.CateID">
-            @foreach (Categories item in cate)
-            {
-                <option value="@item.CateID">@item.Name</option>
-            }
-        </InputSelect>
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
-        </div>
-    </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Mô Tả 1</label>
+                <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label class="font-weight-bold">Trạng Thái</label>
-        <InputSelect class="form-control" @bind-Value="proData.StatusID">
-            <option value="0" selected>Hợp lệ</option>
-            <option value="1">Không hợp lệ</option>
-        </InputSelect>
-    </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Mô Tả 2</label>
+                <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
+                </div>
+            </div>
 
-    <button type="submit" class="btn btn-primary">Thêm Sản Phẩm</button>
-    <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
-</EditForm>
+            <div class="form-group">
+                <label class="font-weight-bold">Danh Mục</label>
+                <InputSelect class="form-control" @bind-Value="proData.CateID">
+                    @foreach (Categories item in cate)
+                    {
+                        <option value="@item.CateID">@item.Name</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Trạng Thái</label>
+                <InputSelect class="form-control" @bind-Value="proData.StatusID">
+                    <option value="0" selected>Hợp lệ</option>
+                    <option value="1">Không hợp lệ</option>
+                </InputSelect>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Thêm Sản Phẩm</button>
+            <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+        </EditForm>
+    </div>
+    <div id="formgetimg" class="col-md-6">
+        <h1>Danh Sách Ảnh</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Hình Ảnh</th>
+                    <th>Khác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var image in images)
+                {
+                    <tr>
+                        <td>
+                            <img src="@GetImagePath(image.Name)" width="100" />
+                        </td>
+
+                        <td>
+                            <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(image))">
+                                Xóa
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h1>Thêm Hình Ảnh Sản Phẩm</h1>
+        <EditForm Model="uploadModel">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label class="font-weight-bold">Tên Sản Phẩm</label>
+                <InputSelect @bind-Value="uploadModel.ProductID" class="form-control">
+                    @foreach (Product item in pro)
+                    {
+                        <option value="@item.ProductID">@item.Name</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Chọn Hình Ảnh</label>
+                <InputFile OnChange="ChangeHandler" />
+            </div>
+
+            <div class="form-group">
+                <button @onclick="UploadFile" class="btn btn-primary">Thêm Hình Ảnh</button>
+            </div>
+
+            <p>@apiResponse</p>
+        </EditForm>
+    </div>
+</div>
+
+<script>
+    function HideProFunction() {
+        var x = document.getElementById("formgetpro");
+        var y = document.getElementById("formgetimg");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            y.style.display = "none";
+        } else {
+            x.style.display = "none";
+            y.style.display = "block";
+        }
+    }
+</script>
 
 @code {
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
+    //pro
     string urlPro = "http://localhost:20714/api/Products";
     string urlCate = "http://localhost:20714/api/Categories";
 
@@ -72,17 +164,44 @@
     protected override async Task OnInitializedAsync()
     {
         await Load();
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     private async Task Load()
     {
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.GetAsync(urlCate))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
-            }
+            var response = await httpClient.GetAsync(urlCate);
+            string apiResponse = await response.Content.ReadAsStringAsync();
+            cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+        }
+
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlPro);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+        }
+
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlImg);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
         }
     }
 
@@ -100,6 +219,7 @@
                 {
                     ReceivedPro = JsonConvert.DeserializeObject<Product>(apiResponse);
                     FormSubmitMessage = "Thêm sản phẩm thành công!";
+                    await Load();
                 }
                 else
                 {
@@ -120,4 +240,81 @@
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 
+
+    //create img
+    string url = "http://localhost:20714/api/Images/UploadFile";
+
+    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
+
+    public string apiResponse { get; set; }
+    public IBrowserFile F;
+    private Image uploadModel = new Image();
+
+    private void ChangeHandler(InputFileChangeEventArgs e)
+    {
+        F = e.File;
+    }
+
+    public async Task UploadFile()
+    {
+        if (F != null && uploadModel.ProductID > 0)
+        {
+            using (var ms = F.OpenReadStream(968435456))
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StringContent(uploadModel.ProductID.ToString()), "ProductID");
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.PostAsync(url, content))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        apiResponse = await response.Content.ReadAsStringAsync();
+                    }
+                }
+            }
+        }
+        else
+        {
+            apiResponse = "Vui lòng chọn tên sản phẩm";
+        }
+    }
+
+    public class Image
+    {
+        public int ProductID { get; set; }
+        public IBrowserFile File { get; set; }
+    }
+
+    //get img
+    string urlImg = "http://localhost:20714/api/Images";
+    string imageBasePath = "http://localhost:49972/images/";
+
+    public IEnumerable<Admin.Model.Image> images { get; set; } = Enumerable.Empty<Admin.Model.Image>();
+
+    async Task CallAPIGetImg()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(urlImg);
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
+        }
+    }
+
+    public async Task Delete(Admin.Model.Image r)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.DeleteAsync(urlImg + "/" + r.ImageID))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+            }
+        }
+        await Load();
+    }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }
+
