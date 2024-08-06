@@ -138,12 +138,12 @@
                 @foreach (var similarProduct in similarProducts)
                 {
                     <div class="col-md-4">
-                        <div class="card card-prodcut-same" style="width: 15rem;">
+                        <div class="card card-prodcut-same mx-auto">
                             @if (similarProduct.Image != null && similarProduct.Image.Any())
                             {
                                 @foreach (var image in similarProduct.Image.Take(1))
                                 {
-                                    <img src="@image.Name" class="card-img-top" style="width:100px; height:100px">
+                                    <img src="@GetImagePath(image.Name)" class="card-img-top mx-auto" style="width:250px; height:250px">
                                 }
                             }
                             else

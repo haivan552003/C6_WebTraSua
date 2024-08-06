@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
+using Syncfusion.Blazor;
 
 namespace WebTraSua
 {
@@ -21,6 +22,9 @@ namespace WebTraSua
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             await builder.Build().RunAsync();
+
+            builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:20714/") });
         }
     }
 }

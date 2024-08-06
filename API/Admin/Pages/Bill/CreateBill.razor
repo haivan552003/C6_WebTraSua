@@ -1,27 +1,27 @@
 ﻿@page "/createbill"
 @using System.Text
-<h3>Create</h3>
+<h3>Thêm Hóa Đơn</h3>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
-        <label>Ngày</label>
+        <label>Ngày Tạo</label>
         <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Date"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>Thành tiền</label>
+        <label>Thành Tiền</label>
         <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Total"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>User</label>
+        <label>Khách Hàng</label>
         <InputSelect class="form-control" @bind-Value="proData.UserID">
             @foreach (User item in users)
             {
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>Trạng thái</label>
+        <label>Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="proData.StatusID">
             @foreach (Status item in statuses)
             {
@@ -47,7 +47,7 @@
         </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Thêm hóa đơn</button>
+        <button type="submit" class="btn btn-primary">Thêm Hóa Đơn</button>
     </div>
 </EditForm>
 <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>

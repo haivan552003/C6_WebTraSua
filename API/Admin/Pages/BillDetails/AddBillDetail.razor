@@ -1,13 +1,13 @@
 ﻿@page "/createbilldetails"
 @using System.Text
-<h3>Create</h3>
+<h3>Thêm Hóa Đơn Chi Tiết</h3>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBillDetails">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
-        <label>BillID</label>
+        <label>Mã Hóa Đơn</label>
         <InputSelect class="form-control" @bind-Value="proData.BillID">
             @foreach (Bill item in bills)
             {
@@ -19,21 +19,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>Số lượng</label>
-        <InputNumber class="form-control" @bind-Value="proData.Quality" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Quality"></ValidationMessage>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>Tổng tiền</label>
-        <InputNumber class="form-control" @bind-Value="proData.Subtotal" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Subtotal"></ValidationMessage>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>Size</label>
+        <label>Sản Phẩm</label>
         <InputSelect class="form-control" @bind-Value="proData.SizeProductID">
             @foreach (Size_Product item in size_Products)
             {
@@ -45,7 +31,21 @@
         </div>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Thêm</button>
+        <label>Số Lượng</label>
+        <InputNumber class="form-control" @bind-Value="proData.Quality" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Quality"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Tổng Tiền</label>
+        <InputNumber class="form-control" @bind-Value="proData.Subtotal" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Subtotal"></ValidationMessage>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Thêm Hóa Đơn Chi Tiết</button>
     </div>
 </EditForm>
 <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>

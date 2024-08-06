@@ -3,7 +3,7 @@
 @using Syncfusion.Blazor.BarcodeGenerator
 
 <h3>Danh Sách Hóa Đơn</h3>
-<p> <a href="CreateBill">Thêm hóa đơn</a></p>
+<p> <a href="CreateBill">Thêm Hóa Đơn</a></p>
 <div class="panel panel-primary">
     <!-- Default panel contents -->
     <div class="panel-heading"><h2>Thông tin hóa đơn</h2></div>
@@ -12,14 +12,13 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Ngày</th>
-                <th>Người dùng</th>
-                <th>Trạng thái</th>
-                <th>Tên sản phẩm</th>
-                <th>Size</th>
-                <th>Thành tiền</th>
-                <th>Giá</th>
+                <th>Ngày Tạo</th>
+                <th>Người Dùng</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá Sản Phẩm</th>
+                <th>Thành Tiền</th>
                 <th>QR Code</th>
+                <th>Trạng Thái</th>
             </tr>
         </thead>
         <tbody>
@@ -30,14 +29,13 @@
                     <tr>
                         <td>@bills.Date.ToShortDateString()</td>
                         <td>@bills.User.Name</td>
-                        <td>@bills.Status.Name</td>
                         <td>@item.sizeProduct.Product.Name</td>
-                        <td>@item.sizeProduct.Size.Name</td>
-                        <td>@item.Subtotal</td>
                         <td>@item.sizeProduct.Price</td>
+                        <td>@item.Subtotal</td>
                         <td>
                             <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, item.sizeProduct.Price, item.sizeProduct.Product.Name)"></SfQRCodeGenerator>
                         </td>
+                        <td>@bills.Status.Name</td>
                     </tr>
                 }
             }
@@ -68,9 +66,9 @@
     }
 
     // Hàm tạo chuỗi giá trị cho mã QR
-    private string GetQRCodeValue(int billId, decimal price, string productName)
+    private string GetQRCodeValue(int billId, decimal price, string proName)
     {
-        return $"BillID: {billId}, Price: {price}, ProductName: {productName}";
+        return $"Mã Hóa Đơn: {billId}, Sản Phẩm: {proName}, Thành Tiền: {price}";
     }
 }
 

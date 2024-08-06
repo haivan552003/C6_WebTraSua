@@ -1,28 +1,28 @@
 ﻿@page "/EditBill/{id:int}"
 @using System.Text
-<h3>Create</h3>
+<h3>Sửa Hóa Đơn</h3>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateBill">
     <DataAnnotationsValidator />
     <h1>Sửa Sản Phẩm</h1>
     <div class="form-group">
-        <label>Ngày</label>
-        <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
+        <label>Ngày Tạo</label>
+        <InputDate class="form-control" disable @bind-Value="proData.Date" placeholder="Ngày" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Date"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>Thành tiền</label>
-        <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
+        <label>Thành Tiền</label>
+        <InputNumber class="form-control" disable @bind-Value="proData.Total" placeholder="Tổng" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Total"></ValidationMessage>
         </div>
     </div>
 
     <div class="form-group">
-        <label>User</label>
-        <InputSelect class="form-control" @bind-Value="proData.UserID">
+        <label>Khách Hàng</label>
+        <InputSelect class="form-control" disable @bind-Value="proData.UserID">
             @foreach (User item in users)
             {
                 @item.Name
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>Trạng thái</label>
+        <label>Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="proData.StatusID">
             @foreach (Status item in statuses)
             {
