@@ -1,10 +1,13 @@
 ﻿@page "/bill"
-@using Admin.Model
-@using Syncfusion.Blazor.BarcodeGenerator
+@using QRCoder
+@using System.Drawing.Imaging
+@using System.IO
+@inject IJSRuntime JSRuntime
 
 <h3>Danh Sách Hóa Đơn</h3>
-<p> <a href="CreateBill">Thêm Hóa Đơn</a></p>
-<div class="panel panel-primary">
+<p><a href="CreateBill">Thêm hóa đơn</a></p>
+
+<div id="printableArea" class="panel panel-primary">
     <!-- Default panel contents -->
     <div class="panel-heading"><h2>Thông tin hóa đơn</h2></div>
 
@@ -12,41 +15,59 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Ngày Tạo</th>
-                <th>Người Dùng</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Giá Sản Phẩm</th>
-                <th>Thành Tiền</th>
+                <th>Ngày</th>
+                <th>Mã hóa đơn</th>
+                <th>Người dùng</th>
+                <th>Tên sản phẩm</th>
+                <th>Thành tiền</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
                 <th>QR Code</th>
-                <th>Trạng Thái</th>
+                <th>Trạng thái</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var bills in bill)
             {
-                @foreach (var item in bills.BillDetail)
+                @foreach (var itemBillDetails in billDetails)
                 {
-                    <tr>
-                        <td>@bills.Date.ToShortDateString()</td>
-                        <td>@bills.User.Name</td>
-                        <td>@item.sizeProduct.Product.Name</td>
-                        <td>@item.sizeProduct.Price</td>
-                        <td>@item.Subtotal</td>
-                        <td>
-                            <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, item.sizeProduct.Price, item.sizeProduct.Product.Name)"></SfQRCodeGenerator>
-                        </td>
-                        <td>@bills.Status.Name</td>
-                    </tr>
+                    @foreach (var item in products)
+                    {
+                        @foreach (var itemSizePro in size_Products)
+                        {
+                            <tr>
+                                <td>@bills.Date.ToShortDateString()</td>
+                                <td>@bills.BillId</td>
+                                <td>@bills.User.Name</td>
+                                <td>@item.Name</td>
+                                <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
+                                <td>@itemSizePro.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))  VNĐ</td>
+                                <td>@itemBillDetails.Quality</td>
+                                <td>
+                                    @* <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name)"></SfQRCodeGenerator> *@
+                                    <img src="@GenerateQRCode(GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name,itemBillDetails.Quality, bills.Total))" width="100px" height="100px" alt="QR Code" />
+                                </td>
+                                <td>@bills.Status.Name</td>
+                            </tr>
+                        }
+                    }
                 }
             }
+
         </tbody>
     </table>
 </div>
 
 @code {
     string urlBill = "http://localhost:20714/api/Bills";
+    string urlPro = "http://localhost:20714/api/Products";
+    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
+    string urlBillDetails = "http://localhost:20714/api/BillDetails";
 
     public IEnumerable<Admin.Model.Bill> bill { get; set; } = Enumerable.Empty<Admin.Model.Bill>();
+    public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<Size_Product> size_Products { get; set; } = Enumerable.Empty<Size_Product>();
+    public IEnumerable<BillDetail> billDetails { get; set; } = Enumerable.Empty<BillDetail>();
 
     protected async override Task OnInitializedAsync()
     {
@@ -63,22 +84,63 @@
                 bill = JsonConvert.DeserializeObject<List<Admin.Model.Bill>>(apiResponse);
             }
         }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlPro))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBillDetails))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                billDetails = JsonConvert.DeserializeObject<List<BillDetail>>(apiResponse);
+            }
+        }
     }
 
-    // Hàm tạo chuỗi giá trị cho mã QR
-    private string GetQRCodeValue(int billId, decimal price, string proName)
+    private string GetQRCodeValue(int billId, decimal price, string productName, int quantity, float total)
     {
-        return $"Mã Hóa Đơn: {billId}, Sản Phẩm: {proName}, Thành Tiền: {price}";
+        return $"Mã hóa đơn: {billId}\n" +
+           $"Tên sản phẩm: {productName}\n" +
+           $"Giá: {price.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))} VNĐ\n" +
+           $"Số lượng: {quantity}\n" +
+           $"Thành tiền: {total.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))} VNĐ";
+    }
+
+    private string GenerateQRCode(string text)
+    {
+        using (var qrGenerator = new QRCodeGenerator())
+        {
+            var qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
+            using (var qrCode = new QRCode(qrCodeData))
+            {
+                using (var bitmap = qrCode.GetGraphic(20))
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        bitmap.Save(stream, ImageFormat.Png);
+                        byte[] byteArray = stream.ToArray();
+                        return "data:image/png;base64," + Convert.ToBase64String(byteArray);
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task PrintSelectedArea()
+    {
+        await JSRuntime.InvokeVoidAsync("printSelectedArea", "printableArea");
     }
 }
-
-
-<style>
-    .table th, .table td {
-        text-align: center;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-</style>
