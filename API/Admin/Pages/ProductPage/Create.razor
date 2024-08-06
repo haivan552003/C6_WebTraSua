@@ -88,7 +88,7 @@
                         </td>
 
                         <td>
-                            <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(image))">
+                            <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(image.ImageID))">
                                 Xóa
                             </button>
                         </td>
@@ -138,6 +138,12 @@
             y.style.display = "block";
         }
     }
+    function confirmDelete(message) {
+        return new Promise((resolve) => {
+            const result = confirm(message);
+            resolve(result);
+        });
+    }
 </script>
 
 @code {
@@ -158,6 +164,7 @@
         await Load();
         await GetSession();
     }
+    
 
     private async Task GetSession()
     {
@@ -294,17 +301,31 @@
             images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
         }
     }
+    private async Task ConfirmDelete(int imageId)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bảng hiệu này không?");
+        if (confirmed)
+        {
+            await Delete(imageId);
+        }
+    }
 
-    public async Task Delete(Admin.Model.Image r)
+    public async Task Delete(int imageId)
     {
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.DeleteAsync(urlImg + "/" + r.ImageID))
+            using (var response = await httpClient.DeleteAsync(urlImg + "/" + imageId))
             {
-                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    await Load();
+                }
+                else
+                {
+                    apiResponse = "Xóa thất bại: " + await response.Content.ReadAsStringAsync();
+                }
             }
         }
-        await Load();
     }
 
     private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";

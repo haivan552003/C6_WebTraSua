@@ -24,7 +24,7 @@
                     <a class="btn btn-sm btn-success" href="UpdateBlog/@blogs.Id">
                         Sửa
                     </a> |
-                    <button class="btn btn-sm btn-danger" @onclick="@(() => Delete(blogs.Id))">
+                    <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(blogs.Id))">
                         Xóa
                     </button>
                 </td>
@@ -32,6 +32,14 @@
         }
     </table>
 </div>
+<script>
+    function confirmDelete(message) {
+        return new Promise((resolve) => {
+            const result = confirm(message);
+            resolve(result);
+        });
+    }
+</script>
 
 @code {
     string imageBasePath = "http://localhost:49972/images";
@@ -70,6 +78,14 @@
             var response = await httpClient.GetAsync(urlBanner);
             var apiResponse = await response.Content.ReadAsStringAsync();
             banner = JsonConvert.DeserializeObject<List<Blog>>(apiResponse);
+        }
+    }
+    private async Task ConfirmDelete(int bannerId)
+    {
+        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bài viết này không?");
+        if (confirmed)
+        {
+            await Delete(bannerId);
         }
     }
 
