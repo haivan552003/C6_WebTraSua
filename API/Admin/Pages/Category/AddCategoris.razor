@@ -1,4 +1,6 @@
 ﻿@page "/AddCategories"
+@inject IJSRuntime jsRuntime
+
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text
 @using System.Net.Http.Headers
@@ -50,6 +52,28 @@
     public string FormSubmitMessage { get; set; } = null;
     public string apiResponse { get; set; }
     public IBrowserFile F;
+
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
 
     private void ChangeHandler(InputFileChangeEventArgs e)
     {

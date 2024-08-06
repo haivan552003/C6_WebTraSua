@@ -1,5 +1,6 @@
 ﻿@page "/CreateBanner"
 @using System.Text
+@inject IJSRuntime jsRuntime
 
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
@@ -47,6 +48,14 @@
     public string apiResponse { get; set; }
     public IBrowserFile F;
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+    }
+
     private void ChangeHandler(InputFileChangeEventArgs e)
     {
         F = e.File;
@@ -77,4 +86,19 @@
             apiResponse = "Vui lòng chọn hình ảnh";
         }
     }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
+
 }

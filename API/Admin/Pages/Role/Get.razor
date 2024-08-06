@@ -1,4 +1,6 @@
 ﻿@page "/get"
+@inject IJSRuntime jsRuntime
+
 <PageTitle>get role</PageTitle>
 <h3>Get</h3>
 
@@ -58,9 +60,13 @@
 
     public IEnumerable<Roles> Roless { get; set; } = Enumerable.Empty<Roles>();
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
+        await GetSession();
     }
 
     async Task CallAPI()
@@ -74,4 +80,19 @@
             }
         }
     }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
+
 }

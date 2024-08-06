@@ -1,4 +1,6 @@
 ﻿ @page "/Category"
+ @inject IJSRuntime jsRuntime
+
 <p> <a href="AddCategories">Thêm danh mục sản phẩm</a></p>
 <div class="panel panel-primary">
     <!-- Default panel contents -->
@@ -51,10 +53,13 @@
     public string FormSubmitMessage { get; set; } = "Banner Not Created";
     public IEnumerable<Categories> Categoriss { get; set; } = Enumerable.Empty<Categories>();
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
 
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
+        await GetSession();
     }
 
     async Task CallAPI()
@@ -67,6 +72,19 @@
         }
     }
 
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
 
     private string GetImagePath(string imageName) => $"{imageBasePath}/{imageName}";
 }

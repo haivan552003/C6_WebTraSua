@@ -3,6 +3,7 @@
 @using System.Net.Http
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
+@inject IJSRuntime jsRuntime
 
 <EditForm Model="BlogData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateBlog">
     <DataAnnotationsValidator />
@@ -46,8 +47,30 @@
     Blog ReceivedBlog;
     public string FormSubmitMessage { get; set; } = string.Empty;
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     [Parameter]
     public int Id { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
 
     protected async override Task OnParametersSetAsync()
     {

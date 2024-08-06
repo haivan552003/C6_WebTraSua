@@ -1,0 +1,102 @@
+﻿@page "/"
+@using System.Text
+@layout EmptyLayout
+@inject NavigationManager nv
+@inject IJSRuntime jsRuntime
+
+<body>
+    <header>
+        <!-- place navbar here -->
+    </header>
+    <main>
+        <div class="wrapper">
+            <EditForm Model="userData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="AdminLogin">
+                <DataAnnotationsValidator />
+                <h1>Đăng Nhập</h1>
+                <div class="input-box">
+                    <InputText @bind-Value="userData.UserName" placeholder="Tên đăng nhập" />
+                    <i class='bx bxs-user'></i>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>userData.UserName"></ValidationMessage>
+                    </div>
+                </div>
+                <div class="input-box">
+                    <InputText @bind-Value="userData.PassWord" type="password" placeholder="Mật khẩu" />
+                    <div id="eye">
+                        <i class='bx bx-low-vision'></i>
+                        <div class="text-danger ps-3">
+                            <ValidationMessage For="()=>userData.PassWord"></ValidationMessage>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Đăng Nhập</button>
+                <p class="text-danger text-center p-2">@FormSubmitMessage</p>
+            </EditForm>
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+    <!-- Bootstrap JavaScript Libraries -->
+
+</body>
+
+@code {
+    string url = "http://localhost:20714/api/Login";
+
+    public UserLogin userData { get; set; } = new UserLogin();
+    public string FormSubmitMessage { get; set; } = null;
+
+    public async Task HandleValidSubmit()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var userInfoResponse = await httpClient.GetAsync($"{url}?username={userData.UserName}&password={userData.PassWord}");
+
+            if (userInfoResponse.IsSuccessStatusCode)
+            {
+                var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
+                var userInfo = JsonConvert.DeserializeObject<User>(userInfoJson);
+
+                if (userInfo != null && userInfo.RoleID == 1)
+                {
+                    var jsonContent = JsonConvert.SerializeObject(userData);
+                    StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                    try
+                    {
+                        var response = await httpClient.PostAsync(url, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            await jsRuntime.InvokeVoidAsync("sessionStorageHelper.setItem", "userSession", userInfoJson);
+
+                            string apiResponse = await response.Content.ReadAsStringAsync();
+                            FormSubmitMessage = "Đăng nhập thành công";
+                            nv.NavigateTo("/index");
+                        }
+                        else
+                        {
+                            FormSubmitMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        FormSubmitMessage = "Lỗi khi gọi API: " + ex.Message;
+                    }
+                }
+                else
+                {
+                    FormSubmitMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
+                }
+            }
+            else
+            {
+                FormSubmitMessage = "Tên đăng nhập hoặc mật khẩu không đúng";
+            }
+        }
+    }
+
+    public void HandleInvalidSubmit() => FormSubmitMessage = null;
+}

@@ -1,5 +1,6 @@
 ﻿@page "/EditCategoris/{id:int}"
 @using System.Text
+@inject IJSRuntime jsRuntime
 
 <div class="panel-heading"><h2>Sửa loại sản phẩm </h2></div>
 
@@ -41,8 +42,31 @@
     Categories ReceivedBlog;
     public string FormSubmitMessage { get; set; } = string.Empty;
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
     [Parameter]
     public int Id { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
+
     protected async override Task OnParametersSetAsync()
     {
         using (var httpClient = new HttpClient())

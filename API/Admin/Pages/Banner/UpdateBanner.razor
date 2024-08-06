@@ -1,5 +1,7 @@
 ﻿@page "/UpdateBanner/{Id:int}"
 @using System.Text
+@inject IJSRuntime jsRuntime
+
 <EditForm Model="bannerData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -35,6 +37,28 @@
     public Banner bannerData = new Banner();
     Banner ReceivedBlog;
     public string FormSubmitMessage { get; set; } = string.Empty;
+
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
 
     [Parameter]
     public int Id { get; set; }

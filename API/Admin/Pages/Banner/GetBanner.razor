@@ -1,4 +1,8 @@
 ﻿@page "/GetBanner"
+@inject NavigationManager nv
+
+@inject IJSRuntime jsRuntime
+
 @if (banner != null)
 {
     <p> <a href="CreateBanner">Thêm Bảng Hiệu</a></p>
@@ -41,7 +45,7 @@
                 </tr>
             }
         </table>
-    </div>  
+    </div>
 }
 
 @code {
@@ -52,11 +56,30 @@
     public string FormSubmitMessage { get; set; } = null;
     public IEnumerable<Banner> banner { get; set; } = Enumerable.Empty<Banner>();
 
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
+
 
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
+        await GetSession();
     }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
+
 
     async Task CallAPI()
     {
