@@ -4,26 +4,25 @@
     <div class="row">
         @foreach (Blog blogs in blog)
         {
-            <div class="mb-72">
-                <img src="@GetImagePath(@blogs.Image)"
-                class="w-100"
-                     style="height: 600px" alt="">
-
+            <div class="col-md-6 mb-72">
+                <img src="@GetImagePath(@blogs.Image)" class="w-100" style="height: 400px" alt="">
+            </div>
+            <div class="col-md-6 mb-72">
                 <div class="row color-9F9F9F mt-3">
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <i class="fa-solid fa-user"></i> Admin
                     </div>
-                    <div class="col-md-2">
-                        <i class="fa-solid fa-calendar-days"></i> @DateTime.Now.ToShortDateString()
-                    </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <i class="fa-solid fa-tag"></i> Trà sữa
                     </div>
                 </div>
-                <p class="fw-medium mt-3" style="font-size: 30px;">@blogs.Title</p>
-                <p class="color-9F9F9F mt-3" style="text-align: justify;">
+                <p class="fw-medium mt-3" style="font-size: 30px; word-wrap: break-word; word-break: break-all;">
+                    @blogs.Title
+                </p>
+                <p class="color-9F9F9F mt-3 text-break">
                     @blogs.Decription
                 </p>
+                <a class="color-9F9F9F" @onclick="() => NavigateToBlogDetail(blogs.Id)">Xem chi tiết</a>
                 <hr>
             </div>
         }
@@ -34,12 +33,17 @@
 @code {
     [Inject]
     public NavigationManager NV { get; set; }
+    [Parameter]
+    public int BlogID { get; set; }
 
     string imageBasePath = "http://localhost:49972/images/";
     string url = "http://localhost:20714/api/Blogs";
 
     public IEnumerable<Blog> blog { get; set; } = Enumerable.Empty<Blog>();
-
+    private void NavigateToBlogDetail(int id)
+    {
+        NV.NavigateTo($"/blog/{id}");
+    }
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
