@@ -1,0 +1,141 @@
+﻿@page "/user"
+@inject IJSRuntime jsRuntime
+@inject HttpClient HttpClient
+
+<main class="container mt-6">
+    <div class="row">
+        @if (IsLoggedIn)
+        {
+            @foreach (var user in US)
+            {
+                if (user.UserId == UserId)
+                {
+                    <div class="col-md-8">
+                        <div class="mb-72">
+                            <p class="fs-52 fw-bold">Thông tin của bạn</p>
+                            <form action="" class="col-md-10 mx-auto">
+                                <label for="" class="fw-semibold">Tên người dùng</label>
+                                <div class="input-group flex-nowrap mt-3">
+                                    <span class="input-group-text" id="addon-wrapping">
+                                        <i class="fa-solid fa-address-card"></i>
+                                    </span>
+                                    <input type="text" class="form-control" value="@user.Name" aria-describedby="addon-wrapping">
+                                </div>
+                                <label for="" class="mt-3 fw-semibold">Tên đăng nhập</label>
+                                <div class="input-group flex-nowrap mt-3">
+                                    <span class="input-group-text" id="addon-wrapping"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" class="form-control" value="@user.UserName" aria-describedby="addon-wrapping">
+                                </div>
+                                <label for="" class="mt-3 fw-semibold">Mật khẩu</label>
+                                <div class="input-group flex-nowrap mt-3">
+                                    <span class="input-group-text" id="addon-wrapping"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" class="form-control" value="@user.PassWord" aria-describedby="addon-wrapping">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="" class="mt-3 fw-semibold">Gender</label>
+                                        <select class="form-select mt-3" aria-label="Default select example">
+                                            <option value="0" selected="@user.Gender == 0">Nam</option>
+                                            <option value="1" selected="@user.Gender == 1">Nữ</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="" class="mt-3 fw-semibold">Phone</label>
+                                        <div class="input-group flex-nowrap mt-3">
+                                            <span class="input-group-text" id="addon-wrapping">
+                                                <i class="fa-solid fa-phone"></i>
+                                            </span>
+                                            <input type="text" class="form-control" value="@user.Phone" aria-describedby="addon-wrapping">
+                                        </div>
+                                    </div>
+                                </div>
+                                <label for="" class="mt-3 fw-semibold">Address</label>
+                                <div class="input-group mt-3">
+                                    <span class="input-group-text"><i class="fa-solid fa-address-book"></i></span>
+                                    <textarea class="form-control" aria-label="With textarea">@user.Address</textarea>
+                                </div>
+
+                                <a class="btn text-white button-brown-hover fs-16 fw-bold bg-B88E2F rounded-0 mt-3">
+                                    Lưu thay đổi
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <div class="col-md-10 mx-auto" style="margin-top: 92px;">
+                            <div class="col-md-10 mx-auto" style="margin-top: 92px;">
+                                <img src="https://i.pinimg.com/originals/cf/ba/b9/cfbab918bff4c8f23ab2cf2948233238.jpg"
+                                     alt="" class="img-fluid w-100 h-100 rounded-circle">
+                                <p class="text-center mt-3 fs-16 fw-semibold">@user.Name</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <p>Bạn chưa đăng nhập.</p>
+        }
+    </div>
+</main>
+
+@code {
+    [Inject]
+    public NavigationManager NV { get; set; }
+    private bool IsLoggedIn = false;
+    private int UserId = 0;
+
+    string url = "http://localhost:20714/api/Users";
+
+    public IEnumerable<User> US { get; set; } = Enumerable.Empty<User>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetSession();
+        if (IsLoggedIn)
+        {
+            await CallAPI();
+        }
+    }
+
+    async Task CallAPI()
+    {
+        var response = await HttpClient.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            string apiResponse = await response.Content.ReadAsStringAsync();
+            US = JsonConvert.DeserializeObject<List<User>>(apiResponse);
+            Console.WriteLine("API Response: " + apiResponse);
+        }
+        else
+        {
+            Console.WriteLine("Error retrieving data from API: " + response.StatusCode);
+        }
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<User>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                UserId = userInfo.UserId;
+                Console.WriteLine("Session UserId: " + UserId);
+            }
+            else
+            {
+                Console.WriteLine("Unable to deserialize session information.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No user session found.");
+        }
+    }
+}
