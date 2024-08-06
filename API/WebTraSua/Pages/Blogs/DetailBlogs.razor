@@ -1,0 +1,63 @@
+﻿@page "/blog/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+
+<div class="container mt-5">
+    @if (blog != null)
+    {
+        <div class="mb-72">
+            <img src="@GetImagePath(@blog.Image)"
+                 class="w-100"
+                 style="height: 600px" alt="">
+
+            <div class="row color-9F9F9F mt-3">
+                <div class="col-md-2">
+                    <i class="fa-solid fa-user"></i> Admin
+                </div>
+                <div class="col-md-2">
+                    <i class="fa-solid fa-tag"></i> Trà sữa
+                </div>
+            </div>
+            <p class="fw-medium mt-3" style="font-size: 30px;">@blog.Title</p>
+            <p class="color-9F9F9F mt-3" style="text-align: justify;">
+                @blog.Decription
+            </p>
+            <hr>
+        </div>
+    }
+    else
+    {
+        <p>Đang tải...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Blog blog;
+    private string imageBasePath = "http://localhost:49972/images/";
+    private string apiUrl = "http://localhost:20714/api/Blogs/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBlog();
+    }
+
+    private async Task LoadBlog()
+    {
+        try
+        {
+            blog = await Http.GetFromJsonAsync<Blog>($"{apiUrl}{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lỗi khi tải blog: {ex.Message}");
+            NavigationManager.NavigateTo("/blog");
+        }
+    }
+
+    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
+}
