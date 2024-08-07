@@ -43,30 +43,17 @@
 
 <main class="container">
     <div class="row">
-        <div class="col-md-3">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    BỘ SƯU TẬP(1)
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    NGUỒN GỐC
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    HƯƠNG VỊ
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    CHẤT LƯỢNG
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    CÀ PHÊ
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-            </ul>
-        </div>
+        @foreach (var item in categories)
+        {
+            <div class="col-md-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        @item.Name
+                        <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    </li>
+                </ul>
+            </div>
+        }
         <div class="col-md-9">
             <div class="row">
                 @foreach (var product in products)

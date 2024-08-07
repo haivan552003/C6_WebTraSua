@@ -1,61 +1,188 @@
 ﻿@page "/createbill"
 @using System.Text
+@using Admin.Model
+
+
+<style>
+    #formgetpro {
+        display: block;
+    }
+
+    #formgetimg {
+        display: block;
+    }
+    #table1{
+        display: none;
+    }
+</style>
 <h3>Thêm Hóa Đơn</h3>
+<div class="form-group">
+    <button onclick="HideProFunction()" class="btn btn-primary">Thêm hóa đơn chi tiết</button>
+</div>
+<div class="row">
+    <div id="formgetpro" class="col-md-6">
+        <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+            <div class="form-group">
+                <label>Ngày Tạo</label>
+                <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Date"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Thành Tiền</label>
+                <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Total"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Khách Hàng</label>
+                <InputSelect class="form-control" @bind-Value="proData.UserID">
+                    @foreach (User item in users)
+                    {
+                        <option value="@item.UserId">@item.Name</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.UserID"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Trạng Thái</label>
+                <InputSelect class="form-control" @bind-Value="proData.StatusID">
+                    @foreach (Status item in statuses)
+                    {
+                        <option value="@item.StatusId">@item.Name</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.StatusID"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Thêm Hóa Đơn</button>
+            </div>
+        </EditForm>
+        <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+    </div>
+    <div id="table1" class="col-md-6">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Mã hóa đơn</th>
+                    <th>Tên khách hàng</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bills in bills)
+                {
+                    @foreach (var itemBillDetails in billDetails)
+                    {
+                        @foreach (var item in products)
+                        {
+                            @foreach (var itemSizePro in size_Products)
+                            {
+                                <tr>
+                                    <td>@bills.Date.ToShortDateString()</td>
+                                    <td>@bills.BillId</td>
+                                    <td>@bills.User.Name</td>
+                                    <td>@item.Name</td>
+                                    <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
+                                </tr>
+                            }
+                        }
+                    }
+                }
 
-    <div class="form-group">
-        <label>Ngày Tạo</label>
-        <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Date"></ValidationMessage>
-        </div>
+            </tbody>
+        </table>
     </div>
-    <div class="form-group">
-        <label>Thành Tiền</label>
-        <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Total"></ValidationMessage>
-        </div>
+    <div id="formgetimg" class="col-md-6">
+        <EditForm Model="proData1" OnValidSubmit="HandleValidSubmit1" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBillDetails">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label>Mã Hóa Đơn</label>
+                <InputSelect class="form-control" @bind-Value="proData1.BillID">
+                    @foreach(Admin.Model.Bill item in bills)
+                    {
+                        <option value="@item.BillId">@item.BillId</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData1.BillID"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Sản Phẩm</label>
+                <InputSelect class="form-control" @bind-Value="proData1.SizeProductID">
+                    @foreach (Size_Product item in size_Products)
+                    {
+                        <option value="@item.SizeProductID">@item.SizeProductID</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData1.SizeProductID"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Số Lượng</label>
+                <InputNumber class="form-control" @bind-Value="proData1.Quality" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData1.Quality"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tổng Tiền</label>
+                <InputNumber class="form-control" @bind-Value="proData1.Subtotal" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData1.Subtotal"></ValidationMessage>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Thêm Hóa Đơn Chi Tiết</button>
+            </div>
+        </EditForm>
+        <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+
     </div>
-    <div class="form-group">
-        <label>Khách Hàng</label>
-        <InputSelect class="form-control" @bind-Value="proData.UserID">
-            @foreach (User item in users)
-            {
-                @item.Name
-                <option value="@item.UserId">@item.Name</option>
-            }
-        </InputSelect>
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.UserID"></ValidationMessage>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>Trạng Thái</label>
-        <InputSelect class="form-control" @bind-Value="proData.StatusID">
-            @foreach (Status item in statuses)
-            {
-                @item.Name
-                <option value="@item.StatusId">@item.Name</option>
-            }
-        </InputSelect>
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.StatusID"></ValidationMessage>
-        </div>
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Thêm Hóa Đơn</button>
-    </div>
-</EditForm>
-<p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+</div>
+<script>
+    function HideProFunction() {
+        var x = document.getElementById("formgetpro");
+        var y = document.getElementById("formgetimg");
+        var z = document.getElementById("table1");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            y.style.display = "block";
+            z.style.display = "none";
+        } else {
+            x.style.display = "none";
+            y.style.display = "block";
+            z.style.display = "block";
+        }
+    }
+</script>
+
 
 @code {
     string urlBill = "http://localhost:20714/api/Bills";
     string urlUser = "http://localhost:20714/api/Users";
     string urlStatus = "http://localhost:20714/api/Status";
+
+    string urlBillDetails = "http://localhost:20714/api/BillDetails";
+    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
+
+    string urlPro = "http://localhost:20714/api/Products";
+
 
     public Admin.Model.Bill proData = new Admin.Model.Bill();
     Admin.Model.Bill ReceivedPro;
@@ -63,9 +190,21 @@
     public List<Status> statuses { get; set; } = new List<Status>();
     public string FormSubmitMessage { get; set; } = string.Empty;
 
+
+    public Admin.Model.BillDetail proData1 = new Admin.Model.BillDetail();
+    Admin.Model.BillDetail ReceivedPro1;
+    public List<Admin.Model.Bill> bills { get; set; } = new List<Admin.Model.Bill>();
+    public List<Size_Product> size_Products { get; set; } = new List<Size_Product>();
+    public string FormSubmitMessage1 { get; set; } = string.Empty;
+
+    public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<BillDetail> billDetails { get; set; } = Enumerable.Empty<BillDetail>();
+
     protected override async Task OnInitializedAsync()
     {
         await Load();
+        await Load2();
+        await CallAPI();
     }
 
     private async Task Load()
@@ -89,6 +228,60 @@
         }
     }
 
+    private async Task Load2()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bills = JsonConvert.DeserializeObject<List<Admin.Model.Bill>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+    }
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bills = JsonConvert.DeserializeObject<List<Admin.Model.Bill>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlPro))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBillDetails))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                billDetails = JsonConvert.DeserializeObject<List<BillDetail>>(apiResponse);
+            }
+        }
+    }
     public async Task HandleValidSubmit()
     {
         ReceivedPro = new Admin.Model.Bill();
@@ -129,6 +322,46 @@
         }
     }
 
+    public async Task HandleValidSubmit1()
+    {
+        ReceivedPro1 = new Admin.Model.BillDetail();
+        using (var httpClient = new HttpClient())
+        {
+            StringContent content = new StringContent(JsonConvert.SerializeObject(proData), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PostAsync(urlBillDetails, content))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    ReceivedPro1 = JsonConvert.DeserializeObject<Admin.Model.BillDetail>(apiResponse);
+                    FormSubmitMessage = "Thêm thành công!";
+                }
+                else
+                {
+                    FormSubmitMessage = "Thêm thất bại: " + apiResponse;
+                }
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlSizeProduct))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
+            }
+        }
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlBill))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                bills = JsonConvert.DeserializeObject<List<Admin.Model.Bill>>(apiResponse);
+            }
+        }
+    }
+
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+
 
 }
