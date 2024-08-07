@@ -1,4 +1,24 @@
 ﻿@page "/"
+<style>
+    /* giới hạn dòng và dấu .. */
+    .ellipsis {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .block-ellipsis {
+        display: block;
+        display: -webkit-box;
+        max-width: 100%;
+        margin: 0 auto;
+        line-height: 1.7;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 <header>
     <div id="carouselExampleIndicators" class="carousel slide">
         <div class="carousel-inner">
@@ -29,12 +49,12 @@
         <img src="https://th.bing.com/th/id/R.df17bccbb4546f0e6e78655c1b243f87?rik=WTz3IegmLfcYbw&pid=ImgRaw&r=0"
              class="img-fluid" alt="">
     </div>
-    <div class="col-md-6 mx-auto d-flex align-items-center">
+    <div class="col-md-6 mx-auto d-flex align-items-center block-ellipsis">
         <div class="p-5">
             @foreach (Blog item in blogLast)
             {
-                <a class="fs-36 fw-bold ellipsis">@item.Title</a>
-                <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
+                <a class="fs-36 fw-bold">@item.Title</a>
+                <p class="fs-16 mt-30 color-1C1B1F">
                     @item.Decription
                 </p>
                 <div class="btn btn-black mt-30" style="width: 270px;">XEM SẢN PHẨM</div>
@@ -207,7 +227,7 @@
                                  alt="" class="img-fluid w-100" style="height:300px">
                         </div>
                         <div class="col-md-6 pe-2">
-                            <a class="fs-22 ellipsis">
+                            <a class="fs-22 block-ellipsis">
                                 @item.Title
                             </a>
                             <p class="block-ellipsis color-1C1B1F">
@@ -265,9 +285,9 @@
     {
         <div class="col-md-6 mx-auto d-flex align-items-center">
             <div class="p-5">
-                <a class="fs-36 fw-bold ellipsis">@item.Title</a>
+                <a class="fs-36 fw-bold block-ellipsis">@item.Title</a>
 
-                <p class="block-ellipsis fs-16 mt-30 color-1C1B1F">
+                <p class="fs-16 mt-30 color-1C1B1F block-ellipsis">
                     @item.Decription
                 </p>
 

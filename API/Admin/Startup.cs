@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Syncfusion.Blazor;
 
@@ -35,7 +36,11 @@ public class Startup
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider("D:/FPoly/C# 6/ImageUpload"),
+            RequestPath = "/images"
+        });
         app.UseRouting();
 
         app.UseEndpoints(endpoints =>
