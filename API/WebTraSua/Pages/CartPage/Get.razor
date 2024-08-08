@@ -207,9 +207,9 @@
         var result = JsonConvert.DeserializeObject<List<Bill>>(response);
         bills = result;
     }
-    private async Task LoadSizeProducts(BillDetail detail)
-    {
-        var response = await HttpClient.GetStringAsync($"{urlSizePro}{detail.SizeProductID}");
-        detail.Size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(response);
-    }
+    // private async Task LoadSizeProducts(BillDetail detail)
+    // {
+    //     var response = await HttpClient.GetStringAsync($"{urlSizePro}{detail.SizeProductID}");
+    //     detail.Size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(response);
+    // }
 }

@@ -55,24 +55,24 @@
                                 <p><i class="fa-solid fa-cake-candles fs-5"></i> Bánh kem</p>
                             </div>
                         </div>
-                        @if (product?.Size_Product != null && product.Size_Product.Any())
-                        {
-                            var sizeForProduct = product.Size_Product.Where(size => size.ProductID == product.ProductID).ToList();
-                            if (sizeForProduct.Any())
-                            {
-                                var firstSize = sizeForProduct.FirstOrDefault();
-                                <h1>Giá: @firstSize.Price VNĐ</h1>
-                            }
-                        }
-                        <div class="size">
-                            <p>Size:</p>
-                            <select class="form-select" @bind="selectedSizeProductId">
-                                @foreach (var sizeProduct in product.Size_Product)
-                                {
-                                    <option value="@sizeProduct.SizeProductID">@sizeProduct.Size.Name</option>
-                                }
-                            </select>
-                        </div>
+                        @*   @if (product?.Size_Product != null && product.Size_Product.Any())
+                    {
+                    var sizeForProduct = product.Size_Product.Where(size => size.ProductID == product.ProductID).ToList();
+                    if (sizeForProduct.Any())
+                    {
+                    var firstSize = sizeForProduct.FirstOrDefault();
+                    <h1>Giá: @firstSize.Price VNĐ</h1>
+                    }
+                    }
+                    <div class="size">
+                    <p>Size:</p>
+                    <select class="form-select" @bind="selectedSizeProductId">
+                    @foreach (var sizeProduct in product.Size_Product)
+                    {
+                    <option value="@sizeProduct.SizeProductID">@sizeProduct.Size.Name</option>
+                    }
+                    </select>
+                    </div> *@
 
                         <div class="row">
                             <div class="col-md-6 d-flex">
@@ -150,19 +150,19 @@
                             {
                                 <img src="default.jpg" class="card-img-top h-75">
                             }
-                            <div class="card-body">
-                                <p class="card-text name">@similarProduct.Name</p>
-                                @if (similarProduct?.Size_Product != null && similarProduct.Size_Product.Any())
-                                {
-                                    var sizeForProduct = similarProduct.Size_Product.Where(size => size.ProductID == similarProduct.ProductID).ToList();
-                                    if (sizeForProduct.Any())
-                                    {
-                                        var firstSize = sizeForProduct.FirstOrDefault();
-                                        <h6>Giá: @firstSize.Price VNĐ</h6>
-                                    }
-                                }
+                            @*   <div class="card-body">
+                        <p class="card-text name">@similarProduct.Name</p>
+                        @if (similarProduct?.Size_Product != null && similarProduct.Size_Product.Any())
+                        {
+                        var sizeForProduct = similarProduct.Size_Product.Where(size => size.ProductID == similarProduct.ProductID).ToList();
+                        if (sizeForProduct.Any())
+                        {
+                        var firstSize = sizeForProduct.FirstOrDefault();
+                        <h6>Giá: @firstSize.Price VNĐ</h6>
+                        }
+                        }
 
-                            </div>
+                        </div> *@
                         </div>
                     </div>
                 }
@@ -226,15 +226,6 @@
                 var imageResponse = await response.Content.ReadAsStringAsync();
                 var images = JsonConvert.DeserializeObject<List<Image>>(imageResponse);
                 product.Image = images;
-            }
-
-            string urlSizeProduct = $"http://localhost:20714/api/Size_Product?ProductID={ProductID}";
-            response = await httpClient.GetAsync(urlSizeProduct);
-            if (response.IsSuccessStatusCode)
-            {
-                var sizeProductResponse = await response.Content.ReadAsStringAsync();
-                var sizeProducts = JsonConvert.DeserializeObject<List<Size_Product>>(sizeProductResponse);
-                product.Size_Product = sizeProducts;
             }
         }
     }
@@ -302,7 +293,6 @@
         // Cập nhật thông tin chi tiết
         detailData.BillID = billID;
         detailData.Quality = selectedSizeProductQuality;
-        detailData.SizeProductID = selectedSizeProductId;
         detailData.Subtotal = selectedSizeProductId * 25000;
 
         ReceivedDetail = new BillDetail();

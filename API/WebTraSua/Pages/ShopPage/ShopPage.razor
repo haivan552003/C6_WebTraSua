@@ -78,7 +78,6 @@
                                      style="height: 301px; width: 306px;" alt="">
                                 <div class="mt-3 text-center">
                                     <p style="margin-bottom: 0rem;margin-left: 77px;">@product.Name</p>
-                                    <p style="margin-bottom: 0rem;margin-left: 77px;">@product.Size_Product.FirstOrDefault()?.Price VNĐ</p>
                                 </div>
                             </div>
                         </a>
@@ -96,13 +95,11 @@
 
     string url = "http://localhost:20714/api/Products";
     string urlImage = "http://localhost:20714/api/Images";
-    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
     string urlCategory = "http://localhost:20714/api/Categories";
     string imageBasePath = "http://localhost:49972/images/";
 
     public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
     public IEnumerable<Image> images { get; set; } = Enumerable.Empty<Image>();
-    public IEnumerable<Size_Product> size_Products { get; set; } = Enumerable.Empty<Size_Product>();
     public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
 
     protected async override Task OnInitializedAsync()
@@ -138,15 +135,6 @@
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 images = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
-            }
-            using (var response = await httpClient.GetAsync(urlSizeProduct))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
-                foreach (var product in products)
-                {
-                    product.Size_Product = size_Products.Where(sp => sp.ProductID == product.ProductID).ToList();
-                }
             }
             using (var response = await httpClient.GetAsync(urlCategory))
             {

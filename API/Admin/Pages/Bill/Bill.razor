@@ -26,7 +26,7 @@
                 <th>Trạng thái</th>
             </tr>
         </thead>
-        <tbody>
+       @*  <tbody>
             @foreach (var bills in bill)
             {
                 @foreach (var itemBillDetails in billDetails)
@@ -44,17 +44,17 @@
                                 <td>@itemSizePro.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))  VNĐ</td>
                                 <td>@itemBillDetails.Quality</td>
                                 <td>
-                                    @* <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name)"></SfQRCodeGenerator> *@
-                                    <img src="@GenerateQRCode(GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name,itemBillDetails.Quality, bills.Total))" width="100px" height="100px" alt="QR Code" />
+                              @*       @* <SfQRCodeGenerator Width="100px" Height="100px" Value="@GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name)"></SfQRCodeGenerator> *@
+                                  @*   <img src="GenerateQRCode(GetQRCodeValue(bills.BillId, itemSizePro.Price, item.Name,itemBillDetails.Quality, bills.Total))" width="100px" height="100px" alt="QR Code" />
                                 </td>
-                                <td>@bills.Status.Name</td>
-                            </tr>
+                                <td>bills.Status.Name</td> *@
+                           @*  </tr> *@ 
                         }
                     }
                 }
             }
-
-        </tbody>
+@* 
+        </tbody>   *@
     </table>
 </div>
 
@@ -66,7 +66,6 @@
 
     public IEnumerable<Admin.Model.Bill> bill { get; set; } = Enumerable.Empty<Admin.Model.Bill>();
     public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
-    public IEnumerable<Size_Product> size_Products { get; set; } = Enumerable.Empty<Size_Product>();
     public IEnumerable<BillDetail> billDetails { get; set; } = Enumerable.Empty<BillDetail>();
 
     protected async override Task OnInitializedAsync()
@@ -92,15 +91,7 @@
                 products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
             }
         }
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync(urlSizeProduct))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
-            }
-        }
-        using (var httpClient = new HttpClient())
+            using (var httpClient = new HttpClient())
         {
             using (var response = await httpClient.GetAsync(urlBillDetails))
             {

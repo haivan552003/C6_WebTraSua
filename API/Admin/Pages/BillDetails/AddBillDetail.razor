@@ -18,7 +18,7 @@
             <ValidationMessage For="()=>proData.BillID"></ValidationMessage>
         </div>
     </div>
-    <div class="form-group">
+  @*   <div class="form-group">
         <label>Sản Phẩm</label>
         <InputSelect class="form-control" @bind-Value="proData.SizeProductID">
             @foreach (Size_Product item in size_Products)
@@ -29,7 +29,7 @@
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.SizeProductID"></ValidationMessage>
         </div>
-    </div>
+    </div> *@
     <div class="form-group">
         <label>Số Lượng</label>
         <InputNumber class="form-control" @bind-Value="proData.Quality" />
@@ -53,12 +53,10 @@
 @code {
     string urlBillDetails = "http://localhost:20714/api/BillDetails";
     string urlBill = "http://localhost:20714/api/Bills";
-    string urlSizeProduct = "http://localhost:20714/api/Size_Product";
 
     public Admin.Model.BillDetail proData = new Admin.Model.BillDetail();
     Admin.Model.BillDetail ReceivedPro;
     public List<Bill> bills { get; set; } = new List<Bill>();
-    public List<Size_Product> size_Products { get; set; } = new List<Size_Product>();
     public string FormSubmitMessage { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
@@ -76,15 +74,7 @@
                 bills = JsonConvert.DeserializeObject<List<Bill>>(apiResponse);
             }
         }
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync(urlSizeProduct))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
-            }
-        }
-    }
+          }
 
     public async Task HandleValidSubmit()
     {
@@ -107,15 +97,7 @@
                 }
             }
         }
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync(urlSizeProduct))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(apiResponse);
-            }
-        }
-        using (var httpClient = new HttpClient())
+               using (var httpClient = new HttpClient())
         {
             using (var response = await httpClient.GetAsync(urlBill))
             {
