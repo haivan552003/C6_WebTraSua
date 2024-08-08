@@ -27,6 +27,21 @@ namespace API.Controllers
         {
             return await _context.size.ToListAsync();
         }
+
+        // GET: api/Sizes1/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Size>> GetSize(int id)
+        {
+            var size = await _context.size.FindAsync(id);
+
+            if (size == null)
+            {
+                return NotFound();
+            }
+
+            return size;
+        }
+
         private bool SizeExists(int id)
         {
             return _context.size.Any(e => e.SizeID == id);

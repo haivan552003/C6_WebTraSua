@@ -55,6 +55,7 @@ namespace API.Controllers
             var product = await _context.product
                .Include(u => u.Image)
                .Include(u => u.Categories)
+               .Include(u => u.Size)
                .FirstOrDefaultAsync(u => u.ProductID == id);
 
             if (product == null)

@@ -12,6 +12,7 @@ namespace Admin.Model
         public int SizeID { get; set; }
         public string Name { get; set; }
         public int ProductID { get; set; }
+        public int Price { get; set; }
         public Product Product { get; set; }
     }
 }

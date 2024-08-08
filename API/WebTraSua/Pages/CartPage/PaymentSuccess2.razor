@@ -1,0 +1,45 @@
+﻿@page "/payment-success2"
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@using System.Net.Http.Json
+
+<h2>Thanh Toán Thành Công!</h2>
+
+<p>Cảm ơn bạn đã mua hàng!</p>
+
+<p><strong>Mã Hóa Đơn:</strong> @billID</p>
+<p><strong>Ngày:</strong> @date</p>
+<p><strong>Tổng Giá:</strong> @total VNĐ</p>
+<button class="btn btn-primary" @onclick="BackToHome">Quay về trang chủ</button>
+
+@code {
+    private int billID;
+    private string date;
+    private decimal total;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        billID = int.TryParse(query["billID"], out var id) ? id : 0;
+        date = query["date"];
+        total = decimal.TryParse(query["total"], out var t) ? t : 0;
+
+        Console.WriteLine($"BillID: {billID}, Date: {date}, Total: {total}");
+    }
+
+    private void BackToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public class BillDetail
+    {
+        public string ProductName { get; set; }
+        public string SizeName { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+    }
+}

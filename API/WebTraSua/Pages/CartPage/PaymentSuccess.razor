@@ -1,0 +1,37 @@
+﻿@page "/payment-success"
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+
+<h2>Thanh Toán Thành Công!</h2>
+
+<p>Cảm ơn bạn đã mua hàng!</p>
+
+<p><strong>Tên Sản Phẩm:</strong> @productName</p>
+<p><strong>Kích Cỡ:</strong> @sizeName</p>
+<p><strong>Số Lượng:</strong> @quantity</p>
+<p><strong>Tổng Giá:</strong> @price VNĐ</p>
+
+<button class="btn btn-primary" @onclick="BackToHome">Quay về trang chủ</button>
+
+@code {
+    private string productName;
+    private string sizeName;
+    private int quantity;
+    private decimal price;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        productName = query["productName"];
+        sizeName = query["sizeName"];
+        quantity = int.TryParse(query["quantity"], out var q) ? q : 0;
+        price = decimal.TryParse(query["price"], out var p) ? p : 0;
+    }
+
+    private void BackToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
