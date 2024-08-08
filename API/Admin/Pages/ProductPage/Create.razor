@@ -1,6 +1,7 @@
 ﻿@page "/createproduct"
 @using System.Text
 @inject IJSRuntime jsRuntime
+@inject NavigationManager navManager
 
 <style>
     #formgetpro {
@@ -11,16 +12,16 @@
         display: none;
     }
 </style>
+
 <div class="form-group">
     <button onclick="HideProFunction()" class="btn btn-primary">Thêm Hình Ảnh</button>
 </div>
+
 <div class="row">
     <div id="formgetpro" class="col-md-6">
         <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateProduct">
             <DataAnnotationsValidator />
-            <h1>
-                Thêm Sản Phẩm
-            </h1>
+            <h1>Thêm Sản Phẩm</h1>
             <div class="form-group">
                 <label class="font-weight-bold">Tên Sản Phẩm</label>
                 <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
@@ -86,7 +87,6 @@
                         <td>
                             <img src="@GetImagePath(image.Name)" width="100" />
                         </td>
-
                         <td>
                             <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(image.ImageID))">
                                 Xóa
@@ -101,7 +101,6 @@
         <h1>Thêm Hình Ảnh Sản Phẩm</h1>
         <EditForm Model="uploadModel">
             <DataAnnotationsValidator />
-
             <div class="form-group">
                 <label class="font-weight-bold">Tên Sản Phẩm</label>
                 <InputSelect @bind-Value="uploadModel.ProductID" class="form-control">
@@ -111,16 +110,10 @@
                     }
                 </InputSelect>
             </div>
-
             <div class="form-group">
                 <label class="font-weight-bold">Chọn Hình Ảnh</label>
-                <InputFile OnChange="ChangeHandler" />
+                <InputFile multiple @ref="fileInput" OnChange="UploadFiles" />
             </div>
-
-            <div class="form-group">
-                <button @onclick="UploadFile" class="btn btn-primary">Thêm Hình Ảnh</button>
-            </div>
-
             <p>@apiResponse</p>
         </EditForm>
     </div>
@@ -138,6 +131,7 @@
             y.style.display = "block";
         }
     }
+
     function confirmDelete(message) {
         return new Promise((resolve) => {
             const result = confirm(message);
@@ -149,58 +143,86 @@
 @code {
     private bool IsLoggedIn = false;
     private int RoleID = 0;
-
+    private InputFile fileInput;
+    private IReadOnlyList<IBrowserFile> selectedFiles;
     //pro
+    string urlImg = "http://localhost:49972/images/";
+
     string urlPro = "http://localhost:20714/api/Products";
     string urlCate = "http://localhost:20714/api/Categories";
+    string urlImageApi = "http://localhost:20714/api/Images";
 
     public Product proData = new Product();
+
     Product ReceivedPro;
+    public IEnumerable<Admin.Model.Image> images { get; set; } = Enumerable.Empty<Admin.Model.Image>();
     public IEnumerable<Categories> cate { get; set; } = Enumerable.Empty<Categories>();
+    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
     public string FormSubmitMessage { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        await CheckUserAccess();
         await Load();
-        await GetSession();
     }
-    
 
-    private async Task GetSession()
+    private async Task CheckUserAccess()
     {
-        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
-        if (!string.IsNullOrEmpty(userInfoJson))
+        try
         {
-            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
-            if (userInfo != null)
+            var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+            if (!string.IsNullOrEmpty(userInfoJson))
             {
-                IsLoggedIn = true;
-                RoleID = userInfo.RoleID;
+                var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+                if (userInfo != null && userInfo.RoleID == 1) // Chỉ cho phép truy cập với vai trò admin
+                {
+                    IsLoggedIn = true;
+                    RoleID = userInfo.RoleID;
+                }
+                else
+                {
+                    navManager.NavigateTo("/no-access");
+                }
             }
+            else
+            {
+                navManager.NavigateTo("/login");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in CheckUserAccess(): {ex.Message}");
         }
     }
 
     private async Task Load()
     {
-        using (var httpClient = new HttpClient())
+        try
         {
-            var response = await httpClient.GetAsync(urlCate);
-            string apiResponse = await response.Content.ReadAsStringAsync();
-            cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
-        }
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.GetAsync(urlCate);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+            }
 
-        using (var httpClient = new HttpClient())
-        {
-            var response = await httpClient.GetAsync(urlPro);
-            var apiResponse = await response.Content.ReadAsStringAsync();
-            pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
-        }
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.GetAsync(urlPro);
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
 
-        using (var httpClient = new HttpClient())
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.GetAsync(urlImageApi);
+                var apiResponse = await response.Content.ReadAsStringAsync();
+                images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
+            }
+        }
+        catch (Exception ex)
         {
-            var response = await httpClient.GetAsync(urlImg);
-            var apiResponse = await response.Content.ReadAsStringAsync();
-            images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
+            Console.WriteLine($"Error in Load(): {ex.Message}");
         }
     }
 
@@ -219,20 +241,12 @@
                     ReceivedPro = JsonConvert.DeserializeObject<Product>(apiResponse);
                     FormSubmitMessage = "Thêm sản phẩm thành công!";
                     await Load();
+                    await CallAPIGetImg(); // Cập nhật danh sách hình ảnh
                 }
                 else
                 {
                     FormSubmitMessage = "Thêm thất bại: " + apiResponse;
                 }
-            }
-        }
-
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync(urlCate))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
             }
         }
     }
@@ -243,25 +257,26 @@
     //create img
     string url = "http://localhost:20714/api/Images/UploadFile";
 
-    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
-
     public string apiResponse { get; set; }
-    public IBrowserFile F;
     private Image uploadModel = new Image();
 
-    private void ChangeHandler(InputFileChangeEventArgs e)
+    private async Task UploadFiles(InputFileChangeEventArgs e)
     {
-        F = e.File;
+        selectedFiles = e.GetMultipleFiles();
+        if (selectedFiles != null && selectedFiles.Count > 0)
+        {
+            await UploadMultipleFiles();
+        }
     }
 
-    public async Task UploadFile()
+    private async Task UploadMultipleFiles()
     {
-        if (F != null && uploadModel.ProductID > 0)
+        foreach (var file in selectedFiles)
         {
-            using (var ms = F.OpenReadStream(968435456))
+            using (var ms = file.OpenReadStream(968435456))
             {
                 var content = new MultipartFormDataContent();
-                content.Add(new StreamContent(ms), "file", F.Name);
+                content.Add(new StreamContent(ms), "file", file.Name);
                 content.Add(new StringContent(uploadModel.ProductID.ToString()), "ProductID");
 
                 using (var httpClient = new HttpClient())
@@ -274,33 +289,18 @@
                 }
             }
         }
-        else
-        {
-            apiResponse = "Vui lòng chọn tên sản phẩm";
-        }
     }
-
-    public class Image
-    {
-        public int ProductID { get; set; }
-        public IBrowserFile File { get; set; }
-    }
-
-    //get img
-    string urlImg = "http://localhost:20714/api/Images";
-    string imageBasePath = "http://localhost:49972/images/";
-
-    public IEnumerable<Admin.Model.Image> images { get; set; } = Enumerable.Empty<Admin.Model.Image>();
 
     async Task CallAPIGetImg()
     {
         using (var httpClient = new HttpClient())
         {
-            var response = await httpClient.GetAsync(urlImg);
+            var response = await httpClient.GetAsync(urlImageApi);
             var apiResponse = await response.Content.ReadAsStringAsync();
             images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
         }
     }
+
     private async Task ConfirmDelete(int imageId)
     {
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bảng hiệu này không?");
@@ -314,11 +314,25 @@
     {
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.DeleteAsync(urlImg + "/" + imageId))
+            using (var response = await httpClient.DeleteAsync(urlImageApi + "/" + imageId))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    await Load();
+                    // Xóa hình ảnh khỏi cơ sở dữ liệu
+                    using (var httpClient2 = new HttpClient())
+                    {
+                        using (var response2 = await httpClient2.DeleteAsync($"{urlImageApi}/{imageId}"))
+                        {
+                            if (response2.IsSuccessStatusCode)
+                            {
+                                await Load();
+                            }
+                            else
+                            {
+                                apiResponse = "Xóa thất bại: " + await response2.Content.ReadAsStringAsync();
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -328,6 +342,11 @@
         }
     }
 
-    private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
-}
+    private string GetImagePath(string imageName) => $"{urlImg}{imageName}";
 
+    public class Image
+    {
+        public int ProductID { get; set; }
+        public IBrowserFile File { get; set; }
+    }
+}
