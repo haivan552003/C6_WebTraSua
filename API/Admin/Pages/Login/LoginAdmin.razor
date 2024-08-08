@@ -21,9 +21,9 @@
                     </div>
                 </div>
                 <div class="input-box">
-                    <InputText @bind-Value="userData.PassWord" type="password" placeholder="Mật khẩu" />
-                    <div id="eye">
-                        <i class='bx bx-low-vision'></i>
+                    <InputText id="password" @bind-Value="userData.PassWord" type="password" placeholder="Mật khẩu" />
+                    <div id="eye" onclick="showPassword()">
+                        <i id="toggle" class='bx bx-low-vision'></i>
                         <div class="text-danger ps-3">
                             <ValidationMessage For="()=>userData.PassWord"></ValidationMessage>
                         </div>
@@ -35,11 +35,11 @@
             </EditForm>
         </div>
     </main>
+
     <footer>
         <!-- place footer here -->
     </footer>
     <!-- Bootstrap JavaScript Libraries -->
-
 </body>
 
 @code {
@@ -47,6 +47,27 @@
 
     public UserLogin userData { get; set; } = new UserLogin();
     public string FormSubmitMessage { get; set; } = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("eval", @"
+                const password = document.getElementById('password');
+                const toggle = document.getElementById('toggle');
+
+                function showPassword() {
+                    if (password.type === 'password') {
+                        password.setAttribute('type', 'text');
+                        toggle.classList.add('hide');
+                    } else {
+                        password.setAttribute('type', 'password');
+                        toggle.classList.remove('hide');
+                    }
+                }
+            ");
+        }
+    }
 
     public async Task HandleValidSubmit()
     {
