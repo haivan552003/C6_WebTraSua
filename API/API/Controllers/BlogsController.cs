@@ -101,42 +101,43 @@ namespace API.Controllers
             return NoContent();
         }
         [HttpPost("UploadFile")]
-        public async Task<ActionResult<Blog>> UploadFile([FromForm] IFormFile file, [FromForm] string title, [FromForm] string decription)
+        public async Task<ActionResult<Blog>> UploadFile([FromForm] IFormFile file, [FromForm] string title, [FromForm] string decription, [FromForm] int id)
         {
-            if (file == null || file.Length == 0)
+            var blog = await _context.blog.FindAsync(id);
+            if (blog == null)
             {
-                return BadRequest("File is empty");
+                return NotFound("Blog not found");
             }
 
-            // Đường dẫn đến thư mục
-            var uploadFolder = "D:\\FPoly\\C# 6\\ImageUpload";
-            var imageName = Path.GetFileName(file.FileName);
-            var imagePath = Path.Combine(uploadFolder, imageName);
-
-            // Tạo thư mục nếu chưa tồn tại
-            if (!Directory.Exists(uploadFolder))
+            if (file != null && file.Length > 0)
             {
-                Directory.CreateDirectory(uploadFolder);
+                var uploadFolder = "D:\\FPT Plytechnic\\C Sharp 6\\images";
+                var imageName = Path.GetFileName(file.FileName);
+                var imagePath = Path.Combine(uploadFolder, imageName);
+
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                using (var stream = new FileStream(imagePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                blog.Image = imageName;
             }
 
-            // Lưu file vào thư mục đã chỉ định
-            using (var stream = new FileStream(imagePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            blog.Title = title;
+            blog.Decription = decription;
 
-            var newBanner = new Blog
-            {
-                Image = imageName,
-                Title = title,
-                Decription = decription
-            };
-
-            _context.blog.Add(newBanner);
+            _context.Entry(blog).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("blog", new { id = newBanner.Id }, newBanner);
+            return Ok(blog);
         }
+
+
         private bool BlogExists(int id)
         {
             return _context.blog.Any(e => e.Id == id);
