@@ -15,19 +15,27 @@
             <ValidationMessage For="()=>BlogData.Id"></ValidationMessage>
         </div>
     </div>
+
     <div class="form-group">
         <label class="font-weight-bold">Tiêu Đề</label>
-        <InputText class="form-control" @bind-Value="BlogData.Title"/>
+        <InputText class="form-control" @bind-Value="BlogData.Title" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>BlogData.Title"></ValidationMessage>
         </div>
     </div>
+
     <div class="form-group">
-        <InputText hidden class="form-control" @bind-Value="BlogData.Image" />
+        <label class="font-weight-bold">Hình Ảnh Hiện Tại</label>
+        <div>
+            <img src="@GetImagePath(BlogData.Image)" alt="Current Image" width="150" height="150" />
+        </div>
+        <label class="font-weight-bold">Chọn Hình Ảnh Mới</label>
+        <InputFile OnChange="OnInputFileChange" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>BlogData.Image"></ValidationMessage>
         </div>
     </div>
+
     <div class="form-group">
         <label class="font-weight-bold">Nội Dung</label>
         <InputTextArea class="form-control" @bind-Value="BlogData.Decription" />
@@ -35,9 +43,11 @@
             <ValidationMessage For="()=>BlogData.Decription"></ValidationMessage>
         </div>
     </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Sửa Bài Viết</button>
     </div>
+
     <p class="text-success p-2 mx-auto">@FormSubmitMessage</p>
 </EditForm>
 
@@ -49,6 +59,7 @@
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private IBrowserFile selectedImageFile;
 
     [Parameter]
     public int Id { get; set; }
@@ -85,20 +96,38 @@
         }
     }
 
-    public async Task HandleValidSubmit()
+    private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        ReceivedBlog = new Blog();
+        selectedImageFile = e.File;
+    }
+
+    private async Task HandleValidSubmit()
+    {
         using (var httpClient = new HttpClient())
         {
-            var jsonContent = new StringContent(JsonConvert.SerializeObject(BlogData), Encoding.UTF8, "application/json");
+            var content = new MultipartFormDataContent();
+            if (selectedImageFile != null)
+            {
+                var fileContent = new StreamContent(selectedImageFile.OpenReadStream());
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(selectedImageFile.ContentType);
+                content.Add(fileContent, "file", selectedImageFile.Name);
+            }
+            else
+            {
+                // Nếu không có hình ảnh mới được chọn, gửi giá trị null cho file
+                content.Add(new StringContent(""), "file");
+            }
 
-            using (var response = await httpClient.PutAsync($"{urlPro}/{BlogData.Id}", jsonContent))
+            content.Add(new StringContent(BlogData.Title), "title");
+            content.Add(new StringContent(BlogData.Decription), "decription");
+            content.Add(new StringContent(BlogData.Id.ToString()), "id");
+
+            using (var response = await httpClient.PostAsync($"{urlPro}/UploadFile", content))
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    ReceivedBlog = JsonConvert.DeserializeObject<Blog>(apiResponse);
-                    FormSubmitMessage = "Sửa blog thành công !";
+                    FormSubmitMessage = "Sửa blog thành công!";
                 }
                 else
                 {
@@ -107,6 +136,11 @@
             }
         }
     }
+
+
+
+
+    private string GetImagePath(string imageName) => $"http://localhost:49972/images/{imageName}";
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 }

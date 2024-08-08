@@ -1,0 +1,269 @@
+﻿@page "/GetUser"
+@inject IJSRuntime jsRuntime
+<style>
+    /* Add this CSS to your site.css or the component's scoped CSS file */
+
+.panel {
+.pagination-container
+    {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-heading {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+}
+
+.panel-heading h2 {
+    margin: 0;
+}
+
+.table {
+    margin: 20px 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th,
+.table td {
+    border: 1px solid #dee2e6;
+    padding: 12px;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table tr:hover {
+    background-color: #e9ecef;
+}
+
+select {
+    padding: 5px;
+    margin: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1em;
+}
+input {
+    padding: 3px;
+    margin: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1em;
+}
+btn-search {
+    height: 40px;
+    margin-right: 15px;
+    margin-left: 0px
+}
+
+label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+</style>
+
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading">
+        <h2>Thông tin người dùng</h2>
+        <div>
+            <label for="searchInput">Tìm kiếm:</label>
+            <input type="text" id="searchInput" @bind="searchQuery" placeholder="Nhập tên, địa chỉ, số điện thoại..." />
+            <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
+
+            <label for="nameSort">Lọc theo tên:</label>
+            <select id="nameSort" @onchange="OnNameSortChanged" value="@nameSortOrder">
+                <option value="asc">Lọc theo tên từ A - Z</option>
+                <option value="desc">Lọc theo tên từ Z - A</option>
+            </select>
+
+            <label for="genderFilter">Lọc theo giới tính:</label>
+            <select id="genderFilter" @onchange="OnGenderFilterChanged" value="@selectedGender">
+                <option value="">Tất Cả</option>
+                <option value="0">Nam</option>
+                <option value="1">Nữ</option>
+                <option value="2">Không xác định</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="table">
+        <tr>
+            <th>Họ Và Tên</th>
+            <th>Tài Khoản</th>
+            <th>Giới Tính</th>
+            <th>Số Điện Thoại</th>
+            <th>Email</th>
+            <th>Địa Chỉ</th>
+        </tr>
+        @foreach (var user in PaginatedUsers)
+        {
+            <tr>
+                <td>@user.Name</td>
+                <td>@user.UserName</td>
+                <td>
+                    @if (user.Gender == 0)
+                    {
+                        <span>Nam</span>
+                    }
+                    else if (user.Gender == 1)
+                    {
+                        <span>Nữ</span>
+                    }
+                    else
+                    {
+                        <span>Không xác định</span>
+                    }
+                </td>
+                <td>@user.Phone</td>
+                <td>@user.Email</td>
+                <td>@user.Address</td>
+            </tr>
+        }
+    </table>
+</div>
+<div class="pagination-container">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" @onclick="PreviousPage" disabled="@(!CanGoBack)">
+                    <span aria-hidden="true">«</span> Trang Trước
+                </a>
+            </li>
+            <li class="page-item"><span class="page-link text-black">Trang @currentPage trên @totalPages</span></li>
+            <li class="page-item">
+                <a class="page-link" @onclick="NextPage" disabled="@(!CanGoNext)">
+                    Trang Sau <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+
+@code {
+    string url = "http://localhost:20714/api/Users";
+    public IEnumerable<User> Userss { get; set; } = Enumerable.Empty<User>();
+    public IEnumerable<User> FilteredUsers { get; set; } = Enumerable.Empty<User>();
+    private string selectedGender = string.Empty;
+    private string nameSortOrder = "asc";
+    private string searchQuery = string.Empty;
+
+    // Biến phân trang
+    private int currentPage = 1;
+    private int pageSize = 5; // Số lượng người dùng hiển thị trên mỗi trang
+    private int totalPages => (int)Math.Ceiling((double)FilteredUsers.Count() / pageSize);
+    private bool CanGoBack => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CallAPI();
+        ApplyFilters();
+    }
+
+    async Task CallAPI()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                Userss = JsonConvert.DeserializeObject<List<User>>(apiResponse);
+                ApplyFilters();
+            }
+        }
+    }
+
+    private void OnNameSortChanged(ChangeEventArgs e)
+    {
+        nameSortOrder = e.Value.ToString();
+        ApplyFilters();
+        currentPage = 1; // Reset về trang đầu tiên sau khi sắp xếp
+    }
+
+    private void OnGenderFilterChanged(ChangeEventArgs e)
+    {
+        selectedGender = e.Value.ToString();
+        ApplyFilters();
+        currentPage = 1; // Reset về trang đầu tiên sau khi lọc
+    }
+
+    private void OnSearchClicked()
+    {
+        ApplyFilters();
+        currentPage = 1; // Reset về trang đầu tiên sau khi tìm kiếm
+    }
+
+    private void ApplyFilters()
+    {
+        var filtered = Userss.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(selectedGender))
+        {
+            int gender;
+            if (int.TryParse(selectedGender, out gender))
+            {
+                filtered = filtered.Where(user => user.Gender == gender);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            searchQuery = searchQuery.ToLower();
+            filtered = filtered.Where(user =>
+                user.Name.ToLower().Contains(searchQuery) ||
+                user.Address.ToLower().Contains(searchQuery) ||
+                user.Phone.ToLower().Contains(searchQuery) ||
+                user.Email.ToLower().Contains(searchQuery));
+        }
+
+        if (nameSortOrder == "asc")
+        {
+            filtered = filtered.OrderBy(user => user.Name);
+        }
+        else if (nameSortOrder == "desc")
+        {
+            filtered = filtered.OrderByDescending(user => user.Name);
+        }
+
+        FilteredUsers = filtered.ToList();
+    }
+
+    private IEnumerable<User> PaginatedUsers => FilteredUsers.Skip((currentPage - 1) * pageSize).Take(pageSize);
+
+    private void PreviousPage()
+    {
+        if (CanGoBack)
+        {
+            currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            currentPage++;
+        }
+    }
+}

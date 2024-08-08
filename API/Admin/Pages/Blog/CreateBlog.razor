@@ -6,13 +6,13 @@
 
 <EditForm Model="BlogData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
-    <ValidationSummary />
     <h1>Thêm Bài Viết</h1>
 
     <div class="form-group">
         <label class="font-weight-bold">Tiêu Đề</label>
-        <ValidationMessage For="@(() => BlogData.Title)" />
         <InputText class="form-control" @bind-Value="BlogData.Title" />
+        <ValidationMessage For="@(() => BlogData.Title)" />
+
     </div>
     <div class="form-group">
         <label class="font-weight-bold">Hình Ảnh</label>
@@ -20,8 +20,8 @@
     </div>
     <div class="form-group">
         <label class="font-weight-bold">Nội Dung</label>
-        <ValidationMessage For="@(() => BlogData.Decription)" />
         <InputTextArea class="form-control" @bind-Value="BlogData.Decription">
+        <ValidationMessage For="@(() => BlogData.Decription)" />
         </InputTextArea>
     </div>
     <div class="form-group">

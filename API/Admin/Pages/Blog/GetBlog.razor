@@ -1,10 +1,109 @@
 ﻿@page "/blog"
 @inject IJSRuntime jsRuntime
 
-<p> <a href="CreateBlog">Thêm Bài Viết</a></p>
+<style>
+    .panel {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-heading {
+        background-color: #007bff;
+        color: white;
+        padding: 15px 15px 5px 15px;
+        border-radius: 8px 8px 0 0;
+    }
+
+        .panel-heading h2 {
+            margin: 0;
+        }
+
+    .table {
+        margin: 20px 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:hover {
+            background-color: #e9ecef;
+        }
+
+    select, input {
+        padding: 5px;
+        margin: 5px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+
+    .btn-search {
+        height: 40px;
+        margin-right: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+        padding: 0;
+    }
+
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            padding: 8px 12px;
+            color: #007bff;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+            .pagination .page-link[disabled] {
+                pointer-events: none;
+                opacity: 0.5;
+            }
+</style>
+
+<p><a href="CreateBlog">Thêm Bài Viết</a></p>
+
 <div class="panel panel-primary">
     <!-- Default panel contents -->
-    <div class="panel-heading"><h2>Thông tin bài viết</h2></div>
+    <div class="panel-heading">
+        <h2>Thông tin bài viết</h2>
+        <div>
+            <label for="searchInput">Tìm kiếm:</label>
+            <input type="text" id="searchInput" @bind="searchQuery" placeholder="Tìm kiếm tiêu đề..." />
+            <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
+
+            <label for="titleSort">Lọc theo tiêu đề:</label>
+            <select id="titleSort" @onchange="OnTitleSortChanged" value="@titleSortOrder">
+                <option value="asc">Lọc theo tiêu đề từ A - Z</option>
+                <option value="desc">Lọc theo tiêu đề từ Z - A</option>
+            </select>
+        </div>
+    </div>
 
     <!-- Table -->
     <table class="table">
@@ -13,18 +112,18 @@
             <th>Hình ảnh</th>
             <th>Khác</th>
         </tr>
-        @foreach (var blogs in banner)
+        @foreach (var blog in PaginatedBlogs)
         {
             <tr>
-                <td>@blogs.Title</td>
+                <td>@blog.Title</td>
                 <td>
-                    <img src="@GetImagePath(blogs.Image)" width="100" height="100" />
+                    <img src="@GetImagePath(blog.Image)" width="100" height="100" />
                 </td>
                 <td>
-                    <a class="btn btn-sm btn-success" href="UpdateBlog/@blogs.Id">
+                    <a class="btn btn-sm btn-success" href="UpdateBlog/@blog.Id">
                         Sửa
                     </a> |
-                    <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(blogs.Id))">
+                    <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(blog.Id))">
                         Xóa
                     </button>
                 </td>
@@ -32,74 +131,129 @@
         }
     </table>
 </div>
-<script>
-    function confirmDelete(message) {
-        return new Promise((resolve) => {
-            const result = confirm(message);
-            resolve(result);
-        });
-    }
-</script>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item">
+            <a class="page-link" @onclick="PreviousPage" disabled="@(!CanGoBack)">
+                <span aria-hidden="true">&laquo; Trước</span>
+            </a>
+        </li>
+        <li class="page-item"><span class="page-link text-black">Trang @currentPage trên @totalPages</span></li>
+        <li class="page-item">
+            <a class="page-link" @onclick="NextPage" disabled="@(!CanGoNext)">
+                <span aria-hidden="true">Tiếp &raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
 @code {
-    string imageBasePath = "http://localhost:49972/images";
+    private int currentPage = 1;
+    private int pageSize = 2;
+    private string titleSortOrder = "asc";
+    private string searchQuery = string.Empty;
 
-    string urlBanner = "http://localhost:20714/api/Blogs";
-    public string FormSubmitMessage { get; set; } = "Banner Not Created";
-    public IEnumerable<Blog> banner { get; set; } = Enumerable.Empty<Blog>();
+    private IEnumerable<Blog> Blogss { get; set; } = Enumerable.Empty<Blog>();
+    private IEnumerable<Blog> FilteredBlogs { get; set; } = Enumerable.Empty<Blog>();
 
-    private bool IsLoggedIn = false;
-    private int RoleID = 0;
+    private int totalPages => (int)Math.Ceiling((double)FilteredBlogs.Count() / pageSize);
+    private bool CanGoBack => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
+
+    private IEnumerable<Blog> PaginatedBlogs => FilteredBlogs
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize);
 
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
-        await GetSession();
-    }
-
-    private async Task GetSession()
-    {
-        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
-        if (!string.IsNullOrEmpty(userInfoJson))
-        {
-            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
-            if (userInfo != null)
-            {
-                IsLoggedIn = true;
-                RoleID = userInfo.RoleID;
-            }
-        }
+        ApplyFilters();
     }
 
     async Task CallAPI()
     {
         using (var httpClient = new HttpClient())
         {
-            var response = await httpClient.GetAsync(urlBanner);
+            var response = await httpClient.GetAsync("http://localhost:20714/api/Blogs");
             var apiResponse = await response.Content.ReadAsStringAsync();
-            banner = JsonConvert.DeserializeObject<List<Blog>>(apiResponse);
+            Blogss = JsonConvert.DeserializeObject<List<Blog>>(apiResponse);
+            ApplyFilters();
         }
     }
-    private async Task ConfirmDelete(int bannerId)
+
+    private void OnTitleSortChanged(ChangeEventArgs e)
+    {
+        titleSortOrder = e.Value.ToString();
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void OnSearchClicked()
+    {
+        currentPage = 1;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        var filtered = Blogss.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            searchQuery = searchQuery.ToLower();
+            filtered = filtered.Where(blog =>
+                blog.Title.ToLower().Contains(searchQuery));
+        }
+
+        if (titleSortOrder == "asc")
+        {
+            filtered = filtered.OrderBy(blog => blog.Title);
+        }
+        else if (titleSortOrder == "desc")
+        {
+            filtered = filtered.OrderByDescending(blog => blog.Title);
+        }
+
+        FilteredBlogs = filtered.ToList();
+    }
+
+    private void PreviousPage()
+    {
+        if (CanGoBack)
+        {
+            currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            currentPage++;
+        }
+    }
+
+    private string GetImagePath(string imageName) => $"http://localhost:49972/images/{imageName}";
+
+    private async Task ConfirmDelete(int blogId)
     {
         bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bài viết này không?");
         if (confirmed)
         {
-            await Delete(bannerId);
+            await Delete(blogId);
         }
     }
 
-    public async Task Delete(int bannerId)
+    public async Task Delete(int blogId)
     {
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.DeleteAsync($"{urlBanner}/{bannerId}"))
+            using (var response = await httpClient.DeleteAsync($"http://localhost:20714/api/Blogs/{blogId}"))
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
             }
         }
         await CallAPI();
     }
-
-    private string GetImagePath(string imageName) => $"{imageBasePath}/{imageName}";
 }
