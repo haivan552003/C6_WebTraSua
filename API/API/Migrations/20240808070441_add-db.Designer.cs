@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240806103941_ASM_GD2")]
-    partial class ASM_GD2
+    [Migration("20240808070441_add-db")]
+    partial class adddb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -80,10 +80,10 @@ namespace API.Migrations
                     b.Property<int>("BillID")
                         .HasColumnType("int");
 
-                    b.Property<int>("Quality")
+                    b.Property<int>("ProductID")
                         .HasColumnType("int");
 
-                    b.Property<int>("SizeProductID")
+                    b.Property<int>("Quality")
                         .HasColumnType("int");
 
                     b.Property<float>("Subtotal")
@@ -93,7 +93,7 @@ namespace API.Migrations
 
                     b.HasIndex("BillID");
 
-                    b.HasIndex("SizeProductID");
+                    b.HasIndex("ProductID");
 
                     b.ToTable("bill_detail");
                 });
@@ -217,34 +217,14 @@ namespace API.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("SizeID");
-
-                    b.ToTable("size");
-                });
-
-            modelBuilder.Entity("API.Model.Size_Product", b =>
-                {
-                    b.Property<int>("SizeProductID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
-
                     b.Property<int>("ProductID")
                         .HasColumnType("int");
 
-                    b.Property<int>("SizeID")
-                        .HasColumnType("int");
-
-                    b.HasKey("SizeProductID");
+                    b.HasKey("SizeID");
 
                     b.HasIndex("ProductID");
 
-                    b.HasIndex("SizeID");
-
-                    b.ToTable("size_product");
+                    b.ToTable("size");
                 });
 
             modelBuilder.Entity("API.Model.Status", b =>
@@ -330,15 +310,15 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Model.Size_Product", "sizeProduct")
-                        .WithMany("billDetail")
-                        .HasForeignKey("SizeProductID")
+                    b.HasOne("API.Model.Product", "Product")
+                        .WithMany("BillDetail")
+                        .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Bill");
 
-                    b.Navigation("sizeProduct");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("API.Model.Image", b =>
@@ -363,23 +343,15 @@ namespace API.Migrations
                     b.Navigation("Categories");
                 });
 
-            modelBuilder.Entity("API.Model.Size_Product", b =>
+            modelBuilder.Entity("API.Model.Size", b =>
                 {
                     b.HasOne("API.Model.Product", "Product")
-                        .WithMany("Size_Product")
+                        .WithMany("Size")
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Model.Size", "Size")
-                        .WithMany("Size_Product")
-                        .HasForeignKey("SizeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Product");
-
-                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("API.Model.User", b =>
@@ -405,24 +377,16 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Model.Product", b =>
                 {
+                    b.Navigation("BillDetail");
+
                     b.Navigation("Image");
 
-                    b.Navigation("Size_Product");
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("API.Model.Roles", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("API.Model.Size", b =>
-                {
-                    b.Navigation("Size_Product");
-                });
-
-            modelBuilder.Entity("API.Model.Size_Product", b =>
-                {
-                    b.Navigation("billDetail");
                 });
 
             modelBuilder.Entity("API.Model.Status", b =>

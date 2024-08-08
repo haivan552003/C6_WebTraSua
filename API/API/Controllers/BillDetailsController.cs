@@ -66,9 +66,6 @@ namespace API.Controllers
 
             var billdetail = await _context.bill_detail
                 .Include(u => u.Bill)
-                .Include(u => u.sizeProduct)
-                .ThenInclude(u => u.Product)
-                .ThenInclude(u => u.Image)
                 .Where(u => u.Bill.User.UserName == userName && u.Bill.StatusID == 1)
                 .ToListAsync();
 
@@ -115,7 +112,6 @@ namespace API.Controllers
             var newBillDetail = new BillDetail
             {
                 BillID = billDetail.BillID,
-                SizeProductID = billDetail.SizeProductID,
                 Quality = billDetail.Quality,
                 Subtotal = billDetail.Subtotal
             };

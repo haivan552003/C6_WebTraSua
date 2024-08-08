@@ -11,10 +11,10 @@ namespace Admin.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BillDetailID { get; set; }
         public int BillID { get; set; }
-        public int SizeProductID { get; set; }
+        public int ProductID { get; set; }
         public int Quality { get; set; }
         public float Subtotal { get; set; }
-        public Size_Product sizeProduct { get; set; }
+        public Product Product { get; set; }
         public Bill Bill { get; set; }
     }
 }

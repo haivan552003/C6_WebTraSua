@@ -66,19 +66,6 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "size",
-                columns: table => new
-                {
-                    SizeID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_size", x => x.SizeID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "status",
                 columns: table => new
                 {
@@ -163,29 +150,22 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "size_product",
+                name: "size",
                 columns: table => new
                 {
-                    SizeProductID = table.Column<int>(type: "int", nullable: false)
+                    SizeID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductID = table.Column<int>(type: "int", nullable: false),
-                    SizeID = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<float>(type: "real", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_size_product", x => x.SizeProductID);
+                    table.PrimaryKey("PK_size", x => x.SizeID);
                     table.ForeignKey(
-                        name: "FK_size_product_product_ProductID",
+                        name: "FK_size_product_ProductID",
                         column: x => x.ProductID,
                         principalTable: "product",
                         principalColumn: "ProductID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_size_product_size_SizeID",
-                        column: x => x.SizeID,
-                        principalTable: "size",
-                        principalColumn: "SizeID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -224,7 +204,7 @@ namespace API.Migrations
                     BillDetailID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BillID = table.Column<int>(type: "int", nullable: false),
-                    SizeProductID = table.Column<int>(type: "int", nullable: false),
+                    ProductID = table.Column<int>(type: "int", nullable: false),
                     Quality = table.Column<int>(type: "int", nullable: false),
                     Subtotal = table.Column<float>(type: "real", nullable: false)
                 },
@@ -238,10 +218,10 @@ namespace API.Migrations
                         principalColumn: "BillId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_bill_detail_size_product_SizeProductID",
-                        column: x => x.SizeProductID,
-                        principalTable: "size_product",
-                        principalColumn: "SizeProductID",
+                        name: "FK_bill_detail_product_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "product",
+                        principalColumn: "ProductID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -261,9 +241,9 @@ namespace API.Migrations
                 column: "BillID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_bill_detail_SizeProductID",
+                name: "IX_bill_detail_ProductID",
                 table: "bill_detail",
-                column: "SizeProductID");
+                column: "ProductID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_image_ProductID",
@@ -276,14 +256,9 @@ namespace API.Migrations
                 column: "CateID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_size_product_ProductID",
-                table: "size_product",
+                name: "IX_size_ProductID",
+                table: "size",
                 column: "ProductID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_size_product_SizeID",
-                table: "size_product",
-                column: "SizeID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_RoleID",
@@ -306,10 +281,13 @@ namespace API.Migrations
                 name: "image");
 
             migrationBuilder.DropTable(
+                name: "size");
+
+            migrationBuilder.DropTable(
                 name: "bill");
 
             migrationBuilder.DropTable(
-                name: "size_product");
+                name: "product");
 
             migrationBuilder.DropTable(
                 name: "status");
@@ -318,16 +296,10 @@ namespace API.Migrations
                 name: "user");
 
             migrationBuilder.DropTable(
-                name: "product");
-
-            migrationBuilder.DropTable(
-                name: "size");
+                name: "category");
 
             migrationBuilder.DropTable(
                 name: "role");
-
-            migrationBuilder.DropTable(
-                name: "category");
         }
     }
 }

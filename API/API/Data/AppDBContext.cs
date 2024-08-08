@@ -17,7 +17,6 @@ namespace API.Data
         public DbSet<Categories> category { get; set; }
         public DbSet<Product> product { get; set; }
         public DbSet<Size> size { get; set; }
-        public DbSet<Size_Product> size_product { get; set; }
         public DbSet<Status> status { get; set; }
         public DbSet<Image> image { get; set; }
         public DbSet<Blog> blog { get; set; }
@@ -33,24 +32,18 @@ namespace API.Data
                 .HasForeignKey(r => r.RoleID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Size_Product>()
+            modelBuilder.Entity<BillDetail>()
                .HasOne(sp => sp.Product)
-               .WithMany(p => p.Size_Product)
+               .WithMany(p => p.BillDetail)
                .HasForeignKey(sp => sp.ProductID)
                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Size_Product>()
-                .HasOne(sp => sp.Size)
-                .WithMany(s => s.Size_Product)
-                .HasForeignKey(sp => sp.SizeID)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Size>()
+              .HasOne(sp => sp.Product)
+              .WithMany(s => s.Size)
+              .HasForeignKey(sp => sp.ProductID)
+              .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Size_Product>()
-                .HasMany(sp => sp.billDetail)
-                .WithOne(s => s.sizeProduct)
-                .HasForeignKey(sp => sp.SizeProductID)
-                .OnDelete(DeleteBehavior.Cascade);
-            
             modelBuilder.Entity<Product>()
                   .HasOne(p => p.Categories)
                   .WithMany(c => c.Products)

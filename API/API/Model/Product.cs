@@ -17,7 +17,8 @@ namespace API.Model
         public int CateID { get; set; }
         public byte StatusID { get; set; }
 
-        public ICollection<Size_Product> Size_Product { get; set; }
+        public ICollection<BillDetail> BillDetail { get; set; }
+        public ICollection<Size> Size { get; set; }
         public ICollection<Image> Image { get; set; }
         public Categories Categories { get; set; }
     }

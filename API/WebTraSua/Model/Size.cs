@@ -11,6 +11,7 @@ namespace WebTraSua.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SizeID { get; set; }
         public string Name { get; set; }
-        public ICollection<Size_Product> Size_Product { get; set; }
+        public int ProductID { get; set; }
+        public Product Product { get; set; }
     }
 }

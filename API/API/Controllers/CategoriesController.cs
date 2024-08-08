@@ -45,7 +45,6 @@ namespace API.Controllers
                               .Include(u => u.Products)
                             .ThenInclude(u => u.Image)
                             .ThenInclude(u => u.Products)
-                            .ThenInclude(u => u.Size_Product)
                             .Where(u => u.CateID == id)
                             .ToListAsync();
 

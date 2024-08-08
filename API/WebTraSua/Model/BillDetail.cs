@@ -11,10 +11,10 @@ namespace WebTraSua.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BillDetailID { get; set; }
         public int BillID { get; set; }
-        public int SizeProductID { get; set; }
+        public int ProductID { get; set; }
         public int Quality { get; set; }
         public float Subtotal { get; set; }
-        public ICollection<Size_Product> Size_Products { get; set; }
+        public Product Product { get; set; }
         public Bill Bill { get; set; }
     }
 }
