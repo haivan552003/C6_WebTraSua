@@ -2,13 +2,48 @@
 @inject NavigationManager nv;
 @inject HttpClient httpClient;
 @inject IJSRuntime jsRuntime
+
+<style>
+    .radio-button {
+        display: inline-block;
+        margin-right: 5px;
+        cursor: pointer;
+        padding: 5px 5px;
+        border-radius: 5px;
+        border: 1px solid #000;
+        background-color: #fff;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+        .radio-button:hover {
+            background-color: #000;
+            color: #fff
+        }
+
+        .radio-button input[type="radio"] {
+            display: none;
+        }
+
+            .radio-button input[type="radio"]:checked + .radio-button-label {
+                background-color: #000;
+                color: white;
+                border-color: #000;
+            }
+
+    .radio-button-label {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+
+
 <div class="container">
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-            <div class="path">
-                <h5>Home/Product/ProductDetail</h5>
-            </div>
             <div class="row">
                 <div class="col-md-4">
                     <!-- product image -->
@@ -16,22 +51,15 @@
                     {
                         var imagesForProduct = product.Image.Where(img => img.ProductID == product.ProductID).ToList();
 
-                        if (imagesForProduct.Any())
-                        {
-                            <img id="mainImage" src="@GetImagePath(imagesForProduct.First().Name)" class="img-fluid h-75 w-100 main-image" />
-                            <div class="row secondary">
-                                @foreach (var image in imagesForProduct.Take(4))
-                                {
-                                    <div class="col-md-3">
-                                        <img src="@GetImagePath(@image.Name)" class="img-fluid h-100 w-100 secondary-img" onclick="changeMainImage('@image.Name')" />
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <p>Loading...</p>
-                        }
+                        <img id="mainImage" src="@GetImagePath(imagesForProduct.First().Name)" class="img-fluid h-75 w-100 main-image" />
+                        <div class="row secondary">
+                            @foreach (var image in product.Image.Take(4))
+                            {
+                                <div class="col-md-3">
+                                    <img src="@GetImagePath(@image.Name)" class="img-fluid h-100 w-100 secondary-img" onclick="changeMainImage('@image.Name')" />
+                                </div>
+                            }
+                        </div>
                     }
                     else
                     {
@@ -55,33 +83,45 @@
                                 <p><i class="fa-solid fa-cake-candles fs-5"></i> Bánh kem</p>
                             </div>
                         </div>
-                        @*   @if (product?.Size_Product != null && product.Size_Product.Any())
-                    {
-                    var sizeForProduct = product.Size_Product.Where(size => size.ProductID == product.ProductID).ToList();
-                    if (sizeForProduct.Any())
-                    {
-                    var firstSize = sizeForProduct.FirstOrDefault();
-                    <h1>Giá: @firstSize.Price VNĐ</h1>
-                    }
-                    }
-                    <div class="size">
-                    <p>Size:</p>
-                    <select class="form-select" @bind="selectedSizeProductId">
-                    @foreach (var sizeProduct in product.Size_Product)
-                    {
-                    <option value="@sizeProduct.SizeProductID">@sizeProduct.Size.Name</option>
-                    }
-                    </select>
-                    </div> *@
+                        <p>Số lượng:</p>
+                        <div class="quantity-control me-3">
+                            <button id="decreaseBtn" @onclick="DecreaseQuantity">-</button>
+                            <input type="text" id="quantityInput" @bind="selectedSizeProductQuality" step="1" min="1" max="10" readonly>
+                            <button id="increaseBtn" @onclick="IncreaseQuantity">+</button>
+                        </div>
+                        <div class="size">
+                            <p>Kích cỡ:</p>
+                            @foreach (var sizeProduct in product.Size)
+                            {
+                                <div class="form-check radio-button">
+                                    <input type="radio" class="form-check-input" id="size-@sizeProduct.SizeID" name="sizeOptions" value="@sizeProduct.SizeID" @onchange="() => UpdateSelectedSize(sizeProduct)" />
+                                    <label class="radio-button-label" for="size-@sizeProduct.SizeID">
+                                        @sizeProduct.Name
+                                    </label>
+                                </div>
+                            }
+                            <p>
+                                Giá:
+                                @if (selectedSize != null)
+                                {
+                                <p>@(selectedSizeProductQuality * selectedSize.Price) VNĐ</p>
+                                }
+                                else
+                                {
+                                <p>0 VNĐ</p>
+                                }
+                            </p>
+
+                        </div>
 
                         <div class="row">
                             <div class="col-md-6 d-flex">
-                                <div class="quantity-control me-3">
-                                    <button id="decreaseBtn" @onclick="DecreaseQuantity">-</button>
-                                    <input type="text" id="quantityInput" @bind="selectedSizeProductQuality" step="1" min="1" max="10" readonly>
-                                    <button id="increaseBtn" @onclick="IncreaseQuantity">+</button>
-                                </div>
-                                <button class="btn btn-black mt-30" style="width: 270px;" @onclick="HandleValidSubmit">
+                                <button class="btn btn-black mt-30" style="width: 270px;" @onclick="HandleBuyNowClick">
+                                    <i class="fa-solid fa-cart-shopping"></i> MUA NGAY
+                                </button>
+                            </div>
+                            <div class="col-md-6 d-flex">
+                                <button class="btn btn-black mt-30" style="width: 270px;" @onclick="HandleAddToCartClick">
                                     <i class="fa-solid fa-cart-shopping"></i> THÊM VÀO GIỎ
                                 </button>
                             </div>
@@ -150,19 +190,19 @@
                             {
                                 <img src="default.jpg" class="card-img-top h-75">
                             }
-                            @*   <div class="card-body">
-                        <p class="card-text name">@similarProduct.Name</p>
-                        @if (similarProduct?.Size_Product != null && similarProduct.Size_Product.Any())
-                        {
-                        var sizeForProduct = similarProduct.Size_Product.Where(size => size.ProductID == similarProduct.ProductID).ToList();
-                        if (sizeForProduct.Any())
-                        {
-                        var firstSize = sizeForProduct.FirstOrDefault();
-                        <h6>Giá: @firstSize.Price VNĐ</h6>
-                        }
-                        }
+                            <div class="card-body">
+                                @*   <p class="card-text name">@similarProduct.Name</p>
+                            @if (similarProduct?.ProductID != null && similarProduct.ProductID.Any())
+                            {
+                            var sizeForProduct = similarProduct.ProductID.Where(size => size.ProductID == similarProduct.ProductID).ToList();
+                            if (sizeForProduct.Any())
+                            {
+                            var firstSize = sizeForProduct.FirstOrDefault();
+                            <h6>Giá: @firstSize.Price VNĐ</h6>
+                            }
+                            } *@
 
-                        </div> *@
+                            </div>
                         </div>
                     </div>
                 }
@@ -177,6 +217,7 @@
     public int ProductID { get; set; }
 
     private Product product;
+    private Product buyproduct = new Product();
     private List<Product> similarProducts = new List<Product>();
     private int selectedSizeProductId;
     private int selectedSizeProductQuality = 1;
@@ -188,6 +229,7 @@
 
     private bool IsLoggedIn = false;
     private string UserName = null;
+    private int UserID = 0;
 
 
     public string FormSubmitMessage { get; set; } = string.Empty;
@@ -199,14 +241,82 @@
     {
         await LoadProductDetails();
         await LoadSimilarProducts();
+        await GetSession();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await Task.Delay(500);
             await jsRuntime.InvokeVoidAsync("attachQuantityHandlers");
+        }
+    }
+
+    private async Task HandleAddToCartClick()
+    {
+        if (selectedSize.Name != null)
+        {
+            if (!IsLoggedIn)
+            {
+                nv.NavigateTo("/login", true);
+            }
+            else
+            {
+                var cartItem = new CartItem
+                    {
+                        ProductID = ProductID,
+                        ProductName = product.Name,
+                        SizeName = selectedSize.Name,
+                        Price = selectedSize.Price,
+                        Quantity = selectedSizeProductQuality,
+                        UserID = UserID
+                    };
+
+                var cartItemsJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "cartItems");
+                var cartItems = string.IsNullOrEmpty(cartItemsJson) ? new List<CartItem>() : JsonConvert.DeserializeObject<List<CartItem>>(cartItemsJson);
+
+                var existingItem = cartItems.FirstOrDefault(item => item.ProductID == cartItem.ProductID && item.SizeName == cartItem.SizeName);
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += cartItem.Quantity;
+                }
+                else
+                {
+                    cartItems.Add(cartItem);
+                }
+
+                var updatedCartJson = JsonConvert.SerializeObject(cartItems);
+                await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "cartItems", updatedCartJson);
+
+                Console.WriteLine("Sản phẩm đã được thêm vào giỏ hàng.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Vui lòng chọn kích cỡ.");
+        }
+    }
+
+
+    private void HandleBuyNowClick()
+    {
+        if (selectedSize.Name != null)
+        {
+            if (!IsLoggedIn)
+            {
+                nv.NavigateTo("/login", true);
+            }
+            else
+            {
+                var totalPrice = selectedSizeProductQuality * selectedSize.Price;
+                Console.WriteLine($"Mua ngay sản phẩm: {product.Name}, Kích cỡ: {selectedSize.Name}, Giá: {selectedSize.Price} VNĐ");
+                var url = $"/order-summary?productID={ProductID}&productName={Uri.EscapeDataString(product.Name)}&sizeName={Uri.EscapeDataString(selectedSize.Name)}&price={totalPrice}&quantity={selectedSizeProductQuality}&userid={UserID}";
+                nv.NavigateTo(url);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Vui lòng chọn kích cỡ.");
         }
     }
 
@@ -275,48 +385,6 @@
         return billID;
     }
 
-    public async Task HandleValidSubmit()
-    {
-        // Lấy UserName từ session
-        await GetSession();
-
-        // Lấy BillID dựa trên UserName
-        int billID = await GetBillIDByUserName(UserName);
-
-        // Nếu không lấy được BillID, trả về hoặc xử lý lỗi
-        if (billID == 0)
-        {
-            FormSubmitMessage = "Không lấy được BillID từ API.";
-            return;
-        }
-
-        // Cập nhật thông tin chi tiết
-        detailData.BillID = billID;
-        detailData.Quality = selectedSizeProductQuality;
-        detailData.Subtotal = selectedSizeProductId * 25000;
-
-        ReceivedDetail = new BillDetail();
-        using (var client = new HttpClient())
-        {
-            StringContent content = new StringContent(JsonConvert.SerializeObject(detailData), Encoding.UTF8, "application/json");
-
-            using (var response = await client.PostAsync("http://localhost:20714/api/BillDetails", content))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                    ReceivedDetail = JsonConvert.DeserializeObject<BillDetail>(apiResponse);
-                    FormSubmitMessage = "Thêm chi tiết hóa đơn thành công!";
-                }
-                else
-                {
-                    FormSubmitMessage = "Thêm thất bại: " + apiResponse;
-                }
-            }
-        }
-    }
-
-
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 
@@ -346,8 +414,16 @@
             {
                 IsLoggedIn = true;
                 UserName = userInfo.UserName;
+                UserID = userInfo.UserID;
             }
         }
+    }
+
+    private Size selectedSize = new Size();
+
+    private void UpdateSelectedSize(Size sizeProduct)
+    {
+        selectedSize = sizeProduct;
     }
 
     private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";

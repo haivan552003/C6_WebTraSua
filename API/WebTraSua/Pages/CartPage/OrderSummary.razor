@@ -1,0 +1,127 @@
+﻿@page "/order-summary"
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@using System.Net.Http.Json
+@using Newtonsoft.Json
+
+<h3>Đơn Hàng</h3>
+
+<p><strong>Tên Sản Phẩm:</strong> @productName</p>
+<p><strong>Kích Cỡ:</strong> @sizeName</p>
+<div class="quantity-control me-3">
+    <button id="decreaseBtn" @onclick="DecreaseQuantity">-</button>
+    <input type="text" id="quantityInput" @bind="quantity" step="1" min="1" max="10" readonly>
+    <button id="increaseBtn" @onclick="IncreaseQuantity">+</button>
+</div>
+<p><strong>Số lượng:</strong> @quantity</p>
+<p><strong>Giá:</strong> @price VNĐ</p>
+<p><strong>Tổng Giá:</strong> @totalPrice VNĐ</p>
+
+<button class="btn btn-black mt-30" style="width: 270px;" @onclick="ProceedToPayment">
+    <i class="fa-solid fa-cart-shopping"></i> THANH TOÁN
+</button>
+
+@code {
+    private bool IsLoggedIn = false;
+    private string UserName = null;
+
+    [Parameter]
+    public string productName { get; set; }
+
+    [Parameter]
+    public string sizeName { get; set; }
+
+    [Parameter]
+    public decimal price { get; set; }
+
+    [Parameter]
+    public int quantity { get; set; }
+
+    [Parameter]
+    public int productID { get; set; }
+
+    private decimal totalPrice => price * quantity;
+
+    protected override void OnParametersSet()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        productName = query["productName"];
+        sizeName = query["sizeName"];
+        price = decimal.TryParse(query["price"], out var p) ? p : 0;
+        quantity = int.TryParse(query["quantity"], out var q) ? q : 0;
+        productID = int.TryParse(query["productID"], out var id) ? id : 0;
+    }
+
+    private async Task ProceedToPayment()
+    {
+        // Lấy thông tin người dùng từ session
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (string.IsNullOrEmpty(userInfoJson))
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+        if (userInfo == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var userID = userInfo.UserID; // Lấy ID người dùng từ thông tin đã giải mã
+
+        // Tạo hóa đơn mới
+        var newBill = new
+        {
+            Date = DateTime.UtcNow,
+            Total = totalPrice,
+            UserID = userID,
+            StatusID = 1 // Hoặc giá trị statusID phù hợp với yêu cầu của bạn
+        };
+
+        // Gửi hóa đơn mới đến API Bills
+        var httpClient = new HttpClient();
+        var response = await httpClient.PostAsJsonAsync("http://localhost:20714/api/Bills", newBill);
+        response.EnsureSuccessStatusCode();
+        var bill = await response.Content.ReadFromJsonAsync<Bill>();
+
+        // Tạo chi tiết hóa đơn
+        var billDetail = new
+        {
+            BillID = bill.BillId, 
+            ProductID = productID, 
+            Quality = quantity,
+            Subtotal = totalPrice
+        };
+
+        // Gửi chi tiết hóa đơn đến API BillDetails
+        await httpClient.PostAsJsonAsync("http://localhost:20714/api/BillDetails", billDetail);
+
+        // Chuyển hướng đến trang thanh toán thành công
+        var paymentUrl = $"/payment-success?productName={Uri.EscapeDataString(productName)}&sizeName={Uri.EscapeDataString(sizeName)}&price={totalPrice}&quantity={quantity}&productID={productID}";
+        NavigationManager.NavigateTo(paymentUrl);
+    }
+
+    private void DecreaseQuantity()
+    {
+        if (quantity > 1)
+        {
+            quantity--;
+            StateHasChanged();
+        }
+    }
+
+    private void IncreaseQuantity()
+    {
+        if (quantity < 10)
+        {
+            quantity++;
+            StateHasChanged();
+        }
+    }
+
+}

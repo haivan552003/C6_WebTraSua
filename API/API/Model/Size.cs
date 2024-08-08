@@ -16,8 +16,7 @@ namespace API.Model
 
         [Required(ErrorMessage = "Mã sản phẩm không được bỏ trống.")]
         public int ProductID { get; set; }
-
-        [ForeignKey("ProductID")]
+        public int Price { get; set; }
         public Product Product { get; set; }
     }
 }

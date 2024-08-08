@@ -1,215 +1,156 @@
 ﻿@page "/cart"
 @inject IJSRuntime jsRuntime
-@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@using Newtonsoft.Json
 
-<div class="container-fluid-custom" style="margin-top: 85px">
-    <main>
-        <div class="container">
-            <div class="header-cart mb-3">
-                <div class="row">
-                    <div class="col-md-1 pe-0">1.Giỏ hàng</div>
-                    <div class="col-md-3">
-                        <hr width="100%" size="2" />
-                    </div>
-                    <div class="col-md-1 text-black-50">2.Vận chuyển</div>
-                    <div class="col-md-3">
-                        <hr width="100%" size="2" />
-                    </div>
-                    <div class="col-md-4 text-black-50">3.Đánh giá & thanh toán</div>
-                </div>
-            </div>
-            <div class="content-cart">
-                <div class="row">
-                    <div class="col-md-3">
-                    </div>
-                    <div class="col-md-6">
-                        @if (bills == null || !bills.Any())
-                        {
-                            <p>Không có hóa đơn.</p>
-                        }
-                        else
-                        {
-                            <div class="mb-5" style="background-color: #eeeeee;height: 420px;">
-                                <h1>Thanh toán ngay nào, @UserName</h1>
+<h3>Giỏ Hàng</h3>
 
-                                @foreach (var bill in bills)
-                                {
-                                    <div class="pt-5">
-                                        <h2 class="fs-20 ps-4 mb-4">Hoá đơn</h2>
+@if (cartItems.Count == 0)
+{
+    <p>Giỏ hàng của bạn hiện đang trống.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tên Sản Phẩm</th>
+                <th>Kích Cỡ</th>
+                <th>Số Lượng</th>
+                <th>Giá</th>
+                <th>Tổng Giá</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in cartItems)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.SizeName</td>
+                    <td>
+                        <button class="btn btn-secondary" @onclick="() => DecreaseQuantity(item)">-</button>
+                        @item.Quantity
+                        <button class="btn btn-secondary" @onclick="() => IncreaseQuantity(item)">+</button>
+                    </td>
+                    <td>@item.Price VNĐ</td>
+                    <td>@(item.Price * item.Quantity) VNĐ</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => RemoveFromCart(item)">Xóa</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-                                    </div>
-                                    <div class="ms-4 mb-0">
-                                        <div class="row mb-3">
-                                            <div class="col-md-9">
-                                                <span class="fs-16">Tổng Tiền</span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span>@bill.Total</span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-md-9">
-                                                <span class="fs-16">Phí Vận Chuyển</span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span>Miễn phí</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-1"></div>
-                                        <div class="col-md-10">
-                                            <hr />
-                                        </div>
-                                        <div class="col-md-1"></div>
-                                    </div>
-                                    <div class="ms-4 mb-0">
-                                        <div class="row mb-3">
-                                            <div class="col-md-9">
-                                                <span class="fs-16">Thành Tiền</span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="fs-16">@bill.Total VNĐ</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="ms-4 mb-3">
-                                        <span class="fs-16 text-black-50">Estimated shipping time: 2days</span>
-                                    </div>
-                                    <div class="col-md-10 mx-auto">
-                                        <div class="row">
-                                            <div class="btn btn-black mt-30" style="width: 100%">
-                                                XEM SẢN PHẨM
-                                            </div>
-                                        </div>
-                                        <div class="row mb-5"></div>
-                                        <div class="row mb-4"></div>
-                                    </div>
-
-
-                                }
-                            </div>
-                        }
-                        <div class="mb-5" style="background-color: #eeeeee;height: 190px;">
-                            <div class="pt-5">
-                                <h2 class="fs-20 ps-4 mb-4">Hình thức thanh toán</h2>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-1"></div>
-                                <div class="col-md-2 ms-4 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
-                                     style=" width: 65px; height: 35px;">
-                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Sealey-Logo.png"
-                                         alt="" style="width: 50px;">
-                                </div>
-                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
-                                     style=" width: 65px; height: 35px;">
-                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Visa-credit-card-Logo-768x432.png"
-                                         alt="" style="width: 50px;">
-                                </div>
-                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
-                                     style=" width: 65px; height: 35px;">
-                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Mastercard-credit-card-Logo-768x432.png"
-                                         alt="" style="width: 50px;">
-                                </div>
-                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1 me-3"
-                                     style=" width: 65px; height: 35px;">
-                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/Citi-credit-card-Logo-768x432.png"
-                                         alt="" style="width: 50px;">
-                                </div>
-                                <div class="col-md-2 ps-2 p-1 pe-2 position-relative bg-black rounded-1"
-                                     style=" width: 65px; height: 35px;">
-                                    <img src="https://1000logos.net/wp-content/uploads/2024/07/PNC-credit-card-Logo-768x461.png"
-                                         alt="" style="width: 50px;">
-                                </div>
-                                <div class="col-md-1"></div>
-                            </div>
-                        </div>
-                        <div style="background-color: #eeeeee;height: 300px;">
-                            <div class="pt-5">
-                                <h2 class="fs-20 ps-4 mb-4">Chính sách giao hàng và trả hàng</h2>
-                            </div>
-                            <div class="collapseoder mb-3">
-                                <p class="d-inline-flex gap-1">
-                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                                        > Đặt hàng trước 12h00 và chúng tôi sẽ giao hàng ngay trong ngày.
-                                    </a>
-                                </p>
-                                <div class="collapse" id="collapseExample">
-                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
-                                        Chúng tôi cam kết mang đến dịch vụ giao hàng nhanh chóng và tiện lợi nhất cho khách hàng. Bằng cách đặt hàng trước 12h00, bạn sẽ nhận được sản phẩm trong cùng ngày, đảm bảo không làm gián đoạn kế hoạch của bạn. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="collapseoder mb-3">
-                                <p class="d-inline-flex gap-1">
-                                    <a class="text-black ps-4 fw-semibold" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
-                                        > Các đơn hàng được thực hiện sau 12:00 thứ sáu sẽ được sử lý vào thứ hai.
-                                    </a>
-                                </p>
-                                <div class="collapse" id="collapseExample1">
-                                    <div style="background-color: #eeeeee;" class=" ps-4 card-body">
-                                        Điều này giúp chúng tôi đảm bảo rằng bạn nhận được dịch vụ tốt nhất, kể cả trong những ngày cuối tuần. Hãy trải nghiệm dịch vụ tuyệt vời của chúng tôi ngay hôm nay!
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    <footer>
-        <!-- place footer here -->
-    </footer>
-</div>
-
+    <div class="total">
+        <p><strong>Tổng cộng:</strong> @totalPrice VNĐ</p>
+        <button class="btn btn-black" @onclick="ProceedToCheckout">Thanh Toán</button>
+    </div>
+}
 
 @code {
-    private bool IsLoggedIn = false;
-    private string UserName = null;
-    private string url = "http://localhost:20714/api/Bills/";
-    private string urlSizePro = "http://localhost:20714/api/Size_Product/";
-    private IEnumerable<Bill> bills = Enumerable.Empty<Bill>();
+    private List<CartItem> cartItems = new List<CartItem>();
+    private decimal totalPrice = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        await GetSession();
-        if (!IsLoggedIn)
+        var cartJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "cartItems");
+        if (!string.IsNullOrEmpty(cartJson))
         {
-            NavigationManager.NavigateTo("/login", true);
-        }
-        else
-        {
-            await LoadBills();
+            cartItems = JsonConvert.DeserializeObject<List<CartItem>>(cartJson);
+            UpdateTotalPrice();
         }
     }
 
-    private async Task GetSession()
+    private void DecreaseQuantity(CartItem item)
+    {
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+            UpdateTotalPrice();
+            SaveCartToSession();
+        }
+    }
+
+    private void IncreaseQuantity(CartItem item)
+    {
+        item.Quantity++;
+        UpdateTotalPrice();
+        SaveCartToSession();
+    }
+
+    private void RemoveFromCart(CartItem item)
+    {
+        cartItems.Remove(item);
+        UpdateTotalPrice();
+        SaveCartToSession();
+    }
+
+    private void UpdateTotalPrice()
+    {
+        totalPrice = cartItems.Sum(i => i.Price * i.Quantity);
+    }
+
+    private async void SaveCartToSession()
+    {
+        var cartJson = JsonConvert.SerializeObject(cartItems);
+        await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "cartItems", cartJson);
+    }
+
+    private async Task ProceedToCheckout()
     {
         var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
-        if (!string.IsNullOrEmpty(userInfoJson))
+        if (string.IsNullOrEmpty(userInfoJson))
         {
-            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
-            if (userInfo != null)
-            {
-                IsLoggedIn = true;
-                UserName = userInfo.UserName;
-            }
+            NavigationManager.NavigateTo("/login");
+            return;
         }
-    }
 
-    private async Task LoadBills()
-    {
-        var response = await HttpClient.GetStringAsync($"{url}{UserName}");
-        var result = JsonConvert.DeserializeObject<List<Bill>>(response);
-        bills = result;
+        var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+        if (userInfo == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var userID = userInfo.UserID;
+
+        // Tạo hóa đơn mới
+        var newBill = new
+        {
+            Date = DateTime.UtcNow,
+            Total = totalPrice,
+            UserID = userID,
+            StatusID = 1 // Trạng thái đơn hàng
+        };
+
+        // Gửi hóa đơn mới đến API Bills
+        var httpClient = new HttpClient();
+        var response = await httpClient.PostAsJsonAsync("http://localhost:20714/api/Bills", newBill);
+        response.EnsureSuccessStatusCode();
+        var bill = await response.Content.ReadFromJsonAsync<Bill>();
+
+        // Gửi chi tiết hóa đơn cho từng sản phẩm trong giỏ hàng
+        foreach (var item in cartItems)
+        {
+            var billDetail = new
+            {
+                BillID = bill.BillId,
+                ProductID = item.ProductID,
+                Quality = item.Quantity,
+                Subtotal = item.Price * item.Quantity
+            };
+
+            await httpClient.PostAsJsonAsync("http://localhost:20714/api/BillDetails", billDetail);
+        }
+
+        // Chuyển hướng đến trang thanh toán thành công với thông tin hóa đơn
+        var paymentUrl = $"/payment-success2?billID={bill.BillId}&date={Uri.EscapeDataString(bill.Date.ToString())}&total={totalPrice}";
+        NavigationManager.NavigateTo(paymentUrl);
+
+        // Xóa giỏ hàng sau khi thanh toán thành công
+        cartItems.Clear();
+        SaveCartToSession();
     }
-    // private async Task LoadSizeProducts(BillDetail detail)
-    // {
-    //     var response = await HttpClient.GetStringAsync($"{urlSizePro}{detail.SizeProductID}");
-    //     detail.Size_Products = JsonConvert.DeserializeObject<List<Size_Product>>(response);
-    // }
 }

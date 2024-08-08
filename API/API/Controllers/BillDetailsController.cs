@@ -56,8 +56,8 @@ namespace API.Controllers
         //}
 
         // GET: api/BillDetails/5
-        [HttpGet("{userName}")]
-        public async Task<ActionResult<BillDetail>> GetBillDetail(string userName)
+        [HttpGet("{billId}")]
+        public async Task<ActionResult<BillDetail>> GetBillDetail(int billId)
         {
             var options = new JsonSerializerOptions
             {
@@ -66,7 +66,7 @@ namespace API.Controllers
 
             var billdetail = await _context.bill_detail
                 .Include(u => u.Bill)
-                .Where(u => u.Bill.User.UserName == userName && u.Bill.StatusID == 1)
+                .Where(u => u.BillID == billId)
                 .ToListAsync();
 
             var serializedData = JsonSerializer.Serialize(billdetail, options);
@@ -107,19 +107,24 @@ namespace API.Controllers
         // POST: api/BillDetails
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<BillDetail>> PostBillDetail(BillDetail billDetail)
+        public async Task<ActionResult<BillDetail>> PostBillDetail(BillDetailVM billDetail)
         {
             var newBillDetail = new BillDetail
             {
                 BillID = billDetail.BillID,
                 Quality = billDetail.Quality,
-                Subtotal = billDetail.Subtotal
+                Subtotal = billDetail.Subtotal,
+                ProductID = billDetail.ProductID
             };
+
             _context.bill_detail.Add(newBillDetail);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBillDetail", new { id = billDetail.BillDetailID }, newBillDetail);
+            var newBillDetailId = newBillDetail.BillDetailID;
+
+            return CreatedAtAction("GetBillDetails", new { id = newBillDetailId }, newBillDetail);
         }
+
         private bool BillDetailExists(int id)
         {
             return _context.bill_detail.Any(e => e.BillDetailID == id);
