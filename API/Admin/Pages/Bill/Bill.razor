@@ -5,44 +5,59 @@
 @inject IJSRuntime JSRuntime
 
 <h3>Danh Sách Hóa Đơn</h3>
-<p><a href="CreateBill">Thêm hóa đơn</a></p>
 
 <div id="printableArea" class="panel panel-primary">
-    <!-- Default panel contents -->
-    <div class="panel-heading"><h2>Thông tin hóa đơn</h2></div>
+    <div class="panel-heading">
+        <h2>Thông tin hóa đơn</h2>
+    </div>
 
-    <!-- Table -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Mã hóa đơn</th>
-                <th>Ngày</th>
-                <th>Thành tiền</th>
-                <th>Người dùng</th>
-                <th>Trạng thái</th>
-                <th>Mã QR</th>
-                <th>Xem chi tiết</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bills in bill)
-            {
+    @if (bill == null || !bill.Any())
+    {
+        <div class="alert alert-warning">
+            Không có hóa đơn nào để hiển thị.
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@bills.BillId</td>
-                    <td>@bills.Date.ToShortDateString()</td>
-                    <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
-                    <td>@bills.User.Name</td>
-                    <td>@bills.Status.Name</td>
-                    <td>
-                        <img src="@GenerateQRCode(bills.BillId)" width="150px" height="150px" alt="QR Code" />
-                    </td>
-                    <td><a href="/billdetails/@bills.BillId">Xem chi tiết</a></td>
+                    <th>Mã hóa đơn</th>
+                    <th>Ngày</th>
+                    <th>Thành tiền</th>
+                    <th>Người dùng</th>
+                    <th>Trạng thái</th>
+                    <th>Mã QR</th>
+                    <th>Xem chi tiết</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-
+            </thead>
+            <tbody>
+                @foreach (var bills in bill)
+                {
+                    <tr>
+                        <td>@bills.BillId</td>
+                        <td>@bills.Date.ToShortDateString()</td>
+                        <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
+                        <td>@bills.User.Name</td>
+                        <td>@bills.Status.Name</td>
+                        <td>
+                            @if (string.IsNullOrEmpty(GenerateQRCode(bills.BillId)))
+                            {
+                                <span>Không có chi tiết hóa đơn</span>
+                            }
+                            else
+                            {
+                                <img src="@GenerateQRCode(bills.BillId)" width="150px" height="150px" alt="QR Code" />
+                            }
+                        </td>
+                        <td><a href="/billdetails/@bills.BillId">Xem chi tiết</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
+
 
 @code {
     string urlBill = "http://localhost:20714/api/Bills";
