@@ -9,7 +9,7 @@
             <div>
                 <img src="logo.png" alt="" class="mb-3" style="width: 36px; height: 36px;">
                 <a class="navbar-brand roboto-regular text-light-emphasis fs-20" style="letter-spacing: -1px;"
-                   href="#">
+                   href="/">
                     Năm Chú Mèo
                     Con
                 </a>
@@ -61,16 +61,21 @@
                             @if (IsLoggedIn)
                             {
                                 <li>
-                                    <a class="dropdown-item" href="#" @onclick="Logout">Đăng xuất</a>
+                                    <a class="dropdown-item" href="/user">Thông tin tài khoản</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="/user" >Thông tin</a>
+                                    <a class="dropdown-item" href="/history">Lịch sử mua hàng</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/" @onclick="Logout">Đăng xuất</a>
                                 </li>
                             }
                             else
                             {
                                 <li>
                                     <a class="dropdown-item" href="/login">Đăng nhập</a>
+                                </li>
+                                <li>
                                     <a class="dropdown-item" href="/register">Đăng ký</a>
                                 </li>
                             }
@@ -87,7 +92,7 @@
     </div>
 </nav>
 
-<main class="container" style="margin-top: 72px;">
+<main class="container" style="margin-top: 100px;">
     @Body
 
 

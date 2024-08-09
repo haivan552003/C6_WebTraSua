@@ -46,55 +46,28 @@ namespace API.Controllers
 
         // GET: api/Bills/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Bill>> GetBill(int id)
+        public async Task<ActionResult<IEnumerable<Bill>>> GetBills(int id)
         {
             var options = new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
 
-            var bill = await _context.bill
-                .Include(u => u.User)
+            var bills = await _context.bill
                 .Include(u => u.Status)
                 .Include(u => u.BillDetail)
                 .ThenInclude(u => u.Product)
-                .ThenInclude(u => u.Image)
-                .FirstOrDefaultAsync(u => u.BillId == id);
-
-            if (bill == null)
-            {
-                return NotFound();
-            }
-
-            var serializedData = JsonSerializer.Serialize(bill, options);
-            return Content(serializedData, "application/json");
-        }
-
-        // GET: api/Bills/5
-        [HttpGet("{userName}")]
-        public async Task<ActionResult<Bill>> GetBill(string userName)
-        {
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-
-            var bill = await _context.bill
-                .Include(u => u.User)
-                .Include(u => u.BillDetail)
-                .Where(u => u.User.UserName == userName)
+                .Where(u => u.UserID == id)
                 .ToListAsync();
 
-
-            if (bill == null)
+            if (bills == null || !bills.Any())
             {
                 return NotFound();
             }
 
-            var serializedData = JsonSerializer.Serialize(bill, options);
+            var serializedData = JsonSerializer.Serialize(bills, options);
             return Content(serializedData, "application/json");
         }
-
 
         // PUT: api/Bills/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
