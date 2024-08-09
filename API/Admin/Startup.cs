@@ -38,7 +38,7 @@ public class Startup
         app.UseStaticFiles();
         app.UseStaticFiles(new StaticFileOptions
         {
-            FileProvider = new PhysicalFileProvider("D:/FPoly/C# 6/ImageUpload"),
+            FileProvider = new PhysicalFileProvider("D:\\FPT Plytechnic\\C Sharp 6\\images"),
             RequestPath = "/images"
         });
         app.UseRouting();

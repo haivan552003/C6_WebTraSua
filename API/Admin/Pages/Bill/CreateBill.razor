@@ -1,5 +1,6 @@
 ﻿@page "/createbill"
 @using System.Text
+@inject IJSRuntime jsRuntime
 <h3>Thêm Hóa Đơn</h3>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
@@ -56,6 +57,8 @@
     string urlBill = "http://localhost:20714/api/Bills";
     string urlUser = "http://localhost:20714/api/Users";
     string urlStatus = "http://localhost:20714/api/Status";
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
 
     public Admin.Model.Bill proData = new Admin.Model.Bill();
     Admin.Model.Bill ReceivedPro;
@@ -66,6 +69,29 @@
     protected override async Task OnInitializedAsync()
     {
         await Load();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+        }
+    }
+
+    private async Task GetSession()
+    {
+        await Task.Delay(100);
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     private async Task Load()
