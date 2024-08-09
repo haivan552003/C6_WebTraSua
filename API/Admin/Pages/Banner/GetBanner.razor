@@ -14,6 +14,11 @@
             <input type="text" id="searchInput" @bind="searchQuery" placeholder="Nhập tên Title..." />
             <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
         </div>
+        <label for="nameSort">Lọc theo tên:</label>
+        <select id="nameSort" @onchange="OnNameSortChanged" value="@nameSortOrder">
+            <option value="asc">Lọc theo tên từ A - Z</option>
+            <option value="desc">Lọc theo tên từ Z - A</option>
+        </select>
 
         <!-- Table -->
         <table class="table">
@@ -89,6 +94,7 @@ else
     private int currentPage = 1;
     private int pageSize = 5;
     private string selectedStatus = string.Empty;
+    private string nameSortOrder = "asc"; // Thêm thuộc tính này
 
     protected async override Task OnInitializedAsync()
     {
@@ -154,6 +160,16 @@ else
             filtered = filtered.Where(b => b.Title.ToLower().Contains(searchQuery.ToLower()));
         }
 
+        // Áp dụng sắp xếp theo tên
+        if (nameSortOrder == "asc")
+        {
+            filtered = filtered.OrderBy(b => b.Title);
+        }
+        else if (nameSortOrder == "desc")
+        {
+            filtered = filtered.OrderByDescending(b => b.Title);
+        }
+
         // Cập nhật danh sách banner đã lọc
         filteredBanner = filtered.ToList();
     }
@@ -184,16 +200,16 @@ else
         }
     }
 
-    private async void OnSearchClicked()
+    private void OnNameSortChanged(ChangeEventArgs e)
     {
-        currentPage = 1;
+        nameSortOrder = e.Value.ToString();
         ApplyFilters();
+        currentPage = 1; // Reset về trang đầu tiên sau khi sắp xếp
     }
 
-    private async void sortStatus(ChangeEventArgs e)
+    private void OnSearchClicked()
     {
-        selectedStatus = e.Value.ToString();
-        currentPage = 1; // Reset to the first page after sorting
         ApplyFilters();
+        currentPage = 1;
     }
 }

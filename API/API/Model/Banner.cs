@@ -7,8 +7,6 @@ namespace API.Model
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Hình ảnh không được bỏ trống.")]
-        [StringLength(500, ErrorMessage = "Độ dài hình ảnh không thể lớn hơn 500 ký tự.")]
         public string Image { get; set; }
 
         [Required(ErrorMessage = "Tiêu đề không được bỏ trống.")]

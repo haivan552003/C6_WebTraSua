@@ -15,8 +15,7 @@ namespace Admin.Model
         [StringLength(100, ErrorMessage = "Độ dài tên không thể lớn hơn 100 ký tự.")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Hình ảnh không được bỏ trống.")]
-        [StringLength(500, ErrorMessage = "Độ dài hình ảnh không thể lớn hơn 500 ký tự.")]
+      
         public string Image { get; set; }
 
         [Required(ErrorMessage = "Trạng thái không được bỏ trống.")]
