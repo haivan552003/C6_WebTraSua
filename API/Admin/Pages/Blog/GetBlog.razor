@@ -89,7 +89,6 @@
 <p><a href="CreateBlog">Thêm Bài Viết</a></p>
 
 <div class="panel panel-primary">
-    <!-- Default panel contents -->
     <div class="panel-heading">
         <h2>Thông tin bài viết</h2>
         <div>
@@ -105,7 +104,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <table class="table">
         <tr>
             <th>Tiêu đề</th>
@@ -123,7 +121,7 @@
                     <a class="btn btn-sm btn-success" href="UpdateBlog/@blog.Id">
                         Sửa
                     </a> |
-                    <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(blog.Id))">
+                    <button class="btn btn-sm btn-danger" @onclick="@(() => ShowDeleteModal(blog.Id))">
                         Xóa
                     </button>
                 </td>
@@ -148,11 +146,47 @@
     </ul>
 </nav>
 
+<!-- Modal Xác Nhận Xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa bài viết này không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function showModal(modalId) {
+        var modal = new bootstrap.Modal(document.querySelector(modalId));
+        modal.show();
+    }
+
+    function hideModal(modalId) {
+        var modal = bootstrap.Modal.getInstance(document.querySelector(modalId));
+        if (modal) {
+            modal.hide();
+        }
+    }
+</script>
+
+
 @code {
     private int currentPage = 1;
     private int pageSize = 2;
     private string titleSortOrder = "asc";
     private string searchQuery = string.Empty;
+    private int blogIdToDelete;
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
 
     private IEnumerable<Blog> Blogss { get; set; } = Enumerable.Empty<Blog>();
     private IEnumerable<Blog> FilteredBlogs { get; set; } = Enumerable.Empty<Blog>();
@@ -169,6 +203,29 @@
     {
         await CallAPI();
         ApplyFilters();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+        }
+    }
+
+    private async Task GetSession()
+    {
+        await Task.Delay(100);
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     async Task CallAPI()
@@ -236,12 +293,19 @@
 
     private string GetImagePath(string imageName) => $"http://localhost:49972/images/{imageName}";
 
-    private async Task ConfirmDelete(int blogId)
+    private void ShowDeleteModal(int blogId)
     {
-        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bài viết này không?");
-        if (confirmed)
+        blogIdToDelete = blogId;
+        jsRuntime.InvokeVoidAsync("showModal", "#deleteModal");
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (blogIdToDelete != 0)
         {
-            await Delete(blogId);
+            await Delete(blogIdToDelete);
+            blogIdToDelete = 0;
+            jsRuntime.InvokeVoidAsync("hideModal", "#deleteModal");
         }
     }
 

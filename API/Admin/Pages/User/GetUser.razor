@@ -99,7 +99,6 @@ label {
                 <option value="">Tất Cả</option>
                 <option value="0">Nam</option>
                 <option value="1">Nữ</option>
-                <option value="2">Không xác định</option>
             </select>
         </div>
     </div>
@@ -127,10 +126,6 @@ label {
                     else if (user.Gender == 1)
                     {
                         <span>Nữ</span>
-                    }
-                    else
-                    {
-                        <span>Không xác định</span>
                     }
                 </td>
                 <td>@user.Phone</td>
@@ -167,6 +162,8 @@ label {
     private string selectedGender = string.Empty;
     private string nameSortOrder = "asc";
     private string searchQuery = string.Empty;
+    private bool IsLoggedIn = false;
+    private int RoleID = 0;
 
     // Biến phân trang
     private int currentPage = 1;
@@ -179,6 +176,29 @@ label {
     {
         await CallAPI();
         ApplyFilters();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+        }
+    }
+
+    private async Task GetSession()
+    {
+        await Task.Delay(100);
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
     }
 
     async Task CallAPI()

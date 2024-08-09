@@ -64,13 +64,17 @@
     [Parameter]
     public int Id { get; set; }
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await GetSession();
+        if (firstRender)
+        {
+            await GetSession();
+        }
     }
 
     private async Task GetSession()
     {
+        await Task.Delay(100);
         var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
         if (!string.IsNullOrEmpty(userInfoJson))
         {

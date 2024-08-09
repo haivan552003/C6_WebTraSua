@@ -114,14 +114,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCategories();
-        await LoadProduct();
-        await GetSession();
+        await Load();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+        }
     }
 
     private async Task LoadCategories()
     {
-        using (var httpClient = new HttpClient())
+        await Task.Delay(100);
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
         {
             using (var response = await httpClient.GetAsync(urlCate))
             {
