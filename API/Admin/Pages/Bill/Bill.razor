@@ -4,12 +4,103 @@
 @using System.IO
 @inject IJSRuntime jsRuntime
 
-<h3>Danh Sách Hóa Đơn</h3>
+<style>
+    .panel {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-heading {
+        background-color: #007bff;
+        color: white;
+        padding: 15px 15px 5px 15px;
+        border-radius: 8px 8px 0 0;
+    }
+
+        .panel-heading h2 {
+            margin: 0;
+        }
+
+    .table {
+        margin: 20px 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:hover {
+            background-color: #e9ecef;
+        }
+
+    select, input {
+        padding: 5px;
+        margin: 5px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+
+    .btn-search {
+        height: 40px;
+        margin-right: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+        padding: 0;
+    }
+
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            padding: 8px 12px;
+            color: #007bff;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+            .pagination .page-link[disabled] {
+                pointer-events: none;
+                opacity: 0.5;
+            }
+</style>
 <p><a href="CreateBill">Thêm hóa đơn</a></p>
 
 <div id="printableArea" class="panel panel-primary">
     <!-- Default panel contents -->
-    <div class="panel-heading"><h2>Thông tin hóa đơn</h2></div>
+    <div class="panel-heading">
+        <h2>Thông Tin Hóa Đơn</h2>
+    </div>
 
     <!-- Table -->
     <table class="table">
@@ -25,7 +116,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var bills in bill)
+            @foreach (var bills in PaginatedBills)
             {
                 <tr>
                     <td>@bills.BillId</td>
@@ -41,7 +132,25 @@
             }
         </tbody>
     </table>
+</div>
 
+<!-- Pagination -->
+<div class="pagination-container">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" @onclick="PreviousPage" disabled="@(!CanGoBack)">
+                    <span aria-hidden="true">«</span> Trang Trước
+                </a>
+            </li>
+            <li class="page-item"><span class="page-link text-black">Trang @currentPage trên @totalPages</span></li>
+            <li class="page-item">
+                <a class="page-link" @onclick="NextPage" disabled="@(!CanGoNext)">
+                    Trang Sau <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 @code {
@@ -52,14 +161,20 @@
     private bool IsLoggedIn = false;
     private int RoleID = 0;
 
+    private const int PageSize = 2; // Số lượng hóa đơn trên mỗi trang
+    private int currentPage = 1;
+    private int totalPages;
     public IEnumerable<Admin.Model.Bill> bill { get; set; } = Enumerable.Empty<Admin.Model.Bill>();
+    public IEnumerable<Admin.Model.Bill> PaginatedBills { get; set; } = Enumerable.Empty<Admin.Model.Bill>();
     public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
     public IEnumerable<BillDetail> billDetails { get; set; } = Enumerable.Empty<BillDetail>();
 
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
+        ApplyPagination();
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -67,6 +182,7 @@
             await GetSession();
         }
     }
+
     private async Task GetSession()
     {
         await Task.Delay(100);
@@ -110,9 +226,35 @@
         }
     }
 
+    private void ApplyPagination()
+    {
+        totalPages = (int)Math.Ceiling(bill.Count() / (double)PageSize);
+        PaginatedBills = bill.Skip((currentPage - 1) * PageSize).Take(PageSize);
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            ApplyPagination();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            ApplyPagination();
+        }
+    }
+
+    private bool CanGoBack => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
+
     private string GenerateQRCode(int billId)
     {
-        // Ensure billDetails is loaded and contains data
         if (billDetails == null || !billDetails.Any())
         {
             return string.Empty; // Handle as needed
@@ -152,7 +294,6 @@
             }
         }
     }
-
 
     private async Task PrintSelectedArea()
     {

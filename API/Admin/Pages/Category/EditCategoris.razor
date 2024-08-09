@@ -2,7 +2,7 @@
 @using System.Text
 @inject IJSRuntime jsRuntime
 
-<div class="panel-heading"><h2>Sửa loại sản phẩm </h2></div>
+<div class="panel-heading"><h2>Sửa loại sản phẩm</h2></div>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -15,27 +15,44 @@
             <ValidationMessage For="()=>proData.Name"></ValidationMessage>
         </div>
     </div>
+
     <div class="form-group">
         <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="proData.Status">
-            <option value="0" selected>Hợp lệ</option>
+            <option value="0">Hợp lệ</option>
             <option value="1">Không hợp lệ</option>
         </InputSelect>
 
         <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Status">
-
-            </ValidationMessage>
+            <ValidationMessage For="()=>proData.Status"></ValidationMessage>
         </div>
     </div>
+
+    <div class="form-group">
+        <label class="font-weight-bold">Hình Ảnh Hiện Tại</label>
+        <div>
+            <img src="@GetImagePath(proData.Image)" alt="Current Image" width="150" height="150" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="font-weight-bold">Tải Lên Hình Ảnh Mới</label>
+        <InputFile OnChange="HandleFileSelected" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Image"></ValidationMessage>
+        </div>
+    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Sửa Danh Mục</button>
     </div>
-
 </EditForm>
+
 <h2 class="text-success p-2">@FormSubmitMessage</h2>
 
 @code {
+    private IBrowserFile selectedFile;
+    private string imageBaseUrl = "http://localhost:20714/images"; // Đường dẫn cơ bản tới thư mục chứa hình ảnh
 
     string urlCate = "http://localhost:20714/api/Categories";
     public Categories proData = new Categories();
@@ -84,9 +101,43 @@
         }
     }
 
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        proData.Image = selectedFile.Name; // Đặt tên file vào model proData
+    }
+
     public async Task HandleValidSubmit()
     {
-        ReceivedBlog = new Categories();
+        if (selectedFile != null)
+        {
+            var content = new MultipartFormDataContent();
+            content.Add(new StreamContent(selectedFile.OpenReadStream()), "file", selectedFile.Name);
+            content.Add(new StringContent(proData.Name), "name");
+            content.Add(new StringContent(proData.Status.ToString()), "status");
+
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.PutAsync($"{urlCate}/UploadFile/{proData.CateID}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    FormSubmitMessage = "Sửa thành công!";
+                }
+                else
+                {
+                    FormSubmitMessage = "Sửa thất bại: " + response.ReasonPhrase;
+                }
+            }
+        }
+        else
+        {
+            await UpdateCategoryWithoutImage();
+        }
+    }
+
+    private async Task UpdateCategoryWithoutImage()
+    {
         using (var httpClient = new HttpClient())
         {
             var jsonContent = new StringContent(JsonConvert.SerializeObject(proData), Encoding.UTF8, "application/json");
@@ -96,8 +147,7 @@
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    ReceivedBlog = JsonConvert.DeserializeObject<Categories>(apiResponse);
-                    FormSubmitMessage = "Sửa  thành công !";
+                    FormSubmitMessage = "Sửa thành công!";
                 }
                 else
                 {
@@ -106,6 +156,7 @@
             }
         }
     }
+    private string GetImagePath(string imageName) => $"http://localhost:49972/images/{imageName}";
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 }

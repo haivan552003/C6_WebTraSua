@@ -60,15 +60,38 @@ namespace API.Controllers
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategories(int id, Categories categories)
+        [HttpPut("UploadFile/{id}")]
+        public async Task<IActionResult> PutCategoryWithImage(int id, [FromForm] IFormFile file, [FromForm] string name, [FromForm] byte status)
         {
-            if (id != categories.CateID)
+            var category = await _context.category.FindAsync(id);
+            if (category == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(categories).State = EntityState.Modified;
+            if (file != null && file.Length > 0)
+            {
+                var uploadFolder = "D:\\FPT Plytechnic\\C Sharp 6\\images";
+                var imageName = Path.GetFileName(file.FileName);
+                var imagePath = Path.Combine(uploadFolder, imageName);
+
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                using (var stream = new FileStream(imagePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                category.Image = imageName; // Cập nhật tên file ảnh mới
+            }
+
+            category.Name = name;
+            category.Status = status;
+
+            _context.Entry(category).State = EntityState.Modified;
 
             try
             {
@@ -88,6 +111,7 @@ namespace API.Controllers
 
             return NoContent();
         }
+
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("UploadFile")]
         public async Task<ActionResult<Categories>> UploadFile([FromForm] IFormFile file, [FromForm] string name, [FromForm] byte status)
@@ -97,7 +121,7 @@ namespace API.Controllers
                 return BadRequest("File is empty");
             }
 
-            var uploadFolder = "D:\\FPoly\\C# 6\\ImageUpload";
+            var uploadFolder = "D:\\FPT Plytechnic\\C Sharp 6\\images";
             var imageName = Path.GetFileName(file.FileName);
             var imagePath = Path.Combine(uploadFolder, imageName);
 

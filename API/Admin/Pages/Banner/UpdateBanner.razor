@@ -5,9 +5,9 @@
 <EditForm Model="bannerData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-
+    <h2>SỬA BẢNG HIỆU</h2>
     <div class="form-group">
-        <label class="font-weight-bold">Tiêu Đfề</label>
+        <label class="font-weight-bold">Tiêu Đề</label>
         <InputText class="form-control" @bind-Value="bannerData.Title" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Title"></ValidationMessage>

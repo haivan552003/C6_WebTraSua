@@ -1,28 +1,28 @@
 ﻿@page "/createbill"
 @using System.Text
 @inject IJSRuntime jsRuntime
-<h3>Thêm Hóa Đơn</h3>
+<h2>THÊM HÓA ĐƠN</h2>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateBill">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
-        <label>Ngày Tạo</label>
+        <label class="font-weight-bold">Ngày Tạo</label>
         <InputDate class="form-control" @bind-Value="proData.Date" placeholder="Ngày" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Date"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>Thành Tiền</label>
+        <label class="font-weight-bold">Thành Tiền</label>
         <InputNumber class="form-control" @bind-Value="proData.Total" placeholder="Tổng" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Total"></ValidationMessage>
         </div>
     </div>
     <div class="form-group">
-        <label>Khách Hàng</label>
+        <label class="font-weight-bold">Khách Hàng</label>
         <InputSelect class="form-control" @bind-Value="proData.UserID">
             @foreach (User item in users)
             {
@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>Trạng Thái</label>
+        <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="proData.StatusID">
             @foreach (Status item in statuses)
             {
