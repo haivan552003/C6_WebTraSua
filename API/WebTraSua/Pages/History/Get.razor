@@ -1,0 +1,105 @@
+﻿@page "/history"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject HttpClient HttpClient
+@inject IJSRuntime jsRuntime
+
+<h3>Lịch Sử Đơn Hàng</h3>
+
+@if (bills != null && bills.Count > 0)
+{
+    foreach (var bill in bills)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                <h4>
+                    Hóa Đơn #@bill.BillId -
+                    <a href="#" class="font-weight-bold fs-24 text-primary"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="right"
+                       title="Bấm vào để thay đổi trạng thái">
+                        @bill.Status.Name
+                    </a>
+                </h4>
+                <p>Ngày đặt: @bill.Date.ToString("dd/MM/yyyy")</p>
+                <p>Tổng Hóa Đơn: @bill.Total VNĐ</p>
+            </div>
+            <div class="card-body">
+                <h5>Chi Tiết Hóa Đơn</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sản Phẩm</th>
+                            <th>Số Lượng</th>
+                            <th>Giá</th>
+                            <th>Tổng Cộng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in bill.BillDetail)
+                        {
+                            var price = detail.Subtotal / (detail.Quality > 0 ? detail.Quality : 1);
+                            <tr>
+                                <td>@detail.Product.Name</td>
+                                <td>@detail.Quality</td>
+                                <td>@price VNĐ</td>
+                                <td>@detail.Subtotal VNĐ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Bạn chưa có đơn hàng nào.</p>
+}
+
+@code {
+    private List<Bill> bills = new List<Bill>();
+    private bool IsLoggedIn = false;
+    private int UserID = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetSession();
+        if (IsLoggedIn)
+        {
+            await LoadBills();
+        }
+    }
+
+    private async Task LoadBills()
+    {
+        try
+        {
+            var response = await HttpClient.GetStringAsync($"http://localhost:20714/api/Bills/{UserID}");
+            bills = System.Text.Json.JsonSerializer.Deserialize<List<Bill>>(response, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.Preserve
+                }) ?? new List<Bill>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching bill data: {ex.Message}");
+        }
+    }
+
+    private async Task GetSession()
+    {
+        await Task.Delay(100);  // Đảm bảo session đã sẵn sàng
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                UserID = userInfo.UserID;
+            }
+        }
+    }
+}
