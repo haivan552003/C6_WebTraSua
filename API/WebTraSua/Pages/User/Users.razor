@@ -4,13 +4,120 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NV
 
+<style>
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    .fs-52 {
+        font-size: 2.25rem;
+    }
+
+    .fw-bold {
+        font-weight: 700;
+    }
+
+    .mb-72 {
+        margin-bottom: 72px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .fw-semibold {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 10px;
+        font-size: 1rem;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+        .form-control:hover, .form-select:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(38, 143, 255, 0.2);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+            outline: none;
+        }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    
+
+    .text-success {
+        color: #28a745;
+    }
+
+    .p-2 {
+        padding: 0.5rem;
+    }
+
+    .ms-auto {
+        margin-left: auto;
+    }
+
+    .rounded-0 {
+        border-radius: 0;
+    }
+
+    .mt-96 {
+        margin-top: 96px;
+    }
+
+    .col-md-8 {
+        margin: auto;
+    }
+
+    .col-md-10 {
+        margin: auto;
+    }
+
+    .col-md-6 {
+        padding: 0 10px;
+    }
+
+    .mt-3 {
+        margin-top: 1rem;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
+
+
 <main class="container mt-96">
     <div class="row">
         @if (IsLoggedIn)
         {
             <div class="col-md-8">
                 <div class="mb-72">
-                    <p class="fs-52 fw-bold">Thông tin của bạn</p>
+                    <p class="fs-52 fw-bold text-center">Thông tin của bạn</p>
                     <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
                         <DataAnnotationsValidator />
                         <ValidationSummary />
@@ -37,7 +144,7 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-md-6">
-                                    <label class="fw-semibold">Gender</label>
+                                    <label class="fw-semibold">Giới tính</label>
                                     <InputSelect class="form-select" @bind-Value="user.Gender">
                                         <option value="0">Nam</option>
                                         <option value="1">Nữ</option>
@@ -45,30 +152,23 @@
                                     <ValidationMessage For="@(() => user.Gender)" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="fw-semibold">Phone</label>
+                                    <label class="fw-semibold">Số điện thoại</label>
                                     <InputText class="form-control" @bind-Value="user.Phone" />
                                     <ValidationMessage For="@(() => user.Phone)" />
                                 </div>
                             </div>
                             <div class="form-group mt-3">
-                                <label class="fw-semibold">Address</label>
+                                <label class="fw-semibold">Địa chỉ</label>
                                 <InputTextArea class="form-control" @bind-Value="user.Address" />
                                 <ValidationMessage For="@(() => user.Address)" />
                             </div>
 
-                            <button type="submit" class="btn btn-primary text-white button-brown-hover fs-16 fw-bold bg-B88E2F rounded-0 mt-3">
+                            <button type="submit" class="btn btn-black ">
                                 Lưu thay đổi
                             </button>
                         </div>
                     </EditForm>
                     <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="col-md-10 mx-auto" style="margin-top: 92px;">
-                    <img src="https://i.pinimg.com/originals/cf/ba/b9/cfbab918bff4c8f23ab2cf2948233238.jpg"
-                         alt="" class="img-fluid w-100 h-100 rounded-circle">
-                    <p class="text-center mt-3 fs-16 fw-semibold">@user.Name</p>
                 </div>
             </div>
 
@@ -80,6 +180,7 @@
     </div>
 
 </main>
+
 
 
 @code {

@@ -20,12 +20,12 @@
                     </div>
                 </div>
                 <div class="input-box">
-                    <InputText @bind-Value="userData.PassWord" type="password" placeholder="Mật khẩu" />
-                    <div id="eye">
+                    <InputText @bind-Value="userData.PassWord" id="password" type="password" placeholder="Mật khẩu" />
+                    <div id="toggle">
                         <i class='bx bx-low-vision'></i>
-                        <div class="text-danger ps-3">
-                            <ValidationMessage For="()=>userData.PassWord"></ValidationMessage>
-                        </div>
+                    </div>
+                    <div class="text-danger ps-3">
+                        <ValidationMessage For="()=>userData.PassWord"></ValidationMessage>
                     </div>
                 </div>
 
@@ -46,8 +46,27 @@
     <footer>
         <!-- place footer here -->
     </footer>
-    <!-- Bootstrap JavaScript Libraries -->
 
+    <script>
+        function initializePasswordToggle() {
+            const password = document.getElementById('password');
+            const toggle = document.getElementById('toggle');
+
+            toggle.addEventListener('click', function () {
+                if (password.type === 'password') {
+                    password.setAttribute('type', 'text');
+                    toggle.classList.add('hide');
+                } else {
+                    password.setAttribute('type', 'password');
+                    toggle.classList.remove('hide');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializePasswordToggle();
+        });
+    </script>
 </body>
 
 @code {
@@ -55,6 +74,14 @@
 
     public UserLogin userData { get; set; } = new UserLogin();
     public string FormSubmitMessage { get; set; } = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("initializePasswordToggle");
+        }
+    }
 
     public async Task HandleValidSubmit()
     {
