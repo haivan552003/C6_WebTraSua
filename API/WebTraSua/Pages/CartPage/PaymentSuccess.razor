@@ -2,16 +2,92 @@
 @using Microsoft.AspNetCore.WebUtilities
 @inject NavigationManager NavigationManager
 
-<h2>Thanh Toán Thành Công!</h2>
+<style>
+    .payment-success {
+        text-align: center;
+        background-color: #f4f4f9;
+        border-radius: 10px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 40px auto;
+        font-family: Arial, sans-serif;
+    }
 
-<p>Cảm ơn bạn đã mua hàng!</p>
+        .payment-success h2 {
+            color: white;
+            background-color:black;
+            border-radius: 5px 5px 0 0;
+            font-size: 2.5rem;
+            
+        }
 
-<p><strong>Tên Sản Phẩm:</strong> @productName</p>
-<p><strong>Kích Cỡ:</strong> @sizeName</p>
-<p><strong>Số Lượng:</strong> @quantity</p>
-<p><strong>Tổng Giá:</strong> @price VNĐ</p>
+        .payment-success p {
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
 
-<button class="btn btn-primary" @onclick="BackToHome">Quay về trang chủ</button>
+            .payment-success p strong {
+                color: #333;
+                flex: 1; /* Ensures that the strong tag does not shrink */
+                text-align: left; /* Align text to the left */
+            }
+
+            .payment-success p span {
+                flex: 2; /* Ensures the remaining space is taken by the span */
+                text-align: right; /* Align text to the right */
+            }
+
+        .payment-success .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .payment-success .btn:hover {
+                background-color: #0056b3;
+                transform: scale(1.05);
+            }
+
+            .payment-success .btn:focus {
+                outline: none;
+            }
+</style>
+
+<div class="payment-success">
+    <h2 class="m-0 p-0">Thanh Toán Thành Công!</h2>
+    <div class="p-5">
+        <div class=" mx-auto w-75">
+            <p><strong>Tên Sản Phẩm:</strong> <span>@productName</span></p>
+            <p><strong>Kích Cỡ:</strong> <span>@sizeName</span></p>
+            <p><strong>Số Lượng:</strong> <span>@quantity</span></p>
+            <p><strong>Tổng Giá:</strong> <span class="fw-bold fs-24">@price </span>VNĐ</p>
+        </div>
+        <div class="w-75  mx-auto">
+            <span style="color:forestgreen;">Cảm ơn bạn đã mua hàng!</span>
+
+        </div>
+        
+    </div>     
+</div>
+<div class="w-75">
+    <a @onclick="BackToHome" class="text-primary fs-16 float-end">
+        Quay về trang chủ
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+</div>
+
+
 
 @code {
     private string productName;
