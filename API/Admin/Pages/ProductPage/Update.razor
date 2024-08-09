@@ -1,84 +1,150 @@
-﻿@page "/updatepro/{id:int}"
+﻿@page "/updatepro/{Id:int}"
 @using System.Text
 @inject IJSRuntime jsRuntime
 
-<EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateProduct">
-    <DataAnnotationsValidator />
-    <h1>Sửa Sản Phẩm</h1>
-    <div class="form-group">
-        <label class="font-weight-bold">Tên Sản Phẩm</label>
-        <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Name"></ValidationMessage>
-        </div>
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateProduct">
+            <DataAnnotationsValidator />
+            <h1>Sửa Sản Phẩm</h1>
+
+            <!-- Product Edit Form -->
+            <div class="form-group">
+                <label class="font-weight-bold">Tên Sản Phẩm</label>
+                <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Name"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Đánh Giá</label>
+                <InputNumber class="form-control" @bind-Value="proData.Rate" placeholder="Đánh giá" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Mô Tả 1</label>
+                <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Mô Tả 2</label>
+                <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Danh Mục</label>
+                <InputSelect class="form-control" @bind-Value="proData.CateID">
+                    @foreach (var item in cate)
+                    {
+                        <option value="@item.CateID">@item.Name</option>
+                    }
+                </InputSelect>
+                <div class="text-danger ps-3">
+                    <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="font-weight-bold">Trạng Thái</label>
+                <InputSelect class="form-control" @bind-Value="proData.StatusID">
+                    <option value="0">Hợp lệ</option>
+                    <option value="1">Không hợp lệ</option>
+                </InputSelect>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Sửa Sản Phẩm</button>
+            <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+        </EditForm>
+
     </div>
+    <div class="col-md-6">
+        <h2>Danh Sách Hình Ảnh</h2>
 
-    <div class="form-group">
-        <label class="font-weight-bold">Đánh Giá</label>
-        <InputNumber class="form-control" @bind-Value="proData.Rate" placeholder="Đánh giá" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Rate"></ValidationMessage>
-        </div>
+        @if (proData.Image != null && proData.Image.Any())
+        {
+
+            <div class="row">
+
+                @foreach (var image in proData.Image)
+                {
+                    <div class="col-md-4">
+                        <div class="card">
+                            <img src="@GetImagePath(image.Name)" class="w-100" style="height:200px;" alt="Product Image">
+                            <div class="card-body">
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteImage(image.ImageID)">Xóa ảnh</button>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+
+
+        }
+        else
+        {
+            <p>Không có hình ảnh nào.</p>
+        }
     </div>
+</div>
 
-    <div class="form-group">
-        <label class="font-weight-bold">Mô Tả 1</label>
-        <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="font-weight-bold">Mô Tả 2</label>
-        <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="font-weight-bold">Danh Mục</label>
-        <InputSelect class="form-control" @bind-Value="proData.CateID">
-            @foreach (Categories item in cate)
-            {
-                <option value="@item.CateID">@item.Name</option>
-            }
-        </InputSelect>
-        <div class="text-danger ps-3">
-            <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="font-weight-bold">Trạng Thái</label>
-        <InputSelect class="form-control" @bind-Value="proData.StatusID">
-            <option value="0" selected>Hợp lệ</option>
-            <option value="1">Không hợp lệ</option>
-        </InputSelect>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Sửa Sản Phẩm</button>
-    <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
-</EditForm>
-
+<!-- Image List and Delete Functionality -->
 @code {
     string urlPro = "http://localhost:20714/api/Products";
     string urlCate = "http://localhost:20714/api/Categories";
+    string urlImage = "http://localhost:20714/api/Images"; // Update the image API endpoint
 
     public Product proData = new Product();
-    Product ReceivedPro;
     public IEnumerable<Categories> cate { get; set; } = Enumerable.Empty<Categories>();
     public string FormSubmitMessage { get; set; } = string.Empty;
-
     private bool IsLoggedIn = false;
     private int RoleID = 0;
 
+
     protected override async Task OnInitializedAsync()
     {
-        await Load();
+        await LoadCategories();
+        await LoadProduct();
         await GetSession();
     }
+
+    private async Task LoadCategories()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(urlCate))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
+            }
+        }
+    }
+
+    private async Task LoadProduct()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync($"{urlPro}/{Id}"))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                proData = JsonConvert.DeserializeObject<Product>(apiResponse);
+            }
+        }
+    }
+
+    [Parameter]
+    public int Id { get; set; }
 
     private async Task GetSession()
     {
@@ -94,38 +160,8 @@
         }
     }
 
-
-    private async Task Load()
-    {
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync(urlCate))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
-            }
-        }
-    }
-
-    [Parameter]
-    public int Id { get; set; }
-
-    protected async override Task OnParametersSetAsync()
-    {
-        proData = new Product();
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.GetAsync($"{urlPro}/{Id}"))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                proData = JsonConvert.DeserializeObject<Product>(apiResponse);
-            }
-        }
-    }
-
     public async Task HandleValidSubmit()
     {
-        ReceivedPro = new Product();
         using (var httpClient = new HttpClient())
         {
             var jsonSettings = new JsonSerializerSettings
@@ -140,7 +176,6 @@
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    ReceivedPro = JsonConvert.DeserializeObject<Product>(apiResponse);
                     FormSubmitMessage = "Sửa sản phẩm thành công!";
                 }
                 else
@@ -152,4 +187,26 @@
     }
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+
+    private async Task DeleteImage(int imageID)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.DeleteAsync($"{urlImage}/{imageID}"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    // Remove the deleted image from the list
+                    proData.Image = proData.Image.Where(img => img.ImageID != imageID).ToList();
+                    StateHasChanged(); // Refresh UI
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to delete image. Status code: {response.StatusCode}");
+                }
+            }
+        }
+    }
+
+    private string GetImagePath(string imageName) => $"http://localhost:49972/images/{imageName}";
 }

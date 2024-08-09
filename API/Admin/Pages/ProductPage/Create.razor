@@ -3,108 +3,63 @@
 @inject IJSRuntime jsRuntime
 @inject NavigationManager navManager
 
-<style>
-    #formgetpro {
-        display: block;
-    }
-
-    #formgetimg {
-        display: none;
-    }
-</style>
-
-<div class="form-group">
-    <button onclick="HideProFunction()" class="btn btn-primary">Thêm Hình Ảnh</button>
-</div>
+<h1>Quản lý Sản phẩm</h1>
 
 <div class="row">
-    <div id="formgetpro" class="col-md-6">
-        <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="CreateProduct">
+    <div class="col-md-6">
+        <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
             <DataAnnotationsValidator />
-            <h1>Thêm Sản Phẩm</h1>
+            <h2>Thêm Sản Phẩm</h2>
             <div class="form-group">
                 <label class="font-weight-bold">Tên Sản Phẩm</label>
                 <InputText class="form-control" @bind-Value="proData.Name" placeholder="Tên sản phẩm" />
-                <div class="text-danger ps-3">
-                    <ValidationMessage For="()=>proData.Name"></ValidationMessage>
-                </div>
+                <ValidationMessage For="() => proData.Name" />
             </div>
 
             <div class="form-group">
                 <label class="font-weight-bold">Mô Tả 1</label>
                 <InputTextArea class="form-control" @bind-Value="proData.Description1" placeholder="Mô tả 1" />
-                <div class="text-danger ps-3">
-                    <ValidationMessage For="()=>proData.Description1"></ValidationMessage>
-                </div>
+                <ValidationMessage For="() => proData.Description1" />
             </div>
 
             <div class="form-group">
                 <label class="font-weight-bold">Mô Tả 2</label>
                 <InputTextArea class="form-control" @bind-Value="proData.Description2" placeholder="Mô tả 2" />
-                <div class="text-danger ps-3">
-                    <ValidationMessage For="()=>proData.Description2"></ValidationMessage>
-                </div>
+                <ValidationMessage For="() => proData.Description2" />
             </div>
 
             <div class="form-group">
                 <label class="font-weight-bold">Danh Mục</label>
                 <InputSelect class="form-control" @bind-Value="proData.CateID">
-                    @foreach (Categories item in cate)
+                    @foreach (var item in cate)
                     {
                         <option value="@item.CateID">@item.Name</option>
                     }
                 </InputSelect>
-                <div class="text-danger ps-3">
-                    <ValidationMessage For="()=>proData.CateID"></ValidationMessage>
-                </div>
+                <ValidationMessage For="() => proData.CateID" />
             </div>
 
             <div class="form-group">
                 <label class="font-weight-bold">Trạng Thái</label>
                 <InputSelect class="form-control" @bind-Value="proData.StatusID">
-                    <option value="0" selected>Hợp lệ</option>
+                    <option value="0">Hợp lệ</option>
                     <option value="1">Không hợp lệ</option>
                 </InputSelect>
             </div>
 
-            <button type="submit" class="btn btn-primary">Thêm Sản Phẩm</button>
-            <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+            <button type="submit" class="btn btn-primary mt-3">Thêm Sản Phẩm</button>
+            <p class="text-success mt-2">@FormSubmitMessage</p>
         </EditForm>
     </div>
-    <div id="formgetimg" class="col-md-6">
-        <h1>Danh Sách Ảnh</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Hình Ảnh</th>
-                    <th>Khác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var image in images)
-                {
-                    <tr>
-                        <td>
-                            <img src="@GetImagePath(image.Name)" width="100" />
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" @onclick="@(() => ConfirmDelete(image.ImageID))">
-                                Xóa
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+
     <div class="col-md-6">
-        <h1>Thêm Hình Ảnh Sản Phẩm</h1>
-        <EditForm Model="uploadModel">
+        <h2>Thêm Hình Ảnh Sản Phẩm</h2>
+        <EditForm Model="uploadModel" OnSubmit="UploadFiles">
             <DataAnnotationsValidator />
             <div class="form-group">
-                <label class="font-weight-bold">Tên Sản Phẩm</label>
+                <label class="font-weight-bold">Chọn Sản Phẩm</label>
                 <InputSelect @bind-Value="uploadModel.ProductID" class="form-control">
-                    @foreach (Product item in pro)
+                    @foreach (var item in pro)
                     {
                         <option value="@item.ProductID">@item.Name</option>
                     }
@@ -112,53 +67,30 @@
             </div>
             <div class="form-group">
                 <label class="font-weight-bold">Chọn Hình Ảnh</label>
-                <InputFile multiple @ref="fileInput" OnChange="UploadFiles" />
+                <InputFile multiple OnChange="OnFileChange" />
             </div>
+            <button type="submit" class="btn btn-primary mt-3">Tải lên Hình Ảnh</button>
             <p>@apiResponse</p>
         </EditForm>
     </div>
 </div>
 
-<script>
-    function HideProFunction() {
-        var x = document.getElementById("formgetpro");
-        var y = document.getElementById("formgetimg");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-            y.style.display = "none";
-        } else {
-            x.style.display = "none";
-            y.style.display = "block";
-        }
-    }
-
-    function confirmDelete(message) {
-        return new Promise((resolve) => {
-            const result = confirm(message);
-            resolve(result);
-        });
-    }
-</script>
-
 @code {
     private bool IsLoggedIn = false;
     private int RoleID = 0;
-    private InputFile fileInput;
-    private IReadOnlyList<IBrowserFile> selectedFiles;
-    //pro
-    string urlImg = "http://localhost:49972/images/";
 
     string urlPro = "http://localhost:20714/api/Products";
     string urlCate = "http://localhost:20714/api/Categories";
     string urlImageApi = "http://localhost:20714/api/Images";
 
     public Product proData = new Product();
-
-    Product ReceivedPro;
-    public IEnumerable<Admin.Model.Image> images { get; set; } = Enumerable.Empty<Admin.Model.Image>();
-    public IEnumerable<Categories> cate { get; set; } = Enumerable.Empty<Categories>();
-    public IEnumerable<Product> pro { get; set; } = Enumerable.Empty<Product>();
+    public IEnumerable<Categories> cate { get; set; } = new List<Categories>();
+    public IEnumerable<Product> pro { get; set; } = new List<Product>();
     public string FormSubmitMessage { get; set; } = string.Empty;
+
+    private Image uploadModel = new Image();
+    private IReadOnlyList<IBrowserFile> selectedFiles;
+    public string apiResponse { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -174,7 +106,7 @@
             if (!string.IsNullOrEmpty(userInfoJson))
             {
                 var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
-                if (userInfo != null && userInfo.RoleID == 1) // Chỉ cho phép truy cập với vai trò admin
+                if (userInfo != null && userInfo.RoleID == 1)
                 {
                     IsLoggedIn = true;
                     RoleID = userInfo.RoleID;
@@ -204,20 +136,10 @@
                 var response = await httpClient.GetAsync(urlCate);
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 cate = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
-            }
 
-            using (var httpClient = new HttpClient())
-            {
-                var response = await httpClient.GetAsync(urlPro);
-                var apiResponse = await response.Content.ReadAsStringAsync();
+                response = await httpClient.GetAsync(urlPro);
+                apiResponse = await response.Content.ReadAsStringAsync();
                 pro = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
-            }
-
-            using (var httpClient = new HttpClient())
-            {
-                var response = await httpClient.GetAsync(urlImageApi);
-                var apiResponse = await response.Content.ReadAsStringAsync();
-                images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
             }
         }
         catch (Exception ex)
@@ -228,7 +150,6 @@
 
     public async Task HandleValidSubmit()
     {
-        ReceivedPro = new Product();
         using (var httpClient = new HttpClient())
         {
             StringContent content = new StringContent(JsonConvert.SerializeObject(proData), Encoding.UTF8, "application/json");
@@ -238,10 +159,8 @@
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    ReceivedPro = JsonConvert.DeserializeObject<Product>(apiResponse);
                     FormSubmitMessage = "Thêm sản phẩm thành công!";
-                    await Load();
-                    await CallAPIGetImg(); // Cập nhật danh sách hình ảnh
+                    await Load(); // Refresh product list
                 }
                 else
                 {
@@ -253,96 +172,43 @@
 
     public void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
 
-
-    //create img
-    string url = "http://localhost:20714/api/Images/UploadFile";
-
-    public string apiResponse { get; set; }
-    private Image uploadModel = new Image();
-
-    private async Task UploadFiles(InputFileChangeEventArgs e)
+    private void OnFileChange(InputFileChangeEventArgs e)
     {
         selectedFiles = e.GetMultipleFiles();
+    }
+
+    private async Task UploadFiles()
+    {
         if (selectedFiles != null && selectedFiles.Count > 0)
         {
-            await UploadMultipleFiles();
-        }
-    }
-
-    private async Task UploadMultipleFiles()
-    {
-        foreach (var file in selectedFiles)
-        {
-            using (var ms = file.OpenReadStream(968435456))
+            foreach (var file in selectedFiles)
             {
-                var content = new MultipartFormDataContent();
-                content.Add(new StreamContent(ms), "file", file.Name);
-                content.Add(new StringContent(uploadModel.ProductID.ToString()), "ProductID");
-
-                using (var httpClient = new HttpClient())
+                using (var ms = file.OpenReadStream(10 * 1024 * 1024)) // 10MB max
                 {
-                    using (var response = await httpClient.PostAsync(url, content))
+                    var content = new MultipartFormDataContent();
+                    content.Add(new StreamContent(ms), "file", file.Name);
+                    content.Add(new StringContent(uploadModel.ProductID.ToString()), "ProductID");
+
+                    using (var httpClient = new HttpClient())
                     {
-                        response.EnsureSuccessStatusCode();
-                        apiResponse = await response.Content.ReadAsStringAsync();
-                    }
-                }
-            }
-        }
-    }
-
-    async Task CallAPIGetImg()
-    {
-        using (var httpClient = new HttpClient())
-        {
-            var response = await httpClient.GetAsync(urlImageApi);
-            var apiResponse = await response.Content.ReadAsStringAsync();
-            images = JsonConvert.DeserializeObject<List<Admin.Model.Image>>(apiResponse);
-        }
-    }
-
-    private async Task ConfirmDelete(int imageId)
-    {
-        bool confirmed = await jsRuntime.InvokeAsync<bool>("confirmDelete", "Bạn có chắc chắn muốn xóa bảng hiệu này không?");
-        if (confirmed)
-        {
-            await Delete(imageId);
-        }
-    }
-
-    public async Task Delete(int imageId)
-    {
-        using (var httpClient = new HttpClient())
-        {
-            using (var response = await httpClient.DeleteAsync(urlImageApi + "/" + imageId))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    // Xóa hình ảnh khỏi cơ sở dữ liệu
-                    using (var httpClient2 = new HttpClient())
-                    {
-                        using (var response2 = await httpClient2.DeleteAsync($"{urlImageApi}/{imageId}"))
+                        var response = await httpClient.PostAsync(urlImageApi + "/UploadFile", content);
+                        if (response.IsSuccessStatusCode)
                         {
-                            if (response2.IsSuccessStatusCode)
-                            {
-                                await Load();
-                            }
-                            else
-                            {
-                                apiResponse = "Xóa thất bại: " + await response2.Content.ReadAsStringAsync();
-                            }
+                            apiResponse = "Tải lên thành công";
+                        }
+                        else
+                        {
+                            apiResponse = "Tải lên thất bại: " + await response.Content.ReadAsStringAsync();
                         }
                     }
                 }
-                else
-                {
-                    apiResponse = "Xóa thất bại: " + await response.Content.ReadAsStringAsync();
-                }
             }
         }
+        else
+        {
+            apiResponse = "Chưa chọn file nào!";
+        }
     }
-
-    private string GetImagePath(string imageName) => $"{urlImg}{imageName}";
 
     public class Image
     {

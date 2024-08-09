@@ -13,8 +13,11 @@ namespace Admin.Model
 
         public int BillId { get; set; }
         public DateTime Date { get; set; }
+        [Required(ErrorMessage = "Số tiền chưa được cộng hoàn chỉnh, bạn cập nhật lại!")]
         public float Total { get; set; }
+        [Required(ErrorMessage = "Hóa đơn chưa cập nhật được thông tin của bạn, hãy xác nhận lại!")]
         public int UserID { get; set; }
+        [Required(ErrorMessage = "Bạn chưa chọn trạng thái của hóa đơn")]
         public int StatusID { get; set; }
 
         public User User { get; set; }
