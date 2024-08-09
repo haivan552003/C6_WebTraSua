@@ -4,7 +4,7 @@
 
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
-    <h1>Thêm bảng hiệu</h1>
+    <h2>THÊM BẢNG HIỆU</h2>
 
     <div class="form-group">
         <label class="font-weight-bold">Tiêu đề</label>
@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>Hình Ảnh</label>
+        <label class="font-weight-bold">Hình Ảnh</label> <br/>
         <InputFile OnChange="ChangeHandler" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
