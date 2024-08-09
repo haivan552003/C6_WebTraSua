@@ -66,8 +66,16 @@
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
-        await GetSession();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetSession();
+        }
+    }
+
 
     async Task CallAPI()
     {
@@ -83,6 +91,7 @@
 
     private async Task GetSession()
     {
+        await Task.Delay(100);
         var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
         if (!string.IsNullOrEmpty(userInfoJson))
         {
