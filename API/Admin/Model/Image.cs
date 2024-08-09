@@ -8,6 +8,7 @@ namespace Admin.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ImageID { get; set; }
+        [Required(ErrorMessage = "Hình ảnh chưa được chọn!")]
         public string Name { get; set; }
         public int ProductID { get; set; }
 
