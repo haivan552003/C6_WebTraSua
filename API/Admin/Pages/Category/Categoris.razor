@@ -148,6 +148,7 @@
     public string searchQuery { get; set; } = string.Empty;
     public IEnumerable<Categories> Categories { get; set; } = Enumerable.Empty<Categories>();
     public IEnumerable<Categories> filteredCategories { get; set; } = Enumerable.Empty<Categories>();
+    private string nameSortOrder = "asc"; // Lọc mặc định từ A - Z
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;

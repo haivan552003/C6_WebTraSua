@@ -26,7 +26,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Blog>>> Getblog()
         {
-            return await _context.blog.ToListAsync();
+            return await _context.blog.OrderByDescending(b => b.Id).ToListAsync();
         }
 
         // GET: api/Blogs/5
