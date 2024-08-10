@@ -3,8 +3,6 @@
 @inject IJSRuntime jsRuntime
 @inject NavigationManager navManager
 
-<h1>Quản lý Sản phẩm</h1>
-
 <div class="row">
     <div class="col-md-6">
         <EditForm Model="proData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
@@ -66,7 +64,7 @@
                 </InputSelect>
             </div>
             <div class="form-group">
-                <label class="font-weight-bold">Chọn Hình Ảnh</label>
+                <label class="font-weight-bold">Chọn Hình Ảnh</label> <br />
                 <InputFile multiple OnChange="OnFileChange" />
             </div>
             <button type="submit" class="btn btn-primary mt-3">Tải lên Hình Ảnh</button>

@@ -5,7 +5,7 @@
 @using System.Text
 @using System.Net.Http.Headers
 
-<div class="panel-heading"><h2>Thêm danh mục sản phẩm</h2></div>
+<div class="panel-heading"><h2>Thêm Danh Mục Sản Phẩm</h2></div>
 
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="font-weight-bold">Hình Ảnh</label>
+        <label class="font-weight-bold">Hình Ảnh</label> <br/>
         <InputFile OnChange="ChangeHandler" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
