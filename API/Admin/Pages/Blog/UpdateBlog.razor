@@ -28,8 +28,8 @@
         <label class="font-weight-bold">Hình Ảnh Hiện Tại</label>
         <div>
             <img src="@GetImagePath(BlogData.Image)" alt="Current Image" width="150" height="150" />
-        </div>
-        <label class="font-weight-bold">Chọn Hình Ảnh Mới</label>
+        </div> <br/>
+        <label class="font-weight-bold">Chọn Hình Ảnh Mới</label> <br/>
         <InputFile OnChange="OnInputFileChange" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>BlogData.Image"></ValidationMessage>
