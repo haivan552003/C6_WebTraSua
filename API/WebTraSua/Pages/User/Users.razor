@@ -5,12 +5,6 @@
 @inject NavigationManager NV
 
 <style>
-    .container {
-        max-width: 1200px;
-        margin: auto;
-        padding: 20px;
-    }
-
     .row {
         margin: 0;
     }
@@ -19,21 +13,8 @@
         font-size: 2.25rem;
     }
 
-    .fw-bold {
-        font-weight: 700;
-    }
-
     .mb-72 {
         margin-bottom: 72px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .fw-semibold {
-        font-weight: 600;
-        color: #333;
     }
 
     .form-control, .form-select {
@@ -55,39 +36,7 @@
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
             outline: none;
-        }
-
-    .btn {
-        display: inline-block;
-        padding: 12px 24px;
-        font-size: 1rem;
-        border-radius: 8px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    
-
-    .text-success {
-        color: #28a745;
-    }
-
-    .p-2 {
-        padding: 0.5rem;
-    }
-
-    .ms-auto {
-        margin-left: auto;
-    }
-
-    .rounded-0 {
-        border-radius: 0;
-    }
-
-    .mt-96 {
-        margin-top: 96px;
-    }
+        }    
 
     .col-md-8 {
         margin: auto;
@@ -99,14 +48,6 @@
 
     .col-md-6 {
         padding: 0 10px;
-    }
-
-    .mt-3 {
-        margin-top: 1rem;
-    }
-
-    .text-center {
-        text-align: center;
     }
 </style>
 
@@ -120,27 +61,34 @@
                     <p class="fs-52 fw-bold text-center">Thông tin của bạn</p>
                     <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
                         <DataAnnotationsValidator />
-                        <ValidationSummary />
                         <div class="col-md-10 mx-auto">
                             <div class="form-group">
                                 <label class="fw-semibold">Tên người dùng</label>
                                 <InputText class="form-control" @bind-Value="user.Name" />
-                                <ValidationMessage For="@(() => user.Name)" />
+                                <div class="text-danger">
+                                    <ValidationMessage For="@(() => user.Name)" />
+                                </div>
                             </div>
                             <div class="form-group mt-3">
                                 <label class="fw-semibold">Tên đăng nhập</label>
-                                <InputText class="form-control" @bind-Value="user.UserName" />
-                                <ValidationMessage For="@(() => user.UserName)" />
+                                <InputText disabled class="form-control" @bind-Value="user.UserName" />
+                                <div class="text-danger">
+                                    <ValidationMessage For="@(() => user.UserName)" />
+                                </div>
                             </div>
                             <div class="form-group mt-3">
                                 <label class="fw-semibold">Mật khẩu</label>
                                 <InputText class="form-control" @bind-Value="user.PassWord" />
-                                <ValidationMessage For="@(() => user.PassWord)" />
+                                <div class="text-danger">
+                                    <ValidationMessage For="@(() => user.PassWord)" />
+                                </div>
                             </div>
                             <div class="form-group mt-3">
                                 <label class="fw-semibold">Email</label>
                                 <InputText class="form-control" @bind-Value="user.Email" />
-                                <ValidationMessage For="@(() => user.Email)" />
+                                <div class="text-danger">
+                                    <ValidationMessage For="@(() => user.Email)" />
+                                </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-md-6">
@@ -149,45 +97,53 @@
                                         <option value="0">Nam</option>
                                         <option value="1">Nữ</option>
                                     </InputSelect>
-                                    <ValidationMessage For="@(() => user.Gender)" />
+                                    <div class="text-danger">
+                                        <ValidationMessage For="@(() => user.Gender)" />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="fw-semibold">Số điện thoại</label>
                                     <InputText class="form-control" @bind-Value="user.Phone" />
-                                    <ValidationMessage For="@(() => user.Phone)" />
+                                    <div class="text-danger">
+                                        <ValidationMessage For="@(() => user.Phone)" />
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group mt-3">
                                 <label class="fw-semibold">Địa chỉ</label>
                                 <InputTextArea class="form-control" @bind-Value="user.Address" />
-                                <ValidationMessage For="@(() => user.Address)" />
+                                <div class="text-danger">
+                                    <ValidationMessage For="@(() => user.Address)" />
+                                </div>
                             </div>
 
-                            <button type="submit" class="btn btn-black ">
+                            <button type="submit" class="btn btn-black">
                                 Lưu thay đổi
                             </button>
                         </div>
                     </EditForm>
-                    <p class="text-success p-2 ms-auto">@FormSubmitMessage</p>
+                    @if (!string.IsNullOrEmpty(FormSubmitMessage))
+                    {
+                        <div class="alert alert-success mt-3" role="alert">
+                            @FormSubmitMessage
+                        </div>
+                    }
                 </div>
             </div>
-
         }
         else
         {
-            <p>Bạn đã cập nhật thông tin thành công , hãy quay lại trang thông tin để kiểm tra</p>
+            <p>Vui lòng đăng nhập</p>
         }
     </div>
-
 </main>
-
 
 
 @code {
     private bool IsLoggedIn = false;
     private int UserId = 0;
     private User user = new User();
-    public string FormSubmitMessage { get; set; } = string.Empty;
+    public string FormSubmitMessage { get; set; } = null;
 
     string url = "http://localhost:20714/api/Users";
 
@@ -253,8 +209,8 @@
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 user = JsonConvert.DeserializeObject<User>(apiResponse);
+                FormSubmitMessage = "Cập nhật thông tin thành công";
                 await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userSession", JsonConvert.SerializeObject(user));
-                FormSubmitMessage = "Cập nhật thông tin thành công!";
             }
             else
             {
@@ -262,14 +218,8 @@
             }
         }
         StateHasChanged();
-        await ClearFormSubmitMessage();
     }
 
-    private void HandleInvalidSubmit() => FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
-    private async Task ClearFormSubmitMessage()
-    {
-        await Task.Delay(5000); // Đợi 5 giây
-        FormSubmitMessage = string.Empty;
-        StateHasChanged();
-    }
+
+    private void HandleInvalidSubmit() => FormSubmitMessage = null;
 }
