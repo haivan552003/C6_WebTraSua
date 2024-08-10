@@ -49,6 +49,7 @@
     public Categories proData = new Categories();
     Categories ReceivedBlog;
     public string FormSubmitMessage { get; set; } = string.Empty;
+    private IBrowserFile selectedFile;
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
@@ -78,6 +79,12 @@
             }
         }
     }
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        proData.Image = selectedFile.Name; // Đặt tên file vào model proData
+    }
+
 
     protected async override Task OnParametersSetAsync()
     {

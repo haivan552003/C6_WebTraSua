@@ -36,7 +36,7 @@
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
             outline: none;
-        }    
+        }
 
     .col-md-8 {
         margin: auto;
@@ -56,11 +56,11 @@
     <div class="row">
         @if (IsLoggedIn)
         {
-            <div class="col-md-8">
-                <div class="mb-72">
-                    <p class="fs-52 fw-bold text-center">Thông tin của bạn</p>
-                    <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
-                        <DataAnnotationsValidator />
+            <p class="fs-52 fw-bold text-center">Thông tin của bạn</p>
+            <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+                <DataAnnotationsValidator />
+                <div class="col-md-8">
+                    <div class="mb-72">
                         <div class="col-md-10 mx-auto">
                             <div class="form-group">
                                 <label class="fw-semibold">Tên người dùng</label>
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             <div class="row mt-3">
-                                <div class="col-md-6">
+                                <div class="col-md-6 p-0">
                                     <label class="fw-semibold">Giới tính</label>
                                     <InputSelect class="form-select" @bind-Value="user.Gender">
                                         <option value="0">Nam</option>
@@ -101,7 +101,7 @@
                                         <ValidationMessage For="@(() => user.Gender)" />
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 p-0">
                                     <label class="fw-semibold">Số điện thoại</label>
                                     <InputText class="form-control" @bind-Value="user.Phone" />
                                     <div class="text-danger">
@@ -117,19 +117,15 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-black">
+                            <button type="submit" class="btn btn-black mt-3">
                                 Lưu thay đổi
                             </button>
+                            <h6 class="text-success mt-4">@FormSubmitMessage</h6>
                         </div>
-                    </EditForm>
-                    @if (!string.IsNullOrEmpty(FormSubmitMessage))
-                    {
-                        <div class="alert alert-success mt-3" role="alert">
-                            @FormSubmitMessage
-                        </div>
-                    }
+                    </div>
                 </div>
-            </div>
+            </EditForm>
+
         }
         else
         {
@@ -143,7 +139,7 @@
     private bool IsLoggedIn = false;
     private int UserId = 0;
     private User user = new User();
-    public string FormSubmitMessage { get; set; } = null;
+    public string FormSubmitMessage { get; set; } = string.Empty;
 
     string url = "http://localhost:20714/api/Users";
 
@@ -200,26 +196,31 @@
     }
 
 
-    private async Task HandleValidSubmit()
+    public async Task HandleValidSubmit()
     {
-        var jsonContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
-        using (var response = await HttpClient.PutAsync($"{url}/{user.UserId}", jsonContent))
+        using (var httpClient = new HttpClient())
         {
-            if (response.IsSuccessStatusCode)
+            StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+
+            using (var response = await httpClient.PostAsync(url, content))
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
-                user = JsonConvert.DeserializeObject<User>(apiResponse);
-                FormSubmitMessage = "Cập nhật thông tin thành công";
-                await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userSession", JsonConvert.SerializeObject(user));
-            }
-            else
-            {
-                FormSubmitMessage = "Cập nhật thất bại: " + await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    FormSubmitMessage = "Thay đổi thông tin thành công!";
+                }
+                else
+                {
+                    FormSubmitMessage = "thay đổi thông tin thất bại, hãy kiểm tra lại! " ;
+                }
             }
         }
-        StateHasChanged();
+        StateHasChanged(); // Force UI to update
     }
 
-
-    private void HandleInvalidSubmit() => FormSubmitMessage = null;
+    public void HandleInvalidSubmit()
+    {
+        FormSubmitMessage = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
+        StateHasChanged(); // Force UI to update
+    }
 }

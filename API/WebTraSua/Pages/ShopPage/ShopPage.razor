@@ -3,68 +3,87 @@
 
 <style>
     .pagination {
+        display: flex;
         justify-content: center;
-        margin-top: 20px;
+        list-style-type: none;
+        padding: 0;
     }
-
-        .pagination .page-item a.page-link {
-            border: 0;
-            border-radius: 7px;
-            padding: 10px 20px;
-            background-color: #F9F1E7;
-            color: black;
-        }
 
         .pagination .page-item {
-            margin-right: 20px;
+            margin: 0 5px;
         }
 
-    .product-container {
-        position: relative;
+        .pagination .page-link {
+            padding: 8px 12px;
+            color: #007bff;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+            .pagination .page-link[disabled] {
+                pointer-events: none;
+                opacity: 0.5;
+            }
+
+    .cate-hover {
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        cursor: pointer;
     }
 
-    .btn-mua-ngay {
-        display: none;
-        position: absolute;
-        bottom: -45px;
-        left: 68%;
-        transform: translateX(-50%);
-        width: 315px;
-    }
+        .cate-hover:hover {
+            background-color: black;
+            transform: scale(1.05);
+        }
 
-    .product-container:hover .btn-mua-ngay {
-        display: block;
-    }
+        .cate-hover > a {
+            display: block;
+            text-decoration: none;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            transition: color 0.3s ease; 
+        }
 
-    .mt-5 {
-        margin-top: 4rem !important;
-    }
+        .cate-hover:hover > a {
+            color: white;
+        }
 </style>
 
 <main class="container">
     <div class="row">
         <div class="col-md-3">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <a @onclick="() => FilterProducts(null)" class="text-decoration-none text-dark">
+                <li class="list-group-item cate-hover">
+                    <a @onclick="() => FilterProducts(null)" class="text-decoration-none ">
                         Tất cả sản phẩm
                         <span style="float: right;">+</span>
                     </a>
                 </li>
                 @foreach (var cate in categories)
                 {
-                    <li class="list-group-item">
-                        <a @onclick="() => FilterProducts(cate.CateID)" class="text-decoration-none text-dark">
+                    <li class="list-group-item cate-hover">
+                        <a @onclick="() => FilterProducts(cate.CateID)" class="text-decoration-none">
                             @cate.Name
                             <span style="float: right;">+</span>
                         </a>
                     </li>
                 }
             </ul>
+
+            <div class="row mt-4">
+                <div class="col-md-8">
+                    <input class="form-control" type="text" id="searchInput" @bind="searchQuery" placeholder="Tên sản phẩm..." />
+                </div>
+                <div class="col-md-4">
+                    <button class="btn-search btn btn-dark form-control" @onclick="OnSearchClicked"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+
         </div>
         <div class="col-md-9">
             <div class="row">
-                @foreach (var product in filteredProducts)
+                @foreach (var product in PaginatedProducts)
                 {
                     <div class="col-md-4 md-4 mt-5">
                         <a class="nav-link text-black fs-16 me-75" href="details/@product.ProductID">
@@ -79,6 +98,24 @@
                     </div>
                 }
             </div>
+
+            <nav aria-label="Page navigation example mt-4">
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" @onclick="PreviousPage" disabled="@(!CanGoBack)">
+                            <span aria-hidden="true">&laquo; Trước</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <span class="page-link text-black">Trang @currentPage trên @totalPages</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" @onclick="NextPage" disabled="@(!CanGoNext)">
+                            <span aria-hidden="true">Tiếp &raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
     <br>
@@ -99,20 +136,22 @@
     public IEnumerable<Image> images { get; set; } = Enumerable.Empty<Image>();
     public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
 
-    // // private List<Product> PaginatedProducts => Fproduct.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
-    // // private int currentPage = 1;
-    // // private int pageSize = 10;
-    // // private int totalPages => (int)Math.Ceiling((double)product.Count / pageSize);
-    // private bool CanGoBack => currentPage > 1;
-    // private bool CanGoNext => currentPage < totalPages;
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     await LoadCategories();
-    //     await LoadAllProducts();
-    //     filteredProducts = allProducts;
-    //     currentPage = 1;
+    private int currentPage = 1;
+    private int pageSize = 9;
+    private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+    private List<Product> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    private bool CanGoBack => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
 
-    // }
+    private string searchQuery { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+        await LoadAllProducts();
+        filteredProducts = allProducts;
+        currentPage = 1;
+    }
 
     private async Task LoadCategories()
     {
@@ -137,6 +176,7 @@
             }
         }
     }
+
     private void FilterProducts(int? categoryId)
     {
         if (categoryId == null)
@@ -147,23 +187,43 @@
         {
             filteredProducts = allProducts.Where(p => p.CateID == categoryId).ToList();
         }
+        currentPage = 1;
         StateHasChanged();
     }
-    // private void PreviousPage()
-    // {
-    //     if (CanGoBack)
-    //     {
-    //         currentPage--;
-    //     }
-    // }
 
-    // private void NextPage()
-    // {
-    //     if (CanGoNext)
-    //     {
-    //         currentPage++;
-    //     }
-    // }
+    private void OnSearchClicked()
+    {
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            filteredProducts = allProducts;
+        }
+        else
+        {
+            filteredProducts = allProducts
+                .Where(p => p.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        currentPage = 1;
+        StateHasChanged();
+    }
+
+    private void PreviousPage()
+    {
+        if (CanGoBack)
+        {
+            currentPage--;
+            StateHasChanged();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            currentPage++;
+            StateHasChanged();
+        }
+    }
 
     private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }
