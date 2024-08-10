@@ -17,10 +17,6 @@ namespace WebTraSua.Model
         [MinLength(5, ErrorMessage = "Tên phải có ít nhất 5 ký tự")]
         [MaxLength(50, ErrorMessage = "Tên chỉ có thể có tối đa 50 ký tự")]
         public string Name { get; set; }
-
-        [Required(ErrorMessage = "Hình ảnh không được bỏ trống")]
-        [MinLength(50, ErrorMessage = "Hình ảnh phải có ít nhất 50 ký tự")]
-        [MaxLength(1000, ErrorMessage = "Hình ảnh chỉ có thể có tối đa 1000 ký tự")]
         public string Image { get; set; }
 
         [Required(ErrorMessage = "Tài khoản không được bỏ trống")]

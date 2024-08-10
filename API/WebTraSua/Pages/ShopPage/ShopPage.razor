@@ -46,30 +46,25 @@
         <div class="col-md-3">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    BỘ SƯU TẬP(1)
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
+                    <a @onclick="() => FilterProducts(null)" class="text-decoration-none text-dark">
+                        Tất cả sản phẩm
+                        <span style="float: right;">+</span>
+                    </a>
                 </li>
-                <li class="list-group-item">
-                    NGUỒN GỐC
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    HƯƠNG VỊ
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    CHẤT LƯỢNG
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
-                <li class="list-group-item">
-                    CÀ PHÊ
-                    <a style="float: right;color: black;" class="text-decoration-none" href="#">+</a>
-                </li>
+                @foreach (var cate in categories)
+                {
+                    <li class="list-group-item">
+                        <a @onclick="() => FilterProducts(cate.CateID)" class="text-decoration-none text-dark">
+                            @cate.Name
+                            <span style="float: right;">+</span>
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
         <div class="col-md-9">
             <div class="row">
-                @foreach (var product in products)
+                @foreach (var product in filteredProducts)
                 {
                     <div class="col-md-4 md-4 mt-5">
                         <a class="nav-link text-black fs-16 me-75" href="details/@product.ProductID">
@@ -97,53 +92,78 @@
     string urlImage = "http://localhost:20714/api/Images";
     string urlCategory = "http://localhost:20714/api/Categories";
     string imageBasePath = "http://localhost:49972/images/";
+    private List<Product> allProducts = new List<Product>();
+    private List<Product> filteredProducts = new List<Product>();
 
     public IEnumerable<Product> products { get; set; } = Enumerable.Empty<Product>();
     public IEnumerable<Image> images { get; set; } = Enumerable.Empty<Image>();
     public IEnumerable<Categories> categories { get; set; } = Enumerable.Empty<Categories>();
 
-    protected async override Task OnInitializedAsync()
-    {
-        await CallAPI();
-    }
+    // // private List<Product> PaginatedProducts => Fproduct.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    // // private int currentPage = 1;
+    // // private int pageSize = 10;
+    // // private int totalPages => (int)Math.Ceiling((double)product.Count / pageSize);
+    // private bool CanGoBack => currentPage > 1;
+    // private bool CanGoNext => currentPage < totalPages;
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await LoadCategories();
+    //     await LoadAllProducts();
+    //     filteredProducts = allProducts;
+    //     currentPage = 1;
 
-    async Task CallAPI()
-    {
-        string url;
+    // }
 
+    private async Task LoadCategories()
+    {
         using (var httpClient = new HttpClient())
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                url = "http://localhost:20714/api/Products";
-                using (var response = await httpClient.GetAsync(url))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
-                }
-            }
-            else
-            {
-                url = $"http://localhost:20714/api/Products/Cate/{id}";
-                using (var response = await httpClient.GetAsync(url))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    products = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
-                }
-            }
-            using (var response = await httpClient.GetAsync(urlImage))
-            {
-                string apiResponse = await response.Content.ReadAsStringAsync();
-                images = JsonConvert.DeserializeObject<List<Image>>(apiResponse);
-            }
             using (var response = await httpClient.GetAsync(urlCategory))
             {
                 string apiResponse = await response.Content.ReadAsStringAsync();
                 categories = JsonConvert.DeserializeObject<List<Categories>>(apiResponse);
             }
-
         }
     }
+
+    private async Task LoadAllProducts()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            using (var response = await httpClient.GetAsync(url))
+            {
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                allProducts = JsonConvert.DeserializeObject<List<Product>>(apiResponse);
+            }
+        }
+    }
+    private void FilterProducts(int? categoryId)
+    {
+        if (categoryId == null)
+        {
+            filteredProducts = allProducts;
+        }
+        else
+        {
+            filteredProducts = allProducts.Where(p => p.CateID == categoryId).ToList();
+        }
+        StateHasChanged();
+    }
+    // private void PreviousPage()
+    // {
+    //     if (CanGoBack)
+    //     {
+    //         currentPage--;
+    //     }
+    // }
+
+    // private void NextPage()
+    // {
+    //     if (CanGoNext)
+    //     {
+    //         currentPage++;
+    //     }
+    // }
 
     private string GetImagePath(string imageName) => $"{imageBasePath}{imageName}";
 }
