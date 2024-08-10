@@ -20,13 +20,37 @@
         text-overflow: ellipsis;
     }
 
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .pagination a.active {
+                background-color: #007bff;
+                color: #fff;
+            }
+
+            .pagination a:hover {
+                background-color: #f0f0f0;
+            }
 </style>
+
 <main class="container" style="margin-top: 106px;">
     <div class="row">
-        @foreach (Blog blogs in blog)
+        @foreach (var blogPost in PaginatedBlogs)
         {
             <div class="col-md-6 mb-72">
-                <img src="@GetImagePath(@blogs.Image)" class="w-100" style="height: 400px" alt="">
+                <img src="@GetImagePath(blogPost.Image)" class="w-100" style="height: 400px" alt="">
             </div>
             <div class="col-md-6 mb-72">
                 <div class="row color-9F9F9F mt-3">
@@ -38,33 +62,60 @@
                     </div>
                 </div>
                 <p class="fw-medium mt-3 block-ellipsis" style="font-size: 30px; word-wrap: break-word; word-break: break-all;">
-                    @blogs.Title
+                    @blogPost.Title
                 </p>
                 <p class="color-9F9F9F mt-3 text-break block-ellipsis">
-                    @blogs.Decription
+                    @blogPost.Decription
                 </p>
-                <a class="color-9F9F9F" @onclick="() => NavigateToBlogDetail(blogs.Id)">Xem chi tiết</a>
+                <a class="color-9F9F9F" @onclick="() => NavigateToBlogDetail(blogPost.Id)">Xem chi tiết</a>
                 <hr>
             </div>
         }
     </div>
-</main>
 
+    <div class="pagination">
+        @if (CurrentPage > 1)
+        {
+            <a href="#" @onclick="() => ChangePage(CurrentPage - 1)">« Previous</a>
+        }
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            <a href="#" class="@(i == CurrentPage ? "active" : "")" @onclick="() => ChangePage(i)">@i</a>
+        }
+        @if (CurrentPage < TotalPages)
+        {
+            <a href="#" @onclick="() => ChangePage(CurrentPage + 1)">Next »</a>
+        }
+    </div>
+</main>
 
 @code {
     [Inject]
     public NavigationManager NV { get; set; }
-    [Parameter]
-    public int BlogID { get; set; }
 
     string imageBasePath = "http://localhost:49972/images/";
     string url = "http://localhost:20714/api/Blogs";
 
     public IEnumerable<Blog> blog { get; set; } = Enumerable.Empty<Blog>();
+    private const int PageSize = 2;
+    private int CurrentPage { get; set; } = 1;
+    private int TotalPages => (int)Math.Ceiling(blog.Count() / (double)PageSize);
+    private IEnumerable<Blog> PaginatedBlogs => blog.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+
     private void NavigateToBlogDetail(int id)
     {
         NV.NavigateTo($"/blog/{id}");
     }
+
+    private void ChangePage(int pageNumber)
+    {
+        if (pageNumber < 1 || pageNumber > TotalPages)
+            return; // Ensure pageNumber is within valid range
+
+        CurrentPage = pageNumber;
+        StateHasChanged(); // Refresh the page to reflect changes
+    }
+
     protected async override Task OnInitializedAsync()
     {
         await CallAPI();
