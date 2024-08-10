@@ -1,5 +1,7 @@
 ﻿@page "/blog"
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
+
 
 <style>
     .panel {
@@ -187,6 +189,7 @@
     private int blogIdToDelete;
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
 
     private IEnumerable<Blog> Blogss { get; set; } = Enumerable.Empty<Blog>();
     private IEnumerable<Blog> FilteredBlogs { get; set; } = Enumerable.Empty<Blog>();
@@ -199,17 +202,29 @@
         .Skip((currentPage - 1) * pageSize)
         .Take(pageSize);
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await CallAPI();
-        ApplyFilters();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await CallAPI();
+                ApplyFilters();
+            }
+
+            StateHasChanged();
         }
     }
 

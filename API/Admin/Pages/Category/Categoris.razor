@@ -1,5 +1,6 @@
 ﻿@page "/Category"
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
 
 <style>
     .panel {
@@ -89,19 +90,20 @@
 <p><a href="AddCategories">Thêm Danh Mục Sản Phẩm</a></p>
 
 <div class="panel panel-primary">
-    <div class="panel-heading"><h2>Thông Tin Danh Mục Sản Phẩm</h2>
+    <div class="panel-heading">
+        <h2>Thông Tin Danh Mục Sản Phẩm</h2>
 
-    <div>
-        <label for="searchInput">Tìm kiếm:</label>
-        <input type="text" id="searchInput" @bind="searchQuery" placeholder="Nhập tên danh mục..." />
-        <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
-    
-    <label for="nameSort">Lọc theo tên:</label>
-    <select id="nameSort" @onchange="OnNameSortChanged" value="@nameSortOrder">
-        <option value="asc">Lọc theo tên từ A - Z</option>
-        <option value="desc">Lọc theo tên từ Z - A</option>
-    </select>
-    </div>
+        <div>
+            <label for="searchInput">Tìm kiếm:</label>
+            <input type="text" id="searchInput" @bind="searchQuery" placeholder="Nhập tên danh mục..." />
+            <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
+
+            <label for="nameSort">Lọc theo tên:</label>
+            <select id="nameSort" @onchange="OnNameSortChanged" value="@nameSortOrder">
+                <option value="asc">Lọc theo tên từ A - Z</option>
+                <option value="desc">Lọc theo tên từ Z - A</option>
+            </select>
+        </div>
     </div>
 
     <table class="table">
@@ -119,7 +121,7 @@
                 <tr>
                     <td>@item.Name</td>
                     <td><img src="@GetImagePath(item.Image)" width="100" height="100" /></td>
-                    <td>@(item.Status == 0 ? "Hợp lệ" : "Không hợp lệ")</td>
+                    <td>@(item.Status == 0 ? "Hiện" : "Ẩn")</td>
                     <td><a class="btn btn-success" href="EditCategoris/@item.CateID">Sửa</a></td>
                 </tr>
             }
@@ -152,20 +154,33 @@
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
     private int currentPage = 1;
     private int pageSize = 5;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await CallAPI();
-        ApplyFilters();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await CallAPI();
+                ApplyFilters();
+            }
+
+            StateHasChanged();
         }
     }
 

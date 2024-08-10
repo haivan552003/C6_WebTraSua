@@ -1,5 +1,6 @@
 ﻿@page "/AddCategories"
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
 
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text
@@ -10,7 +11,7 @@
 <EditForm Model="bannerData" OnValidSubmit="CreateeeBanner">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    
+
     <div class="form-group">
         <label class="font-weight-bold">Tiêu Đề</label>
         <InputText class="form-control" @bind-Value="bannerData.Name" />
@@ -19,7 +20,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="font-weight-bold">Hình Ảnh</label> <br/>
+        <label class="font-weight-bold">Hình Ảnh</label> <br />
         <InputFile OnChange="ChangeHandler" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>bannerData.Image"></ValidationMessage>
@@ -28,8 +29,8 @@
     <div class="form-group">
         <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="bannerData.Status">
-            <option value="0" selected>Hợp lệ</option>
-            <option value="1">Không hợp lệ</option>
+            <option value="0" selected>Hiện</option>
+            <option value="1">Ẩn</option>
         </InputSelect>
 
         <div class="text-danger ps-3">
@@ -55,14 +56,33 @@
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await CreateeeBanner();
+            }
+
+            StateHasChanged();
         }
     }
+
 
     private async Task GetSession()
     {

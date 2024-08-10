@@ -2,6 +2,7 @@
 @using System.Text
 @inject IJSRuntime jsRuntime
 @inject HttpClient httpClient
+@inject NavigationManager Navigation
 
 <div class="row">
     <div class="col-md-6">
@@ -58,8 +59,8 @@
             <div class="form-group">
                 <label class="font-weight-bold">Trạng Thái</label>
                 <InputSelect class="form-control" @bind-Value="proData.StatusID">
-                    <option value="0">Hợp lệ</option>
-                    <option value="1">Không hợp lệ</option>
+                    <option value="0">Hiện</option>
+                    <option value="1">Ẩn</option>
                 </InputSelect>
             </div>
 
@@ -111,13 +112,33 @@
     public string FormSubmitMessage { get; set; } = string.Empty;
     private bool IsLoggedIn = false;
     private int RoleID = 0;
-
+    private bool firstRenderCompleted = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCategories();
-        await LoadProduct();
-        await GetSession();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !firstRenderCompleted)
+        {
+            firstRenderCompleted = true;
+
+            await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await LoadCategories();
+                await LoadProduct();
+                await GetSession();
+            }
+
+            StateHasChanged();
+        }
     }
 
     private async Task LoadCategories()

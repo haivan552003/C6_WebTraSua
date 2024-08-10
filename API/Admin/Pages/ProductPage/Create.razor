@@ -40,8 +40,8 @@
             <div class="form-group">
                 <label class="font-weight-bold">Trạng Thái</label>
                 <InputSelect class="form-control" @bind-Value="proData.StatusID">
-                    <option value="0">Hợp lệ</option>
-                    <option value="1">Không hợp lệ</option>
+                    <option value="0">Hiện</option>
+                    <option value="1">Ẩn</option>
                 </InputSelect>
             </div>
 
@@ -76,6 +76,7 @@
 @code {
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
 
     string urlPro = "http://localhost:20714/api/Products";
     string urlCate = "http://localhost:20714/api/Categories";
@@ -92,10 +93,43 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CheckUserAccess();
-        await Load();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !firstRenderCompleted)
+        {
+            firstRenderCompleted = true;
+
+            await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                navManager.NavigateTo("/");
+            }
+            else
+            {
+                await CheckUserAccess();
+                await Load();
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetSession()
+    {
+        var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
+        if (!string.IsNullOrEmpty(userInfoJson))
+        {
+            var userInfo = JsonConvert.DeserializeObject<UserLogin>(userInfoJson);
+            if (userInfo != null)
+            {
+                IsLoggedIn = true;
+                RoleID = userInfo.RoleID;
+            }
+        }
+    }
     private async Task CheckUserAccess()
     {
         try

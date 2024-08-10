@@ -1,6 +1,7 @@
 ﻿@page "/CreateBlog"
 @using System.Text
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
 
 <link href="/validation.css" rel="stylesheet" />
 
@@ -15,13 +16,13 @@
 
     </div>
     <div class="form-group">
-        <label class="font-weight-bold">Hình Ảnh</label> <br/>
+        <label class="font-weight-bold">Hình Ảnh</label> <br />
         <InputFile OnChange="ChangeHandler" />
     </div>
     <div class="form-group">
         <label class="font-weight-bold">Nội Dung</label>
         <InputTextArea class="form-control" @bind-Value="BlogData.Decription">
-        <ValidationMessage For="@(() => BlogData.Decription)" />
+            <ValidationMessage For="@(() => BlogData.Decription)" />
         </InputTextArea>
     </div>
     <div class="form-group">
@@ -43,14 +44,33 @@
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await CreateeeBanner();
+            }
+
+            StateHasChanged();
         }
     }
+
 
     private async Task GetSession()
     {

@@ -4,6 +4,8 @@
 @using System.Net.Http.Headers
 @using Newtonsoft.Json
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
+
 
 <EditForm Model="BlogData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="UpdateBlog">
     <DataAnnotationsValidator />
@@ -28,8 +30,8 @@
         <label class="font-weight-bold">Hình Ảnh Hiện Tại</label>
         <div>
             <img src="@GetImagePath(BlogData.Image)" alt="Current Image" width="150" height="150" />
-        </div> <br/>
-        <label class="font-weight-bold">Chọn Hình Ảnh Mới</label> <br/>
+        </div> <br />
+        <label class="font-weight-bold">Chọn Hình Ảnh Mới</label> <br />
         <InputFile OnChange="OnInputFileChange" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>BlogData.Image"></ValidationMessage>
@@ -60,17 +62,35 @@
     private bool IsLoggedIn = false;
     private int RoleID = 0;
     private IBrowserFile selectedImageFile;
+    private bool firstRenderCompleted = false;
 
     [Parameter]
     public int Id { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+            }
+
+            StateHasChanged();
         }
     }
+
 
     private async Task GetSession()
     {

@@ -1,5 +1,6 @@
 ﻿@page "/getproduct"
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
 
 <style>
     .panel {
@@ -87,21 +88,21 @@
 </style>
 <p><a href="createproduct">Thêm Sản phẩm</a></p>
 <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2>Thông tin sản phẩm</h2>
-                <div>
-                    <label for="searchInput">Tìm kiếm:</label>
-                    <input type="text" id="searchInput" @bind="searchQuery" placeholder="Tên sản phẩm, loại sản phẩm..." />
-                    <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
+    <div class="panel-heading">
+        <h2>Thông tin sản phẩm</h2>
+        <div>
+            <label for="searchInput">Tìm kiếm:</label>
+            <input type="text" id="searchInput" @bind="searchQuery" placeholder="Tên sản phẩm, loại sản phẩm..." />
+            <button class="btn-search btn btn-primary" @onclick="OnSearchClicked">Tìm kiếm</button>
 
-                    <label for="productSort">Lọc theo trạng thái:</label>
-                    <select id="productSort" @onchange="sortStatus" value="@selectedStatus">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="0">Hợp lệ</option>
-                        <option value="1">Không Hợp lệ</option>
-                    </select>
-                </div>
+            <label for="productSort">Lọc theo trạng thái:</label>
+            <select id="productSort" @onchange="sortStatus" value="@selectedStatus">
+                <option value="">Tất cả trạng thái</option>
+                <option value="0">Hiện</option>
+                <option value="1">Ẩn</option>
+            </select>
         </div>
+    </div>
     <table class="table">
         <tr>
             <th style="width: 400px">Tên Sản Phẩm</th>
@@ -169,6 +170,7 @@
     private string searchQuery = string.Empty;
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
 
     public List<Product> product { get; set; } = new List<Product>();
     public List<Product> Fproduct { get; set; } = new List<Product>();
@@ -182,23 +184,37 @@
     private bool CanGoBack => currentPage > 1;
     private bool CanGoNext => currentPage < totalPages;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await CallAPI();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                await CallAPI();
+                ApplyFilters();
+            }
+
+            StateHasChanged();
         }
     }
 
+
     private async Task OnSearchClicked()
     {
-            ApplyFilters();
-       
+        ApplyFilters();
+
         currentPage = 1;
     }
 

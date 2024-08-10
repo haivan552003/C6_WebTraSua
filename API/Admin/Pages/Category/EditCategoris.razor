@@ -1,6 +1,7 @@
 ﻿@page "/EditCategoris/{id:int}"
 @using System.Text
 @inject IJSRuntime jsRuntime
+@inject NavigationManager Navigation
 
 <div class="panel-heading"><h2>Sửa Danh Mục Sản Phẩm</h2></div>
 
@@ -19,8 +20,8 @@
     <div class="form-group">
         <label class="font-weight-bold">Trạng Thái</label>
         <InputSelect class="form-control" @bind-Value="proData.Status">
-            <option value="0">Hợp lệ</option>
-            <option value="1">Không hợp lệ</option>
+            <option value="0">Hiện</option>
+            <option value="1">Ẩn</option>
         </InputSelect>
 
         <div class="text-danger ps-3">
@@ -36,7 +37,7 @@
     </div>
 
     <div class="form-group">
-        <label class="font-weight-bold">Tải Lên Hình Ảnh Mới</label> <br/>
+        <label class="font-weight-bold">Tải Lên Hình Ảnh Mới</label> <br />
         <InputFile OnChange="HandleFileSelected" />
         <div class="text-danger ps-3">
             <ValidationMessage For="()=>proData.Image"></ValidationMessage>
@@ -61,17 +62,35 @@
 
     private bool IsLoggedIn = false;
     private int RoleID = 0;
+    private bool firstRenderCompleted = false;
 
     [Parameter]
     public int Id { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !firstRenderCompleted)
         {
+            firstRenderCompleted = true;
+
             await GetSession();
+
+            if (!IsLoggedIn)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+            }
+
+            StateHasChanged();
         }
     }
+
 
     private async Task GetSession()
     {
