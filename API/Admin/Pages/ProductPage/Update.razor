@@ -1,6 +1,7 @@
 ﻿@page "/updatepro/{Id:int}"
 @using System.Text
 @inject IJSRuntime jsRuntime
+@inject HttpClient httpClient
 
 <div class="row">
     <div class="col-md-6">
@@ -114,20 +115,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Load();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await GetSession();
-        }
+        await LoadCategories();
+        await LoadProduct();
+        await GetSession();
     }
 
     private async Task LoadCategories()
     {
-        await Task.Delay(100);
         var userInfoJson = await jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "userSession");
         if (!string.IsNullOrEmpty(userInfoJson))
         {

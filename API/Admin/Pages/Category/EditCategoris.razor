@@ -2,7 +2,7 @@
 @using System.Text
 @inject IJSRuntime jsRuntime
 
-<div class="panel-heading"><h2>Sửa loại sản phẩm </h2></div>
+<div class="panel-heading"><h2>Sửa Danh Mục Sản Phẩm</h2></div>
 
 <EditForm Model="proData" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -28,6 +28,14 @@
             </ValidationMessage>
         </div>
     </div>
+    <div class="form-group">
+        <label class="font-weight-bold">Tải Lên Hình Ảnh Mới</label> <br/>
+        <InputFile OnChange="HandleFileSelected" />
+        <div class="text-danger ps-3">
+            <ValidationMessage For="()=>proData.Image"></ValidationMessage>
+        </div>
+    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Sửa Danh Mục</button>
     </div>

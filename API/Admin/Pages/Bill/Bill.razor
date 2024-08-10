@@ -11,51 +11,36 @@
         <h2>Thông tin hóa đơn</h2>
     </div>
 
-    @if (bill == null || !bill.Any())
-    {
-        <div class="alert alert-warning">
-            Không có hóa đơn nào để hiển thị.
-        </div>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
+    <!-- Table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 200px">Mã hóa đơn</th>
+                <th style="width: 150px">Ngày</th>
+                <th style="width: 200px">Thành tiền</th>
+                <th style="width: 250px">Người dùng</th>
+                <th style="width: 200px">Trạng thái</th>
+                <th style="width: 300px">Mã QR</th>
+                <th style="width: 200px">Xem chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bills in PaginatedBills)
+            {
                 <tr>
-                    <th>Mã hóa đơn</th>
-                    <th>Ngày</th>
-                    <th>Thành tiền</th>
-                    <th>Người dùng</th>
-                    <th>Trạng thái</th>
-                    <th>Mã QR</th>
-                    <th>Xem chi tiết</th>
+                    <td>@bills.BillId</td>
+                    <td>@bills.Date.ToShortDateString()</td>
+                    <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
+                    <td>@bills.User.Name</td>
+                    <td>@bills.Status.Name</td>
+                    <td>
+                        <img src="@GenerateQRCode(bills.BillId)" width="150px" height="150px" alt="QR Code" />
+                    </td>
+                    <td><a href="/billdetails/@bills.BillId">Xem chi tiết</a></td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var bills in bill)
-                {
-                    <tr>
-                        <td>@bills.BillId</td>
-                        <td>@bills.Date.ToShortDateString()</td>
-                        <td>@bills.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VNĐ</td>
-                        <td>@bills.User.Name</td>
-                        <td>@bills.Status.Name</td>
-                        <td>
-                            @if (string.IsNullOrEmpty(GenerateQRCode(bills.BillId)))
-                            {
-                                <span>Không có chi tiết hóa đơn</span>
-                            }
-                            else
-                            {
-                                <img src="@GenerateQRCode(bills.BillId)" width="150px" height="150px" alt="QR Code" />
-                            }
-                        </td>
-                        <td><a href="/billdetails/@bills.BillId">Xem chi tiết</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+            }
+        </tbody>
+    </table>
 </div>
 
 
