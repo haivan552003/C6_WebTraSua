@@ -14,19 +14,12 @@ namespace WebTraSua.Model
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "Tên không được bỏ trống")]
-        [MinLength(5, ErrorMessage = "Tên phải có ít nhất 5 ký tự")]
         [MaxLength(50, ErrorMessage = "Tên chỉ có thể có tối đa 50 ký tự")]
         public string Name { get; set; }
         public string Image { get; set; }
-
-        [Required(ErrorMessage = "Tài khoản không được bỏ trống")]
-        [MinLength(50, ErrorMessage = "Tài khoản phải có ít nhất 5 ký tự")]
-        [MaxLength(50, ErrorMessage = "Tài khoản chỉ có thể có tối đa 50 ký tự")]
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Mật khẩu không được bỏ trống")]
-        [MinLength(5, ErrorMessage = "Mật khẩu phải có ít nhất 5 ký tự")]
-        [MaxLength(50, ErrorMessage = "Mật khẩu chỉ có thể có tối đa 50 ký tự")]
         [CustomValidation(typeof(PasswordValidator), "ValidatePassword")]
         public string PassWord { get; set; }
 
@@ -34,7 +27,7 @@ namespace WebTraSua.Model
         public byte Gender { get; set; }
 
         [Required(ErrorMessage = "Số điện thoại không được bỏ trống")]
-        [RegularExpression(@"^(0[1-9][0-9]{8,9})$", ErrorMessage = "Số điện thoại phải bắt đầu bằng số 0 và chỉ nhập được 10 hoặc 11 số")]
+        [RegularExpression(@"^(0[1-9][0-9]{8})$", ErrorMessage = "Số điện thoại không hợp lệ")]
         public string Phone { get; set; }
 
         [Required(ErrorMessage = "Email không được bỏ trống")]
