@@ -44,41 +44,16 @@ namespace API.Controllers
             return Content(serializedData, "application/json");
         }
 
-        // GET: api/Bills/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Bill>>> GetBills(int id)
+        [HttpPut("{id}/update-status")]
+        public async Task<IActionResult> UpdateBillStatus(int id, [FromBody] int statusId)
         {
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve
-            };
-
-            var bills = await _context.bill
-                .Include(u => u.Status)
-                .Include(u => u.BillDetail)
-                .ThenInclude(u => u.Product)
-                .Where(u => u.UserID == id)
-                .ToListAsync();
-
-            if (bills == null || !bills.Any())
+            var bill = await _context.bill.FindAsync(id);
+            if (bill == null)
             {
                 return NotFound();
             }
 
-            var serializedData = JsonSerializer.Serialize(bills, options);
-            return Content(serializedData, "application/json");
-        }
-
-        // PUT: api/Bills/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutBill(int id, Bill bill)
-        {
-            if (id != bill.BillId)
-            {
-                return BadRequest();
-            }
-
+            bill.StatusID = statusId;
             _context.Entry(bill).State = EntityState.Modified;
 
             try
@@ -99,6 +74,96 @@ namespace API.Controllers
 
             return NoContent();
         }
+
+
+        // GET: api/Bills/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<Bill>>> GetBills(int id)
+        {
+            var bill = await _context.bill
+                .Include(u => u.User)
+                .Include(u => u.Status)
+                .Include(u => u.BillDetail)
+                .ThenInclude(u => u.Product)
+                .FirstOrDefaultAsync(u => u.BillId == id);
+
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(bill);
+        }
+
+        // PUT: api/Bills/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutBill(int id, Bill bills)
+        {
+            if (id != bills.BillId)
+            {
+                return BadRequest();
+            }
+
+            var bill = await _context.bill
+                .FirstOrDefaultAsync(p => p.BillId == id);
+
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            bill.Date = bills.Date;
+            bill.Total = bills.Total;
+            bill.UserID = bills.UserID;
+            bill.StatusID = bills.StatusID;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BillExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+        //public async Task<IActionResult> PutBill(int id, Bill bill)
+        //{
+        //    if (id != bill.BillId)
+        //    {
+        //        return BadRequest("Bill ID mismatch.");
+        //    }
+
+        //    _context.Entry(bill).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!BillExists(id))
+        //        {
+        //            return NotFound("Bill not found.");
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
 
         // POST: api/Bills
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

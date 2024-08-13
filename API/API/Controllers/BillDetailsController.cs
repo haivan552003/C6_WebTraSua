@@ -66,6 +66,7 @@ namespace API.Controllers
 
             var billdetail = await _context.bill_detail
                 .Include(u => u.Bill)
+                .Include(u => u.Product)
                 .Where(u => u.BillID == billId)
                 .ToListAsync();
 
