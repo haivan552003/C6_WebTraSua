@@ -38,6 +38,7 @@ namespace API.Controllers
                 .Include(u => u.BillDetail)
                 .ThenInclude(u => u.Product)
                 .ThenInclude(u => u.Image)
+                .OrderByDescending(u => u.BillId)
                 .ToListAsync();
 
             var serializedData = JsonSerializer.Serialize(billUserStatus, options);
@@ -58,6 +59,7 @@ namespace API.Controllers
                 .Include(u => u.BillDetail)
                 .ThenInclude(u => u.Product)
                 .Where(u => u.UserID == id)
+                .OrderByDescending(u => u.BillId)
                 .ToListAsync();
 
             if (bills == null || !bills.Any())

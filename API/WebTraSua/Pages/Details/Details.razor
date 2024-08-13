@@ -52,8 +52,9 @@
                         var imagesForProduct = product.Image.Where(img => img.ProductID == product.ProductID).ToList();
 
                         <img id="mainImage" src="@GetImagePath(imagesForProduct.First().Name)" class="img-fluid h-75 w-100 main-image" />
+
                         <div class="row secondary">
-                            @foreach (var image in product.Image.Take(4))
+                            @foreach (var image in imagesForProduct.Take(4))
                             {
                                 <div class="col-md-3">
                                     <img src="@GetImagePath(@image.Name)" class="img-fluid h-100 w-100 secondary-img" onclick="changeMainImage('@image.Name')" />
@@ -151,24 +152,19 @@
         </div>
         <div class="col-md-6">
             <h3>Mô tả sản phẩm</h3>
-            <div class="row">
-                <div class="col-6">
-                    <p><strong>Hương vị</strong><br>Ngọt vừa phải, đậm trà</p>
+            @if (product != null)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>@product.Description2</strong><br></p>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <p><strong>Topping đi kèm</strong><br>Chân châu đen, pudding</p>
-                </div>
-                <div class="col-6">
-                    <p><strong>Caffeine</strong><br>Không quá cao</p>
-                </div>
-                <div class="col-6">
-                    <p><strong>Năng lượng</strong><br>100KCALO</p>
-                </div>
-            </div>
+            }
             <hr>
             <h3>Nguyên liệu</h3>
             <p>Trà đen Phúc Long, bột béo, bột sữa, đường,.....</p>
         </div>
+
     </div>
     <div class="row same-product">
         <h2>Sản phẩm tương tự</h2>
@@ -191,16 +187,15 @@
                                 <img src="default.jpg" class="card-img-top h-75">
                             }
                             <div class="card-body">
-                                @*   <p class="card-text name">@similarProduct.Name</p>
-                            @if (similarProduct?.ProductID != null && similarProduct.ProductID.Any())
-                            {
-                            var sizeForProduct = similarProduct.ProductID.Where(size => size.ProductID == similarProduct.ProductID).ToList();
-                            if (sizeForProduct.Any())
-                            {
-                            var firstSize = sizeForProduct.FirstOrDefault();
-                            <h6>Giá: @firstSize.Price VNĐ</h6>
-                            }
-                            } *@
+                                <p class="card-text name">@similarProduct.Name</p>
+                                @if (similarProduct?.Size != null && similarProduct.Size.Any())
+                                {
+                                    var sizeForProduct = similarProduct.Size.Where(size => size.ProductID == similarProduct.ProductID).ToList();
+                                    if (sizeForProduct.Any())
+                                    {
+                                        var firstSize = sizeForProduct.FirstOrDefault();
+                                    }
+                                }
 
                             </div>
                         </div>
@@ -211,6 +206,37 @@
         <div class="col-md-2"></div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel" style="text-align:center">Thông báo</h5>
+            </div>
+            <div class="modal-body text-center">
+                <img src="https://media1.tenor.com/m/BntXpMlrGuEAAAAC/check-correct.gif" alt="Loading" class="img-fluid mb-3">
+                <p class="text-success">Sản phẩm đã được thêm vào giỏ hàng</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function changeMainImage(imageName) {
+        document.getElementById('mainImage').src = `http://localhost:49972/images/${imageName}`;
+    }
+
+    function showSuccessModal() {
+        var modal = new bootstrap.Modal(document.getElementById('successModal'));
+        modal.show();
+
+        setTimeout(function () {
+            modal.hide();
+        }, 1500);
+    }
+</script>
 
 @code {
     [Parameter]
@@ -288,7 +314,7 @@
                 var updatedCartJson = JsonConvert.SerializeObject(cartItems);
                 await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "cartItems", updatedCartJson);
 
-                Console.WriteLine("Sản phẩm đã được thêm vào giỏ hàng.");
+                await jsRuntime.InvokeVoidAsync("showSuccessModal");
             }
         }
         else
@@ -296,6 +322,7 @@
             Console.WriteLine("Vui lòng chọn kích cỡ.");
         }
     }
+
 
 
     private void HandleBuyNowClick()
@@ -338,7 +365,11 @@
                 product.Image = images;
             }
         }
+
+        // Load similar products
+        await LoadSimilarProducts();
     }
+
 
     private async Task LoadSimilarProducts()
     {
@@ -354,6 +385,7 @@
             }
         }
     }
+
 
     public async Task<int> GetBillIDByUserName(string userName)
     {
