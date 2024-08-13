@@ -4,63 +4,111 @@
 @inject HttpClient HttpClient
 @inject IJSRuntime jsRuntime
 
-<h3>Lịch Sử Đơn Hàng</h3>
 
 @if (bills != null && bills.Count > 0)
 {
-    foreach (var bill in bills)
-    {
-        <div class="card mb-3">
-            <div class="card-header">
-                <h4>
-                    Hóa Đơn #@bill.BillId -
-                    <a href="#" class="font-weight-bold fs-24 text-primary"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="right"
-                       title="Bấm vào để thay đổi trạng thái">
-                        @bill.Status.Name
-                    </a>
-                </h4>
-                <p>Ngày đặt: @bill.Date.ToString("dd/MM/yyyy")</p>
-                <p>Tổng Hóa Đơn: @bill.Total VNĐ</p>
-            </div>
-            <div class="card-body">
-                <h5>Chi Tiết Hóa Đơn</h5>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Sản Phẩm</th>
-                            <th>Số Lượng</th>
-                            <th>Giá</th>
-                            <th>Tổng Cộng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var detail in bill.BillDetail)
-                        {
-                            var price = detail.Subtotal / (detail.Quality > 0 ? detail.Quality : 1);
-                            <tr>
-                                <td>@detail.Product.Name</td>
-                                <td>@detail.Quality</td>
-                                <td>@price VNĐ</td>
-                                <td>@detail.Subtotal VNĐ</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+   <div class="row mb-4">
+        <div class="col-md-4">
+            <h3>Lịch Sử Đơn Hàng</h3>
         </div>
+       <div class="col-md-4"></div>
+       <div class="col-md-4">
+            <select class="form-select" id="productSort" @onchange="sortStatus" value="@selectedStatus">
+                <option value="">Tất cả trạng thái</option>
+                <option value="1">Đã đặt</option>
+                <option value="2">Đã hủy</option>
+            </select>
+       </div>
+   </div>
+
+    @if (PaginatedProducts.Any())
+    {
+        foreach (var bill in PaginatedProducts)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4>
+                        Hóa Đơn #@bill.BillId -
+                        <a href="#" class="font-weight-bold fs-24 text-primary"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="right"
+                           title="Bấm vào để thay đổi trạng thái">
+                            @bill.Status.Name
+                        </a>
+                    </h4>
+                    <p>Ngày đặt: @bill.Date.ToString("dd/MM/yyyy")</p>
+                    <p>Tổng Hóa Đơn: @bill.Total VNĐ</p>
+                </div>
+                <div class="card-body">
+                    <h5>Chi Tiết Hóa Đơn</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sản Phẩm</th>
+                                <th>Số Lượng</th>
+                                <th>Giá</th>
+                                <th>Tổng Cộng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in bill.BillDetail)
+                            {
+                                var price = detail.Subtotal / (detail.Quality > 0 ? detail.Quality : 1);
+                                <tr>
+                                    <td>@detail.Product.Name</td>
+                                    <td>@detail.Quality</td>
+                                    <td>@price VNĐ</td>
+                                    <td>@detail.Subtotal VNĐ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <nav aria-label="Page navigation example mt-4">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" @onclick="PreviousPage" disabled="@(!CanGoBack)">
+                        <span aria-hidden="true">&laquo; Trước</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <span class="page-link text-black">Trang @currentPage trên @totalPages</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" @onclick="NextPage" disabled="@(!CanGoNext)">
+                        <span aria-hidden="true">Tiếp &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p>Không có hóa đơn nào để hiển thị.</p>
     }
 }
 else
 {
-    <p>Bạn chưa có đơn hàng nào.</p>
+    <p>Bạn chưa có đơn hàng đã hủy, hãy cố gắng trở thành người mua hàng gương mẫu nhé.</p>
 }
 
 @code {
     private List<Bill> bills = new List<Bill>();
+    private List<Bill> filteredProducts = new List<Bill>();
+
     private bool IsLoggedIn = false;
     private int UserID = 0;
+    private string selectedStatus = string.Empty;
+
+    private int currentPage = 1;
+    private int pageSize = 2; // Adjust as needed
+    private int totalPages => (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+    private List<Bill> PaginatedProducts => filteredProducts.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    private bool CanGoBack => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,6 +117,13 @@ else
         {
             await LoadBills();
         }
+    }
+
+    private async Task sortStatus(ChangeEventArgs e)
+    {
+        selectedStatus = e.Value.ToString();
+        ApplyFilters();
+        currentPage = 1;
     }
 
     private async Task LoadBills()
@@ -81,6 +136,7 @@ else
                     PropertyNameCaseInsensitive = true,
                     ReferenceHandler = ReferenceHandler.Preserve
                 }) ?? new List<Bill>();
+            ApplyFilters();
         }
         catch (Exception ex)
         {
@@ -100,6 +156,40 @@ else
                 IsLoggedIn = true;
                 UserID = userInfo.UserID;
             }
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        var filtered = bills.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(selectedStatus))
+        {
+            if (int.TryParse(selectedStatus, out int status))
+            {
+                filtered = filtered.Where(p => p.StatusID == status);
+            }
+        }
+
+        filteredProducts = filtered.ToList();
+        currentPage = 1; // Reset to first page after filtering
+    }
+
+    private void PreviousPage()
+    {
+        if (CanGoBack)
+        {
+            currentPage--;
+            StateHasChanged();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoNext)
+        {
+            currentPage++;
+            StateHasChanged();
         }
     }
 }
