@@ -1,0 +1,141 @@
+﻿@page "/stats/annual"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<style>
+    .panel {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-heading {
+        background-color: #007bff;
+        color: white;
+        padding: 15px 15px 5px 15px;
+        border-radius: 8px 8px 0 0;
+    }
+
+        .panel-heading h2 {
+            margin: 0;
+        }
+
+    .table {
+        margin: 20px 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table tr:hover {
+            background-color: #e9ecef;
+        }
+
+    select, input {
+        padding: 5px;
+        margin: 5px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+
+    .btn-search {
+        height: 40px;
+        margin-right: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+</style>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h2>Thống Kê Doanh Thu Hàng Năm</h2>
+        <div>
+            <label for="year">Chọn năm:</label>
+            <input type="number" id="year" @bind="selectedYear" min="2000" max="2100" />
+
+            <button class="btn-search btn btn-primary" @onclick="FetchAnnualStats">Xem thống kê</button>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Trạng Thái</th>
+                <th>Tổng Doanh Thu</th>
+                <th>Số Lượng Hóa Đơn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var statusStat in FilteredStatusStats)
+            {
+                <tr>
+                    <td>@statusStat.Status</td>
+                    <td>@statusStat.TotalRevenue.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) VND</td>
+                    <td>@statusStat.TotalBills</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private int selectedYear = DateTime.Now.Year;
+    private AnnualStatsResponse annualStats;
+    private IEnumerable<StatusStat> FilteredStatusStats => annualStats?.StatusStats ?? Enumerable.Empty<StatusStat>();
+
+    private async Task FetchAnnualStats()
+    {
+        var url = $"http://localhost:20714/api/Bills/stats/annual?year={selectedYear}";
+
+        try
+        {
+            annualStats = await Http.GetFromJsonAsync<AnnualStatsResponse>(url);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching annual stats: {ex.Message}");
+        }
+    }
+
+    public class AnnualStatsResponse
+    {
+        public int Year { get; set; }
+        public List<StatusStat> StatusStats { get; set; }
+    }
+
+    public class StatusStat
+    {
+        public string Status { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public int TotalBills { get; set; }
+        public List<BillDetail> Bills { get; set; }
+    }
+
+    public class BillDetail
+    {
+        public int BillId { get; set; }
+        public DateTime Date { get; set; }
+        public string Name { get; set; }
+        public decimal Total { get; set; }
+        public string Status { get; set; }
+    }
+}

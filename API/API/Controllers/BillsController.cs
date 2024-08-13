@@ -118,6 +118,153 @@ namespace API.Controllers
             return CreatedAtAction("GetBill", new { id = bill.BillId }, newBill);
         }
 
+        // GET: api/Bills/stats/daily
+        [HttpGet("stats/daily")]
+        public async Task<ActionResult> GetDailyStats(DateTime date)
+        {
+            var bills = await _context.bill
+                .Where(b => b.Date.Date == date.Date)
+                .Include(b => b.Status)
+                .Include(b => b.User)
+                .ToListAsync();
+
+            var statusStats = bills
+                .GroupBy(b => b.Status.Name)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    TotalRevenue = g.Sum(b => b.Total),
+                    TotalBills = g.Count(),
+                    Bills = g.Select(b => new
+                    {
+                        b.BillId,
+                        b.Date,
+                        b.User.Name,
+                        b.Total,
+                        Status = b.Status.Name
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                Date = date.Date,
+                StatusStats = statusStats
+            });
+        }
+
+
+        // GET: api/Bills/stats/monthly
+        [HttpGet("stats/monthly")]
+        public async Task<ActionResult> GetMonthlyStats(int year, int month)
+        {
+            var bills = await _context.bill
+                .Where(b => b.Date.Year == year && b.Date.Month == month)
+                .Include(b => b.Status)
+                .Include(b => b.User)
+                .ToListAsync();
+
+            var statusStats = bills
+                .GroupBy(b => b.Status.Name)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    TotalRevenue = g.Sum(b => b.Total),
+                    TotalBills = g.Count(),
+                    Bills = g.Select(b => new
+                    {
+                        b.BillId,
+                        b.Date,
+                        b.User.Name,
+                        b.Total,
+                        Status = b.Status.Name
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                Year = year,
+                Month = month,
+                StatusStats = statusStats
+            });
+        }
+
+
+        // GET: api/Bills/stats/annual
+        [HttpGet("stats/annual")]
+        public async Task<ActionResult> GetAnnualStats(int year)
+        {
+            var bills = await _context.bill
+                .Where(b => b.Date.Year == year)
+                .Include(b => b.Status)
+                .Include(b => b.User)
+                .ToListAsync();
+
+            var statusStats = bills
+                .GroupBy(b => b.Status.Name)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    TotalRevenue = g.Sum(b => b.Total),
+                    TotalBills = g.Count(),
+                    Bills = g.Select(b => new
+                    {
+                        b.BillId,
+                        b.Date,
+                        b.User.Name,
+                        b.Total,
+                        Status = b.Status.Name
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                Year = year,
+                StatusStats = statusStats
+            });
+        }
+
+
+        // GET: api/Bills/stats/user
+        [HttpGet("stats/user")]
+        public async Task<ActionResult> GetStatsByUser(int year, int month)
+        {
+            var bills = await _context.bill
+                .Where(b => b.Date.Year == year && b.Date.Month == month)
+                .Include(b => b.Status)
+                .Include(b => b.User)
+                .ToListAsync();
+
+            var userStats = bills
+                .GroupBy(b => b.UserID)
+                .Select(g => new
+                {
+                    UserID = g.Key,
+                    UserName = g.FirstOrDefault()?.User.UserName,
+                    StatusStats = g
+                        .GroupBy(b => b.Status.Name)
+                        .Select(sg => new
+                        {
+                            Status = sg.Key,
+                            TotalRevenue = sg.Sum(b => b.Total),
+                            TotalBills = sg.Count()
+                        })
+                        .ToList(),
+                    TotalRevenue = g.Sum(b => b.Total),
+                    TotalBills = g.Count()
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                Year = year,
+                Month = month,
+                UserStats = userStats
+            });
+        }
+
         private bool BillExists(int id)
         {
             return _context.bill.Any(e => e.BillId == id);
