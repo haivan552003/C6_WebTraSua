@@ -1,0 +1,143 @@
+﻿@page "/statistics"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Thống Kê Doanh Thu</PageTitle>
+<h3>Thống Kê Doanh Thu</h3>
+
+<div class="container">
+    <h4>Thống Kê Theo Ngày</h4>
+    <EditForm Model="@dailyStatsModel" OnValidSubmit="GetDailyStats">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="dailyDate" class="form-label">Ngày</label>
+            <InputDate id="dailyDate" @bind-Value="dailyStatsModel.Date" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="dailyStatusId" class="form-label">Trạng Thái ID</label>
+            <InputNumber id="dailyStatusId" @bind-Value="dailyStatsModel.StatusId" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lấy Dữ Liệu</button>
+    </EditForm>
+
+    @if (dailyStatsResult != null)
+    {
+        <div class="mt-3">
+            <h5>Kết Quả Thống Kê Theo Ngày:</h5>
+            <pre>@dailyStatsResult</pre>
+        </div>
+    }
+
+    <h4>Thống Kê Theo Tháng</h4>
+    <EditForm Model="@monthlyStatsModel" OnValidSubmit="GetMonthlyStats">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="monthlyYear" class="form-label">Năm</label>
+            <InputNumber id="monthlyYear" @bind-Value="monthlyStatsModel.Year" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="monthlyMonth" class="form-label">Tháng</label>
+            <InputNumber id="monthlyMonth" @bind-Value="monthlyStatsModel.Month" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="monthlyStatusId" class="form-label">Trạng Thái ID</label>
+            <InputNumber id="monthlyStatusId" @bind-Value="monthlyStatsModel.StatusId" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lấy Dữ Liệu</button>
+    </EditForm>
+
+    @if (monthlyStatsResult != null)
+    {
+        <div class="mt-3">
+            <h5>Kết Quả Thống Kê Theo Tháng:</h5>
+            <pre>@monthlyStatsResult</pre>
+        </div>
+    }
+
+    <h4>Thống Kê Theo Năm</h4>
+    <EditForm Model="@yearlyStatsModel" OnValidSubmit="GetYearlyStats">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="yearlyYear" class="form-label">Năm</label>
+            <InputNumber id="yearlyYear" @bind-Value="yearlyStatsModel.Year" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="yearlyStatusId" class="form-label">Trạng Thái ID</label>
+            <InputNumber id="yearlyStatusId" @bind-Value="yearlyStatsModel.StatusId" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lấy Dữ Liệu</button>
+    </EditForm>
+
+    @if (yearlyStatsResult != null)
+    {
+        <div class="mt-3">
+            <h5>Kết Quả Thống Kê Theo Năm:</h5>
+            <pre>@yearlyStatsResult</pre>
+        </div>
+    }
+</div>
+
+@code {
+    private DailyStatsModel dailyStatsModel = new DailyStatsModel();
+    private MonthlyStatsModel monthlyStatsModel = new MonthlyStatsModel();
+    private YearlyStatsModel yearlyStatsModel = new YearlyStatsModel();
+
+    private string dailyStatsResult;
+    private string monthlyStatsResult;
+    private string yearlyStatsResult;
+
+    private async Task GetDailyStats()
+    {
+        var response = await GetStatsAsync($"http://localhost:20714/api/Bills/stats/daily?date={dailyStatsModel.Date:yyyy-MM-dd}&statusId={dailyStatsModel.StatusId}");
+        dailyStatsResult = response;
+    }
+
+    private async Task GetMonthlyStats()
+    {
+        var response = await GetStatsAsync($"http://localhost:20714/api/Bills/stats/monthly?year={monthlyStatsModel.Year}&month={monthlyStatsModel.Month}&statusId={monthlyStatsModel.StatusId}");
+        monthlyStatsResult = response;
+    }
+
+    private async Task GetYearlyStats()
+    {
+        var response = await GetStatsAsync($"http://localhost:20714/api/Bills/stats/yearly?year={yearlyStatsModel.Year}&statusId={yearlyStatsModel.StatusId}");
+        yearlyStatsResult = response;
+    }
+
+    private async Task<string> GetStatsAsync(string apiEndpoint)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var response = await httpClient.GetAsync(apiEndpoint);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            return "Lỗi khi lấy dữ liệu từ API.";
+        }
+    }
+
+    public class DailyStatsModel
+    {
+        public DateTime Date { get; set; }
+        public int StatusId { get; set; }
+    }
+
+    public class MonthlyStatsModel
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int StatusId { get; set; }
+    }
+
+    public class YearlyStatsModel
+    {
+        public int Year { get; set; }
+        public int StatusId { get; set; }
+    }
+}
